@@ -25,7 +25,13 @@ public static class LicensingManager
     private static BirooniLicenseClient? _client;
     public static BirooniLicenseClient Client => _client ??= new BirooniLicenseClient(ApiBaseUrl, PublicKeyPem, "2026.1.0");
 
+    private static Birooni.Client.Updates.UpdateChecker? _updateChecker;
+    public static Birooni.Client.Updates.UpdateChecker UpdateChecker => _updateChecker ??= new Birooni.Client.Updates.UpdateChecker(ApiBaseUrl);
+
     public static LicenseValidationResult? CurrentStatus { get; private set; }
+    public static Birooni.Client.Updates.AppUpdateInfo? AvailableUpdate { get; private set; }
+
+    public static event EventHandler<Birooni.Client.Updates.AppUpdateInfo>? UpdateDetected;
 
     public static bool IsLicenseValid => CurrentStatus?.IsGranted == true;
 
@@ -41,6 +47,25 @@ public static class LicensingManager
         };
 
         CurrentStatus = await Client.InitializeLicenseAsync();
+
+        // Concurrently check for updates in background (non-blocking)
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var update = await UpdateChecker.CheckAsync("BiruBox", "1.0.0");
+                if (update?.UpdateAvailable == true)
+                {
+                    AvailableUpdate = update;
+                    UpdateDetected?.Invoke(null, update);
+                }
+            }
+            catch
+            {
+                // Silent
+            }
+        });
+
         return CurrentStatus;
     }
 

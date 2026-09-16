@@ -36,8 +36,24 @@ public class License
     [Column("license_type")]
     public string LicenseType { get; set; } = "Standard";
 
+    [Required]
+    [MaxLength(50)]
+    [Column("license_mode")]
+    public string LicenseMode { get; set; } = "Individual"; // Individual, SiteLicense, Floating
+
+    [MaxLength(200)]
+    [Column("company")]
+    public string? Company { get; set; }
+
+    [MaxLength(100)]
+    [Column("allowed_domain")]
+    public string? AllowedDomain { get; set; } // e.g. "@firm.com" for SiteLicense
+
     [Column("max_activations")]
     public int MaxActivations { get; set; } = 1;
+
+    [Column("concurrent_seats")]
+    public int? ConcurrentSeats { get; set; } // For Floating licenses
 
     [Column("is_active")]
     public bool IsActive { get; set; } = true;

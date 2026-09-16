@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birooni Tools — Licensing & Updates Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#f0fdf4', 500: '#22c55e', 600: '#16a34a', 700: '#15803d', 800: '#166534', 900: '#14532d' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+  <div id="app" class="flex flex-col min-h-screen">
+
+    <!-- Top Navbar -->
+    <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/60 sticky top-0 z-30">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <i class="fa-solid fa-cube text-white text-lg"></i>
+          </div>
+          <div>
+            <h1 class="font-bold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300">Birooni Tools</h1>
+            <p class="text-xs text-slate-400">Licensing & Update Infrastructure</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <!-- API Endpoint Selector -->
+          <div class="hidden sm:flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-700 text-xs text-slate-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-slate-400">API:</span>
+            <input id="apiBaseUrl" type="text" value="https://birooni-licensing.onrender.com" class="bg-transparent border-none text-xs focus:outline-none w-56 text-slate-200" onchange="saveApiUrl()">
+          </div>
+
+          <!-- Auth Status & Key Button -->
+          <button onclick="openKeyModal()" class="flex items-center gap-2 text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-600 transition">
+            <i class="fa-solid fa-key text-amber-400"></i>
+            <span id="authStatusText">Admin Key Configured</span>
+          </button>
+
+          <button onclick="refreshAll()" class="p-2 text-slate-400 hover:text-white bg-slate-700 hover:bg-slate-600 rounded-lg transition" title="Refresh data">
+            <i class="fa-solid fa-arrows-rotate"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+      <!-- Metrics KPI Cards -->
+      <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4" id="statsGrid">
+        <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-xl">
+          <p class="text-xs font-medium text-slate-400">Total Licenses</p>
+          <p id="statTotalLicenses" class="text-2xl font-bold text-white mt-1">-</p>
+        </div>
+        <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-xl">
+          <p class="text-xs font-medium text-slate-400">Active Commercial</p>
+          <p id="statActiveLicenses" class="text-2xl font-bold text-emerald-400 mt-1">-</p>
+        </div>
+        <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-xl">
+          <p class="text-xs font-medium text-slate-400">14-Day Trials</p>
+          <p id="statTrialLicenses" class="text-2xl font-bold text-blue-400 mt-1">-</p>
+        </div>
+        <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-xl">
+          <p class="text-xs font-medium text-slate-400">Active Devices</p>
+          <p id="statActiveDevices" class="text-2xl font-bold text-purple-400 mt-1">-</p>
+        </div>
+        <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-xl">
+          <p class="text-xs font-medium text-slate-400">Releases</p>
+          <p id="statTotalReleases" class="text-2xl font-bold text-amber-400 mt-1">-</p>
+        </div>
+        <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-xl">
+          <p class="text-xs font-medium text-slate-400">Pings (24h)</p>
+          <p id="statValidations" class="text-2xl font-bold text-teal-400 mt-1">-</p>
+        </div>
+      </section>
+
+      <!-- Navigation Tabs & Action Bar -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-700 pb-4">
+        <div class="flex items-center gap-2">
+          <button onclick="switchTab('licenses')" id="tabBtnLicenses" class="px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-600 text-white transition flex items-center gap-2">
+            <i class="fa-solid fa-certificate"></i> Licenses
+          </button>
+          <button onclick="switchTab('devices')" id="tabBtnDevices" class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-2">
+            <i class="fa-solid fa-laptop"></i> Devices
+          </button>
+          <button onclick="switchTab('releases')" id="tabBtnReleases" class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-2">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Releases
+          </button>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button onclick="openCreateLicenseModal()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-md shadow-emerald-500/10 flex items-center gap-2 transition">
+            <i class="fa-solid fa-plus"></i> New License
+          </button>
+          <button onclick="openPublishReleaseModal()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg text-sm font-medium border border-slate-600 flex items-center gap-2 transition">
+            <i class="fa-solid fa-upload"></i> Publish Release
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 1: LICENSES -->
+      <section id="tabLicenses" class="space-y-4">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="relative w-full sm:w-80">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-sm"></i>
+            <input type="text" id="licenseSearchInput" oninput="debounceLoadLicenses()" placeholder="Search key, email, company..." class="w-full bg-slate-800 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+          </div>
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <select id="filterLicenseMode" onchange="loadLicenses()" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none">
+              <option value="">All Modes</option>
+              <option value="Individual">Individual</option>
+              <option value="SiteLicense">Site License (@domain)</option>
+              <option value="Floating">Floating Pool</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="bg-slate-800/70 border border-slate-700 rounded-xl overflow-hidden shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-900/60 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700">
+                <tr>
+                  <th class="py-3.5 px-4 font-semibold">License Key</th>
+                  <th class="py-3.5 px-4 font-semibold">Product</th>
+                  <th class="py-3.5 px-4 font-semibold">Customer / Company</th>
+                  <th class="py-3.5 px-4 font-semibold">Mode</th>
+                  <th class="py-3.5 px-4 font-semibold">Seats</th>
+                  <th class="py-3.5 px-4 font-semibold">Status / Expiry</th>
+                  <th class="py-3.5 px-4 font-semibold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="licensesTableBody" class="divide-y divide-slate-700/60 text-slate-300 font-mono text-xs">
+                <tr><td colspan="7" class="py-8 text-center text-slate-500 font-sans">Loading licenses...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: DEVICES -->
+      <section id="tabDevices" class="space-y-4 hidden">
+        <div class="relative w-full sm:w-80">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-sm"></i>
+          <input type="text" id="deviceSearchInput" oninput="debounceLoadDevices()" placeholder="Search machine, user, key..." class="w-full bg-slate-800 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div class="bg-slate-800/70 border border-slate-700 rounded-xl overflow-hidden shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-900/60 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700">
+                <tr>
+                  <th class="py-3.5 px-4 font-semibold">Hardware Device ID</th>
+                  <th class="py-3.5 px-4 font-semibold">Workstation Name</th>
+                  <th class="py-3.5 px-4 font-semibold">License Key</th>
+                  <th class="py-3.5 px-4 font-semibold">Customer Email</th>
+                  <th class="py-3.5 px-4 font-semibold">Version</th>
+                  <th class="py-3.5 px-4 font-semibold">Last Validated</th>
+                  <th class="py-3.5 px-4 font-semibold text-right">Seat Control</th>
+                </tr>
+              </thead>
+              <tbody id="devicesTableBody" class="divide-y divide-slate-700/60 text-slate-300 font-mono text-xs">
+                <tr><td colspan="7" class="py-8 text-center text-slate-500 font-sans">Loading activated devices...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: RELEASES -->
+      <section id="tabReleases" class="space-y-4 hidden">
+        <div class="bg-slate-800/70 border border-slate-700 rounded-xl overflow-hidden shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-900/60 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-700">
+                <tr>
+                  <th class="py-3.5 px-4 font-semibold">Product</th>
+                  <th class="py-3.5 px-4 font-semibold">Version</th>
+                  <th class="py-3.5 px-4 font-semibold">Revit Support</th>
+                  <th class="py-3.5 px-4 font-semibold">Download URL</th>
+                  <th class="py-3.5 px-4 font-semibold">Release Date</th>
+                  <th class="py-3.5 px-4 font-semibold">Release Notes</th>
+                </tr>
+              </thead>
+              <tbody id="releasesTableBody" class="divide-y divide-slate-700/60 text-slate-300 text-xs">
+                <tr><td colspan="6" class="py-8 text-center text-slate-500">Loading published releases...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal: Create License -->
+    <div id="modalCreateLicense" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-plus-circle text-emerald-400"></i> Generate New License
+          </h3>
+          <button onclick="closeModal('modalCreateLicense')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <form id="createLicenseForm" onsubmit="submitCreateLicense(event)" class="space-y-3 text-xs">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 font-medium mb-1">Product</label>
+              <select id="inpProduct" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
+                <option value="BiruBox">BiruBox (Section Box)</option>
+                <option value="BirooniSuite">BirooniSuite (All-in-One)</option>
+                <option value="Robot">View Reference Robot</option>
+                <option value="ProjectSetupTools">Project Setup Tools</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 font-medium mb-1">License Mode</label>
+              <select id="inpLicenseMode" onchange="toggleModeFields()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
+                <option value="Individual">Individual (User + Hardware)</option>
+                <option value="SiteLicense">Site License (@domain.com)</option>
+                <option value="Floating">Floating Pool (Concurrent)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Customer Full Name</label>
+            <input type="text" id="inpCustomerName" required placeholder="e.g. John Architect" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 font-medium mb-1">Customer Email</label>
+              <input type="email" id="inpCustomerEmail" required placeholder="john@firm.com" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
+            </div>
+            <div>
+              <label class="block text-slate-400 font-medium mb-1">Company / Firm Name</label>
+              <input type="text" id="inpCompany" placeholder="e.g. Gensler Architects" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
+            </div>
+          </div>
+
+          <div id="siteLicenseDiv" class="hidden bg-slate-900/60 p-3 rounded-lg border border-slate-700">
+            <label class="block text-emerald-400 font-medium mb-1">Authorized Domain (for Site License)</label>
+            <input type="text" id="inpAllowedDomain" placeholder="e.g. @gensler.com" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
+            <p class="text-[10px] text-slate-400 mt-1">Any user with an email ending in this domain can activate.</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 font-medium mb-1">Max PC Activations</label>
+              <input type="number" id="inpMaxActivations" value="2" min="1" max="1000" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
+            </div>
+            <div>
+              <label class="block text-slate-400 font-medium mb-1">Duration (Days)</label>
+              <input type="number" id="inpDurationDays" value="365" placeholder="Empty = Perpetual" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Custom License Key (Optional)</label>
+            <input type="text" id="inpCustomKey" placeholder="Leave empty to auto-generate (e.g. BIRU-XXXX-XXXX)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200 font-mono">
+          </div>
+
+          <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
+            <button type="button" onclick="closeModal('modalCreateLicense')" class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300">Cancel</button>
+            <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium">Issue License</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: Publish Release -->
+    <div id="modalPublishRelease" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-cloud-arrow-up text-blue-400"></i> Publish Plugin Release / Update
+          </h3>
+          <button onclick="closeModal('modalPublishRelease')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <form id="publishReleaseForm" onsubmit="submitPublishRelease(event)" class="space-y-3 text-xs">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 font-medium mb-1">Product</label>
+              <select id="relProduct" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
+                <option value="BiruBox">BiruBox</option>
+                <option value="BirooniSuite">BirooniSuite</option>
+                <option value="Robot">Robot</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 font-medium mb-1">New Version</label>
+              <input type="text" id="relVersion" required placeholder="e.g. 1.1.0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-400 font-medium mb-1">Revit Target Version</label>
+              <select id="relRevitVersion" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
+                <option value="All">All (2025 - 2027)</option>
+                <option value="2025">Revit 2025</option>
+                <option value="2026">Revit 2026</option>
+                <option value="2027">Revit 2027</option>
+              </select>
+            </div>
+            <div class="flex items-center pt-5">
+              <label class="flex items-center gap-2 cursor-pointer text-slate-300">
+                <input type="checkbox" id="relIsMandatory" class="rounded bg-slate-900 border-slate-700 text-emerald-600 focus:ring-0">
+                <span>Mandatory Update</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Installer Download URL (.msi)</label>
+            <input type="url" id="relDownloadUrl" required placeholder="https://download.birooni.com/BiruBox-Setup-v1.1.0.msi" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
+          </div>
+
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Release Notes / Changelog</label>
+            <textarea id="relReleaseNotes" rows="4" placeholder="• Added automatic boundary buffer&#10;• Fixed Revit 2026 crash" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200"></textarea>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-3 border-t border-slate-700">
+            <button type="button" onclick="closeModal('modalPublishRelease')" class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300">Cancel</button>
+            <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium">Publish Release</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: Admin Key Setting -->
+    <div id="modalAdminKey" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-key text-amber-400"></i> Set Admin API Key
+        </h3>
+        <p class="text-xs text-slate-400">Enter the secret key configured in your ASP.NET Core API environment (<code class="text-amber-300">ADMIN_API_KEY</code>).</p>
+        <input type="password" id="inpAdminKey" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 font-mono" placeholder="birooni-admin-secret-2026">
+        <div class="flex justify-end gap-2 pt-2">
+          <button onclick="closeModal('modalAdminKey')" class="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 text-xs">Cancel</button>
+          <button onclick="saveAdminKey()" class="px-4 py-2 rounded-lg bg-emerald-600 text-white text-xs font-medium">Save Key</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const DEFAULT_KEY = "birooni-admin-secret-2026";
+    let adminKey = localStorage.getItem("birooni_admin_key") || DEFAULT_KEY;
+    let apiBase = localStorage.getItem("birooni_api_url") || "https://birooni-licensing.onrender.com";
+
+    document.getElementById("apiBaseUrl").value = apiBase;
+
+    function saveApiUrl() {
+      apiBase = document.getElementById("apiBaseUrl").value.trim().replace(/\/$/, "");
+      localStorage.setItem("birooni_api_url", apiBase);
+      refreshAll();
+    }
+
+    function openKeyModal() {
+      document.getElementById("inpAdminKey").value = adminKey;
+      openModal("modalAdminKey");
+    }
+
+    function saveAdminKey() {
+      const val = document.getElementById("inpAdminKey").value.trim();
+      if (val) {
+        adminKey = val;
+        localStorage.setItem("birooni_admin_key", adminKey);
+      }
+      closeModal("modalAdminKey");
+      refreshAll();
+    }
+
+    function getHeaders() {
+      return {
+        "Content-Type": "application/json",
+        "X-Admin-Key": adminKey
+      };
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove("hidden"); }
+    function closeModal(id) { document.getElementById(id).classList.add("hidden"); }
+
+    function switchTab(tab) {
+      document.getElementById("tabLicenses").classList.add("hidden");
+      document.getElementById("tabDevices").classList.add("hidden");
+      document.getElementById("tabReleases").classList.add("hidden");
+
+      document.getElementById("tabBtnLicenses").className = "px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-2";
+      document.getElementById("tabBtnDevices").className = "px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-2";
+      document.getElementById("tabBtnReleases").className = "px-4 py-2 rounded-lg text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-2";
+
+      if (tab === 'licenses') {
+        document.getElementById("tabLicenses").classList.remove("hidden");
+        document.getElementById("tabBtnLicenses").className = "px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-600 text-white transition flex items-center gap-2";
+        loadLicenses();
+      } else if (tab === 'devices') {
+        document.getElementById("tabDevices").classList.remove("hidden");
+        document.getElementById("tabBtnDevices").className = "px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-600 text-white transition flex items-center gap-2";
+        loadDevices();
+      } else if (tab === 'releases') {
+        document.getElementById("tabReleases").classList.remove("hidden");
+        document.getElementById("tabBtnReleases").className = "px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-600 text-white transition flex items-center gap-2";
+        loadReleases();
+      }
+    }
+
+    function toggleModeFields() {
+      const mode = document.getElementById("inpLicenseMode").value;
+      const siteDiv = document.getElementById("siteLicenseDiv");
+      if (mode === "SiteLicense") {
+        siteDiv.classList.remove("hidden");
+      } else {
+        siteDiv.classList.add("hidden");
+      }
+    }
+
+    async function loadStats() {
+      try {
+        const res = await fetch(`${apiBase}/api/admin/stats`, { headers: getHeaders() });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        document.getElementById("statTotalLicenses").innerText = data.totalLicenses;
+        document.getElementById("statActiveLicenses").innerText = data.activeLicenses;
+        document.getElementById("statTrialLicenses").innerText = data.trialLicenses;
+        document.getElementById("statActiveDevices").innerText = data.activeDevices;
+        document.getElementById("statTotalReleases").innerText = data.totalReleases;
+        document.getElementById("statValidations").innerText = data.validationsLast24Hours;
+      } catch (err) {
+        console.warn("Stats load failure", err);
+      }
+    }
+
+    let searchTimer;
+    function debounceLoadLicenses() {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(loadLicenses, 300);
+    }
+
+    async function loadLicenses() {
+      const tbody = document.getElementById("licensesTableBody");
+      const search = document.getElementById("licenseSearchInput").value.trim();
+      const mode = document.getElementById("filterLicenseMode").value;
+
+      try {
+        let url = `${apiBase}/api/admin/licenses?`;
+        if (search) url += `search=${encodeURIComponent(search)}&`;
+        if (mode) url += `mode=${encodeURIComponent(mode)}&`;
+
+        const res = await fetch(url, { headers: getHeaders() });
+        if (!res.ok) throw new Error(res.statusText);
+        const list = await res.json();
+
+        if (list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500 font-sans">No licenses found.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = list.map(lic => {
+          const exp = lic.expiresAt ? lic.expiresAt.substring(0, 10) : 'Perpetual';
+          const modeBadge = lic.licenseMode === 'SiteLicense'
+            ? `<span class="bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded font-sans text-[10px] border border-indigo-500/30">Site (${lic.allowedDomain || ''})</span>`
+            : lic.licenseMode === 'Floating'
+            ? `<span class="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-sans text-[10px] border border-amber-500/30">Floating (${lic.concurrentSeats || lic.maxActivations} seats)</span>`
+            : `<span class="bg-slate-700 text-slate-300 px-2 py-0.5 rounded font-sans text-[10px]">Individual</span>`;
+
+          const statusBadge = lic.isActive
+            ? `<span class="text-emerald-400 font-sans">● Active</span> <span class="text-slate-400 text-[10px]">(${exp})</span>`
+            : `<span class="text-rose-400 font-sans">● Revoked</span>`;
+
+          return `
+            <tr class="hover:bg-slate-700/30 transition">
+              <td class="py-3 px-4 font-semibold text-white select-all">${lic.licenseKey}</td>
+              <td class="py-3 px-4 text-slate-300 font-sans">${lic.product}</td>
+              <td class="py-3 px-4 font-sans">
+                <div class="font-medium text-slate-200">${lic.customerName}</div>
+                <div class="text-[11px] text-slate-400">${lic.customerEmail} ${lic.company ? '• ' + lic.company : ''}</div>
+              </td>
+              <td class="py-3 px-4">${modeBadge}</td>
+              <td class="py-3 px-4 font-sans text-slate-300">${lic.activeActivationsCount} / ${lic.maxActivations}</td>
+              <td class="py-3 px-4">${statusBadge}</td>
+              <td class="py-3 px-4 text-right font-sans">
+                ${lic.isActive ? `<button onclick="revokeLicense('${lic.id}', '${lic.licenseKey}')" class="text-rose-400 hover:text-rose-300 hover:underline text-xs">Revoke</button>` : '<span class="text-slate-500 text-xs">Revoked</span>'}
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-rose-400 font-sans">Failed to load licenses. Check API key.</td></tr>`;
+      }
+    }
+
+    async function revokeLicense(id, key) {
+      if (!confirm(`Are you sure you want to revoke license ${key}?\nAll active workstations under this license will immediately lose access.`)) return;
+
+      try {
+        const res = await fetch(`${apiBase}/api/admin/licenses/${id}/revoke`, { method: "POST", headers: getHeaders() });
+        if (res.ok) {
+          alert(`License ${key} revoked.`);
+          refreshAll();
+        } else {
+          alert("Failed to revoke license.");
+        }
+      } catch {
+        alert("Error connecting to server.");
+      }
+    }
+
+    let devSearchTimer;
+    function debounceLoadDevices() {
+      clearTimeout(devSearchTimer);
+      devSearchTimer = setTimeout(loadDevices, 300);
+    }
+
+    async function loadDevices() {
+      const tbody = document.getElementById("devicesTableBody");
+      const search = document.getElementById("deviceSearchInput").value.trim();
+
+      try {
+        let url = `${apiBase}/api/admin/devices?`;
+        if (search) url += `search=${encodeURIComponent(search)}&`;
+
+        const res = await fetch(url, { headers: getHeaders() });
+        if (!res.ok) throw new Error();
+        const list = await res.json();
+
+        if (list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500 font-sans">No activated machines found.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = list.map(dev => `
+          <tr class="hover:bg-slate-700/30 transition">
+            <td class="py-3 px-4 font-mono text-slate-300 select-all">${dev.deviceId}</td>
+            <td class="py-3 px-4 font-sans text-slate-200 font-medium">${dev.deviceName || 'PC'}</td>
+            <td class="py-3 px-4 font-mono text-slate-400 select-all">${dev.licenseKey}</td>
+            <td class="py-3 px-4 font-sans text-slate-300">${dev.customerEmail}</td>
+            <td class="py-3 px-4 font-sans text-slate-400">${dev.pluginVersion || '—'}</td>
+            <td class="py-3 px-4 font-sans text-slate-400 text-[11px]">${dev.lastValidatedAt.substring(0, 16).replace('T', ' ')}</td>
+            <td class="py-3 px-4 text-right font-sans">
+              ${dev.isActive ? `<button onclick="releaseSeat('${dev.id}', '${dev.deviceName || dev.deviceId}')" class="text-amber-400 hover:text-amber-300 hover:underline text-xs">Release Seat</button>` : '<span class="text-slate-500 text-xs">Inactive</span>'}
+            </td>
+          </tr>
+        `).join('');
+      } catch {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-rose-400 font-sans">Failed to load devices.</td></tr>`;
+      }
+    }
+
+    async function releaseSeat(id, name) {
+      if (!confirm(`Release seat for ${name}?\nThis machine can be reactivated or seat reassigned.`)) return;
+
+      try {
+        const res = await fetch(`${apiBase}/api/admin/devices/${id}/release`, { method: "POST", headers: getHeaders() });
+        if (res.ok) {
+          loadDevices();
+          loadStats();
+        } else {
+          alert("Failed to release seat.");
+        }
+      } catch {
+        alert("Error connecting to server.");
+      }
+    }
+
+    async function loadReleases() {
+      const tbody = document.getElementById("releasesTableBody");
+
+      try {
+        const res = await fetch(`${apiBase}/api/admin/releases`, { headers: getHeaders() });
+        if (!res.ok) throw new Error();
+        const list = await res.json();
+
+        if (list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500 font-sans">No published releases yet. Click 'Publish Release' above.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = list.map(rel => `
+          <tr class="hover:bg-slate-700/30 transition">
+            <td class="py-3 px-4 font-bold text-white">${rel.product}</td>
+            <td class="py-3 px-4 font-mono text-emerald-400 font-semibold">v${rel.version}</td>
+            <td class="py-3 px-4 text-slate-300">Revit ${rel.revitVersion}</td>
+            <td class="py-3 px-4"><a href="${rel.downloadUrl}" target="_blank" class="text-blue-400 hover:underline flex items-center gap-1 font-mono text-[11px]"><i class="fa-solid fa-download"></i> Download MSI</a></td>
+            <td class="py-3 px-4 text-slate-400 text-[11px]">${rel.releasedAt.substring(0, 10)}</td>
+            <td class="py-3 px-4 text-slate-300 whitespace-pre-line">${rel.releaseNotes || 'General improvements'}</td>
+          </tr>
+        `).join('');
+      } catch {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-rose-400">Failed to load releases.</td></tr>`;
+      }
+    }
+
+    function openCreateLicenseModal() { openModal("modalCreateLicense"); }
+    function openPublishReleaseModal() { openModal("modalPublishRelease"); }
+
+    async function submitCreateLicense(e) {
+      e.preventDefault();
+      const payload = {
+        product: document.getElementById("inpProduct").value,
+        licenseMode: document.getElementById("inpLicenseMode").value,
+        customerName: document.getElementById("inpCustomerName").value.trim(),
+        customerEmail: document.getElementById("inpCustomerEmail").value.trim(),
+        company: document.getElementById("inpCompany").value.trim() || null,
+        allowedDomain: document.getElementById("inpAllowedDomain").value.trim() || null,
+        maxActivations: parseInt(document.getElementById("inpMaxActivations").value) || 2,
+        durationDays: document.getElementById("inpDurationDays").value ? parseInt(document.getElementById("inpDurationDays").value) : null,
+        customKey: document.getElementById("inpCustomKey").value.trim() || null,
+        licenseType: "Commercial"
+      };
+
+      try {
+        const res = await fetch(`${apiBase}/api/admin/licenses`, {
+          method: "POST",
+          headers: getHeaders(),
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (res.ok && result.success) {
+          alert(`License created successfully!\nKey: ${result.licenseKey}`);
+          closeModal("modalCreateLicense");
+          document.getElementById("createLicenseForm").reset();
+          refreshAll();
+        } else {
+          alert(result.message || "Failed to create license.");
+        }
+      } catch (err) {
+        alert("Network error creating license.");
+      }
+    }
+
+    async function submitPublishRelease(e) {
+      e.preventDefault();
+      const payload = {
+        product: document.getElementById("relProduct").value,
+        version: document.getElementById("relVersion").value.trim(),
+        revitVersion: document.getElementById("relRevitVersion").value,
+        downloadUrl: document.getElementById("relDownloadUrl").value.trim(),
+        releaseNotes: document.getElementById("relReleaseNotes").value.trim(),
+        isMandatory: document.getElementById("relIsMandatory").checked
+      };
+
+      try {
+        const res = await fetch(`${apiBase}/api/admin/releases`, {
+          method: "POST",
+          headers: getHeaders(),
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          alert(`Release ${payload.product} v${payload.version} published! All Revit addins will now see this update.`);
+          closeModal("modalPublishRelease");
+          document.getElementById("publishReleaseForm").reset();
+          loadReleases();
+          loadStats();
+        } else {
+          alert("Failed to publish release.");
+        }
+      } catch {
+        alert("Network error publishing release.");
+      }
+    }
+
+    function refreshAll() {
+      loadStats();
+      loadLicenses();
+      loadDevices();
+      loadReleases();
+    }
+
+    // Initial load
+    refreshAll();
+  </script>
+</body>
+</html>

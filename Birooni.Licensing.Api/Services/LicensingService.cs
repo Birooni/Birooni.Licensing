@@ -49,6 +49,21 @@ public class LicensingService : ILicensingService
             return LicenseResult.Fail($"License expired on {license.ExpiresAt.Value:yyyy-MM-dd HH:mm:ss} UTC.", licenseKey);
         }
 
+        // Domain validation for corporate Site Licenses
+        if (string.Equals(license.LicenseMode, "SiteLicense", StringComparison.OrdinalIgnoreCase) &&
+            !string.IsNullOrWhiteSpace(license.AllowedDomain))
+        {
+            var expectedDomain = license.AllowedDomain.Trim().ToLowerInvariant();
+            if (!expectedDomain.StartsWith('@')) expectedDomain = "@" + expectedDomain;
+
+            var userEmail = request.UserEmail?.Trim().ToLowerInvariant();
+            if (string.IsNullOrWhiteSpace(userEmail) || !userEmail.EndsWith(expectedDomain))
+            {
+                await LogValidationAsync(license.Id, deviceId, "DomainMismatch", ipAddress, cancellationToken);
+                return LicenseResult.Fail($"Site license requires user email matching corporate domain '{license.AllowedDomain}'.", licenseKey);
+            }
+        }
+
         var existingActivation = await _context.Activations
             .FirstOrDefaultAsync(a => a.LicenseId == license.Id && a.DeviceId == deviceId, cancellationToken);
 
@@ -357,5 +372,205 @@ public class LicensingService : ILicensingService
         RandomNumberGenerator.Fill(randomBytes);
         var hex = Convert.ToHexString(randomBytes);
         return $"TRIAL-{hex[..4]}-{hex[4..8]}-{hex[8..12]}";
+    }
+
+    private static string GenerateCommercialKey(string product)
+    {
+        var prefix = product.ToUpperInvariant().Contains("BOX") ? "BIRU" : "BIROONI";
+        Span<byte> randomBytes = stackalloc byte[6];
+        RandomNumberGenerator.Fill(randomBytes);
+        var hex = Convert.ToHexString(randomBytes);
+        return $"{prefix}-{hex[..4]}-{hex[4..8]}-{hex[8..12]}";
+    }
+
+    public async Task<AdminStatsResponse> GetAdminStatsAsync(CancellationToken cancellationToken = default)
+    {
+        var totalLicenses = await _context.Licenses.CountAsync(cancellationToken);
+        var activeLicenses = await _context.Licenses.CountAsync(l => l.IsActive, cancellationToken);
+        var trialLicenses = await _context.Licenses.CountAsync(l => l.LicenseType == "Trial", cancellationToken);
+        var totalActivations = await _context.Activations.CountAsync(cancellationToken);
+        var activeDevices = await _context.Activations.CountAsync(a => a.IsActive, cancellationToken);
+        var totalReleases = await _context.ProductReleases.CountAsync(cancellationToken);
+        var last24Hours = DateTimeOffset.UtcNow.AddHours(-24);
+        var validationsLast24 = await _context.ValidationLogs.CountAsync(v => v.CreatedAt >= last24Hours, cancellationToken);
+
+        return new AdminStatsResponse
+        {
+            TotalLicenses = totalLicenses,
+            ActiveLicenses = activeLicenses,
+            TrialLicenses = trialLicenses,
+            TotalActivations = totalActivations,
+            ActiveDevices = activeDevices,
+            TotalReleases = totalReleases,
+            ValidationsLast24Hours = validationsLast24
+        };
+    }
+
+    public async Task<List<AdminLicenseDto>> GetAdminLicensesAsync(
+        string? search = null,
+        string? licenseMode = null,
+        bool? isActive = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _context.Licenses.Include(l => l.Activations).AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var s = search.Trim().ToLower();
+            query = query.Where(l => l.LicenseKey.ToLower().Contains(s) ||
+                                     l.CustomerName.ToLower().Contains(s) ||
+                                     l.CustomerEmail.ToLower().Contains(s) ||
+                                     (l.Company != null && l.Company.ToLower().Contains(s)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(licenseMode))
+        {
+            var mode = licenseMode.Trim().ToLower();
+            query = query.Where(l => l.LicenseMode.ToLower() == mode);
+        }
+
+        if (isActive.HasValue)
+        {
+            query = query.Where(l => l.IsActive == isActive.Value);
+        }
+
+        return await query
+            .OrderByDescending(l => l.CreatedAt)
+            .Select(l => new AdminLicenseDto
+            {
+                Id = l.Id,
+                LicenseKey = l.LicenseKey,
+                Product = l.Product,
+                CustomerName = l.CustomerName,
+                CustomerEmail = l.CustomerEmail,
+                Company = l.Company,
+                LicenseType = l.LicenseType,
+                LicenseMode = l.LicenseMode,
+                AllowedDomain = l.AllowedDomain,
+                MaxActivations = l.MaxActivations,
+                ConcurrentSeats = l.ConcurrentSeats,
+                ActiveActivationsCount = l.Activations.Count(a => a.IsActive),
+                IsActive = l.IsActive,
+                ExpiresAt = l.ExpiresAt,
+                CreatedAt = l.CreatedAt
+            })
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<LicenseResult> CreateCustomLicenseAsync(CreateCustomLicenseRequest request, CancellationToken cancellationToken = default)
+    {
+        var key = string.IsNullOrWhiteSpace(request.CustomKey)
+            ? GenerateCommercialKey(request.Product)
+            : request.CustomKey.Trim().ToUpperInvariant();
+
+        var existing = await _context.Licenses.AnyAsync(l => l.LicenseKey == key, cancellationToken);
+        if (existing)
+        {
+            return LicenseResult.Fail($"License key '{key}' already exists.", key);
+        }
+
+        DateTimeOffset? expiresAt = request.DurationDays.HasValue
+            ? DateTimeOffset.UtcNow.AddDays(request.DurationDays.Value)
+            : null;
+
+        var license = new License
+        {
+            Id = Guid.NewGuid(),
+            LicenseKey = key,
+            Product = request.Product.Trim(),
+            CustomerName = request.CustomerName.Trim(),
+            CustomerEmail = request.CustomerEmail.Trim(),
+            Company = request.Company?.Trim(),
+            LicenseType = request.LicenseType.Trim(),
+            LicenseMode = request.LicenseMode.Trim(),
+            AllowedDomain = request.AllowedDomain?.Trim().ToLowerInvariant(),
+            MaxActivations = request.MaxActivations > 0 ? request.MaxActivations : 2,
+            ConcurrentSeats = request.ConcurrentSeats,
+            IsActive = true,
+            ExpiresAt = expiresAt,
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+
+        _context.Licenses.Add(license);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Admin created license {Key} for {Customer} ({Mode})", license.LicenseKey, license.CustomerName, license.LicenseMode);
+
+        return LicenseResult.Ok(
+            "License created successfully.",
+            license.LicenseKey,
+            license.Product,
+            license.CustomerName,
+            license.LicenseType,
+            license.ExpiresAt,
+            activationsUsed: 0,
+            maxActivations: license.MaxActivations);
+    }
+
+    public async Task<bool> RevokeLicenseAsync(Guid licenseId, string? reason = null, CancellationToken cancellationToken = default)
+    {
+        var license = await _context.Licenses
+            .Include(l => l.Activations)
+            .FirstOrDefaultAsync(l => l.Id == licenseId, cancellationToken);
+
+        if (license == null) return false;
+
+        license.IsActive = false;
+        foreach (var act in license.Activations)
+        {
+            act.IsActive = false;
+        }
+
+        await LogValidationAsync(license.Id, "SYSTEM", $"Revoked: {reason ?? "Admin Revocation"}", null, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        _logger.LogWarning("License {Key} revoked by admin.", license.LicenseKey);
+        return true;
+    }
+
+    public async Task<List<AdminDeviceDto>> GetAdminDevicesAsync(string? search = null, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Activations.Include(a => a.License).AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var s = search.Trim().ToLower();
+            query = query.Where(a => a.DeviceId.ToLower().Contains(s) ||
+                                     (a.DeviceName != null && a.DeviceName.ToLower().Contains(s)) ||
+                                     (a.License != null && a.License.LicenseKey.ToLower().Contains(s)) ||
+                                     (a.License != null && a.License.CustomerEmail.ToLower().Contains(s)));
+        }
+
+        return await query
+            .OrderByDescending(a => a.LastValidatedAt)
+            .Select(a => new AdminDeviceDto
+            {
+                Id = a.Id,
+                LicenseId = a.LicenseId,
+                LicenseKey = a.License != null ? a.License.LicenseKey : string.Empty,
+                CustomerName = a.License != null ? a.License.CustomerName : string.Empty,
+                CustomerEmail = a.License != null ? a.License.CustomerEmail : string.Empty,
+                Company = a.License != null ? a.License.Company : null,
+                DeviceId = a.DeviceId,
+                DeviceName = a.DeviceName,
+                PluginVersion = a.PluginVersion,
+                IsActive = a.IsActive,
+                ActivatedAt = a.ActivatedAt,
+                LastValidatedAt = a.LastValidatedAt
+            })
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<bool> ReleaseDeviceAsync(Guid activationId, CancellationToken cancellationToken = default)
+    {
+        var activation = await _context.Activations.FirstOrDefaultAsync(a => a.Id == activationId, cancellationToken);
+        if (activation == null) return false;
+
+        activation.IsActive = false;
+        await LogValidationAsync(activation.LicenseId, activation.DeviceId, "AdminReleased", null, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Device {DeviceId} seat released by admin.", activation.DeviceId);
+        return true;
     }
 }

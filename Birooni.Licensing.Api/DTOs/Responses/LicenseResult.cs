@@ -13,7 +13,7 @@ public class LicenseResult
     public int? MaxActivations { get; set; }
     public SignedLicenseToken? Token { get; set; }
 
-    public static LicenseResult Ok(string message, string licenseKey, string product, string customerName, string licenseType, DateTimeOffset? expiresAt, int activationsUsed, int maxActivations, SignedLicenseToken token)
+    public static LicenseResult Ok(string message, string licenseKey, string product, string customerName, string licenseType, DateTimeOffset? expiresAt, int activationsUsed, int maxActivations, SignedLicenseToken? token = null)
     {
         return new LicenseResult
         {

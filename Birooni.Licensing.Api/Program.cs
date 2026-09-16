@@ -9,13 +9,49 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+// CORS for Cloudflare Pages (admin.birooni.com)
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "Birooni Licensing API",
         Version = "v1",
-        Description = "Production-grade licensing and cryptographic validation service for Birooni plugins and software."
+        Description = "Production-grade licensing, updates, and management service for Birooni Revit plugins and software."
+    });
+
+    // Add X-Admin-Key security definition in Swagger UI
+    options.AddSecurityDefinition("AdminApiKey", new OpenApiSecurityScheme
+    {
+        Description = "Admin API Key header. Enter your X-Admin-Key to authorize admin endpoints.",
+        Name = "X-Admin-Key",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "AdminApiKey"
+                }
+            },
+            Array.Empty<string>()
+        }
     });
 });
 
@@ -42,10 +78,13 @@ builder.Services.AddDbContext<LicensingDbContext>(options =>
 // 3. Register Domain and Cryptographic Services
 builder.Services.AddSingleton<ITokenSigner, TokenSigner>();
 builder.Services.AddScoped<ILicensingService, LicensingService>();
+builder.Services.AddScoped<IUpdateService, UpdateService>();
 
 var app = builder.Build();
 
 // 4. Configure HTTP request pipeline.
+app.UseCors();
+
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
@@ -63,7 +102,12 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
+
 app.UseAuthorization();
 app.MapControllers();
 
+// Ensure database schema columns and tables exist in Supabase
+await DatabaseInitializer.InitializeSchemaAsync(app.Services, app.Logger);
+
 app.Run();
+

@@ -13,4 +13,7 @@ public class ActivateLicenseRequest
     public string DeviceName { get; set; } = string.Empty;
 
     public string PluginVersion { get; set; } = string.Empty;
+
+    [EmailAddress]
+    public string? UserEmail { get; set; }
 }
