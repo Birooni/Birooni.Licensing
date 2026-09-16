@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: birooni-licensing-api
+    runtime: docker
+    plan: free
+    region: singapore # or oregon, frankfurt based on preference
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: DATABASE_URL
+        sync: false # Set securely in Render dashboard
+      - key: RSA_PRIVATE_KEY
+        sync: false # Optional: Set persistent 2048-bit RSA Private Key PEM
