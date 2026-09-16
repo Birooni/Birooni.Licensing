@@ -19,7 +19,58 @@
   </script>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
-  <div id="app" class="flex flex-col min-h-screen">
+
+  <!-- Security Gate / Login Screen -->
+  <div id="loginGate" class="min-h-screen flex items-center justify-center p-4 bg-slate-950 relative">
+    <div class="absolute inset-0 bg-gradient-to-tr from-emerald-950/20 via-slate-900/60 to-slate-950 pointer-events-none"></div>
+    
+    <div class="w-full max-w-md bg-slate-900/90 border border-slate-700/80 rounded-2xl shadow-2xl p-8 backdrop-blur-xl relative z-10 space-y-6">
+      <div class="text-center space-y-2">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/25">
+          <i class="fa-solid fa-shield-halved text-white text-2xl"></i>
+        </div>
+        <h2 class="text-xl font-bold text-white tracking-tight">Birooni Administration</h2>
+        <p class="text-xs text-slate-400">Restricted Access. Enter your Master Admin Key to unlock the control center.</p>
+      </div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1.5">Master Admin Key</label>
+          <div class="relative">
+            <input type="password" id="loginKeyInput" required autocomplete="current-password" placeholder="Enter ADMIN_API_KEY"
+              class="w-full bg-slate-950/90 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-mono pr-10">
+            <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-3.5 text-slate-400 hover:text-slate-200 text-sm">
+              <i id="togglePassIcon" class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" id="rememberMe" class="rounded bg-slate-800 border-slate-700 text-emerald-600 focus:ring-0">
+            <span>Remember on this computer</span>
+          </label>
+        </div>
+
+        <div id="loginError" class="hidden text-xs text-rose-400 bg-rose-950/50 border border-rose-800/50 rounded-lg p-3 flex items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span id="loginErrorMsg">Invalid Admin Key. Access Denied.</span>
+        </div>
+
+        <button type="submit" id="btnLogin" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2">
+          <span id="btnLoginText">Unlock Control Center</span>
+          <i id="btnLoginSpinner" class="fa-solid fa-spinner fa-spin hidden"></i>
+        </button>
+      </form>
+      
+      <div class="pt-2 text-center border-t border-slate-800">
+        <span class="text-[11px] text-slate-500 font-mono">Protected by Birooni Licensing Engine</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Authenticated App (Hidden by default until key is validated) -->
+  <div id="app" class="hidden flex-col min-h-screen">
 
     <!-- Top Navbar -->
     <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/60 sticky top-0 z-30">
@@ -35,21 +86,22 @@
         </div>
 
         <div class="flex items-center gap-3">
-          <!-- API Endpoint Selector -->
+          <!-- API Endpoint Indicator -->
           <div class="hidden sm:flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-700 text-xs text-slate-300">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span class="text-slate-400">API:</span>
             <input id="apiBaseUrl" type="text" value="https://api.ibrooni.com" class="bg-transparent border-none text-xs focus:outline-none w-56 text-slate-200" onchange="saveApiUrl()">
           </div>
 
-          <!-- Auth Status & Key Button -->
-          <button onclick="openKeyModal()" class="flex items-center gap-2 text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-600 transition">
-            <i class="fa-solid fa-key text-amber-400"></i>
-            <span id="authStatusText">Admin Key Configured</span>
-          </button>
-
+          <!-- Refresh Button -->
           <button onclick="refreshAll()" class="p-2 text-slate-400 hover:text-white bg-slate-700 hover:bg-slate-600 rounded-lg transition" title="Refresh data">
             <i class="fa-solid fa-arrows-rotate"></i>
+          </button>
+
+          <!-- Logout Button -->
+          <button onclick="handleLogout()" class="flex items-center gap-2 text-xs bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 px-3 py-1.5 rounded-lg border border-rose-800/60 transition" title="Lock Dashboard">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Log Out</span>
           </button>
         </div>
       </div>
@@ -359,8 +411,7 @@
   </div>
 
   <script>
-    const DEFAULT_KEY = "birooni-admin-secret-2026";
-    let adminKey = localStorage.getItem("birooni_admin_key") || DEFAULT_KEY;
+    let adminKey = sessionStorage.getItem("birooni_admin_key") || localStorage.getItem("birooni_admin_key") || "";
     let apiBase = localStorage.getItem("birooni_api_url") || "https://api.ibrooni.com";
 
     document.getElementById("apiBaseUrl").value = apiBase;
@@ -368,22 +419,112 @@
     function saveApiUrl() {
       apiBase = document.getElementById("apiBaseUrl").value.trim().replace(/\/$/, "");
       localStorage.setItem("birooni_api_url", apiBase);
-      refreshAll();
+      if (adminKey) refreshAll();
     }
 
-    function openKeyModal() {
-      document.getElementById("inpAdminKey").value = adminKey;
-      openModal("modalAdminKey");
-    }
-
-    function saveAdminKey() {
-      const val = document.getElementById("inpAdminKey").value.trim();
-      if (val) {
-        adminKey = val;
-        localStorage.setItem("birooni_admin_key", adminKey);
+    function togglePasswordVisibility() {
+      const inp = document.getElementById("loginKeyInput");
+      const icon = document.getElementById("togglePassIcon");
+      if (inp.type === "password") {
+        inp.type = "text";
+        icon.className = "fa-regular fa-eye-slash";
+      } else {
+        inp.type = "password";
+        icon.className = "fa-regular fa-eye";
       }
-      closeModal("modalAdminKey");
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const enteredKey = document.getElementById("loginKeyInput").value.trim();
+      if (!enteredKey) return;
+
+      const btn = document.getElementById("btnLogin");
+      const btnText = document.getElementById("btnLoginText");
+      const spinner = document.getElementById("btnLoginSpinner");
+      const errBox = document.getElementById("loginError");
+      const remember = document.getElementById("rememberMe").checked;
+
+      btn.disabled = true;
+      btnText.innerText = "Authenticating...";
+      spinner.classList.remove("hidden");
+      errBox.classList.add("hidden");
+
+      try {
+        const res = await fetch(`${apiBase}/api/admin/stats`, {
+          headers: {
+            "Content-Type": "application/json",
+            "X-Admin-Key": enteredKey
+          }
+        });
+
+        if (res.ok) {
+          adminKey = enteredKey;
+          if (remember) {
+            localStorage.setItem("birooni_admin_key", adminKey);
+          } else {
+            sessionStorage.setItem("birooni_admin_key", adminKey);
+          }
+          unlockDashboard();
+        } else if (res.status === 401 || res.status === 403) {
+          errBox.classList.remove("hidden");
+          document.getElementById("loginErrorMsg").innerText = "Invalid Master Admin Key. Access Denied.";
+        } else {
+          errBox.classList.remove("hidden");
+          document.getElementById("loginErrorMsg").innerText = `Server returned status ${res.status}. Check API URL.`;
+        }
+      } catch (err) {
+        errBox.classList.remove("hidden");
+        document.getElementById("loginErrorMsg").innerText = "Failed to connect to API server. Check network connection.";
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = "Unlock Control Center";
+        spinner.classList.add("hidden");
+      }
+    }
+
+    function unlockDashboard() {
+      document.getElementById("loginGate").classList.add("hidden");
+      const app = document.getElementById("app");
+      app.classList.remove("hidden");
+      app.classList.add("flex");
       refreshAll();
+    }
+
+    function handleLogout() {
+      adminKey = "";
+      localStorage.removeItem("birooni_admin_key");
+      sessionStorage.removeItem("birooni_admin_key");
+      document.getElementById("loginKeyInput").value = "";
+      document.getElementById("loginError").classList.add("hidden");
+      const app = document.getElementById("app");
+      app.classList.add("hidden");
+      app.classList.remove("flex");
+      document.getElementById("loginGate").classList.remove("hidden");
+    }
+
+    async function checkExistingAuth() {
+      if (!adminKey) {
+        document.getElementById("loginGate").classList.remove("hidden");
+        document.getElementById("app").classList.add("hidden");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${apiBase}/api/admin/stats`, {
+          headers: {
+            "Content-Type": "application/json",
+            "X-Admin-Key": adminKey
+          }
+        });
+        if (res.ok) {
+          unlockDashboard();
+        } else {
+          handleLogout();
+        }
+      } catch {
+        handleLogout();
+      }
     }
 
     function getHeaders() {
@@ -682,8 +823,8 @@
       loadReleases();
     }
 
-    // Initial load
-    refreshAll();
+    // Initial load: Verify auth before rendering any data
+    checkExistingAuth();
   </script>
 </body>
 </html>
