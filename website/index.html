@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birooni | BiruBox — Intelligent 3D Section Box Suite for Autodesk Revit</title>
+  <meta name="description" content="BiruBox is the premier 3D section box and view navigation add-in for Autodesk Revit 2025, 2026, and 2027. Instant sectioning, interactive box drawing, and dynamic offset sizing.">
+  <link rel="icon" type="image/x-icon" href="assets/BiruBox.ico">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              400: '#4ade80',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              900: '#14532d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+    }
+    .glow-emerald {
+      box-shadow: 0 0 50px -10px rgba(34, 197, 94, 0.25);
+    }
+    .glow-radial {
+      background: radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.15) 0%, transparent 70%);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans selection:bg-emerald-500 selection:text-slate-950 antialiased">
+
+  <!-- Glow Background Accent -->
+  <div class="fixed inset-0 glow-radial pointer-events-none z-0"></div>
+
+  <!-- Header / Navigation -->
+  <header class="fixed top-0 inset-x-0 z-50 glass-card border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition">
+          <i class="fa-solid fa-cube text-white text-xl"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl font-extrabold tracking-tight text-white">Birooni</span>
+            <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full">BiruBox</span>
+          </div>
+          <p class="text-[10px] text-slate-400 -mt-1 font-mono">Revit Tools &amp; Licensing</p>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+        <a href="#features" class="hover:text-emerald-400 transition">Features</a>
+        <a href="#tools" class="hover:text-emerald-400 transition">The Suite</a>
+        <a href="#compatibility" class="hover:text-emerald-400 transition">Revit Support</a>
+        <a href="#pricing" class="hover:text-emerald-400 transition">Pricing</a>
+        <a href="#faq" class="hover:text-emerald-400 transition">FAQ</a>
+      </nav>
+
+      <!-- CTA Buttons -->
+      <div class="flex items-center gap-3">
+        <a href="https://admin.ibrooni.com" target="_blank" class="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-300 hover:text-white px-3 py-2 rounded-lg hover:bg-slate-800 transition">
+          <i class="fa-solid fa-lock text-slate-400 text-xs"></i>
+          <span>Admin Portal</span>
+        </a>
+        <a href="#download" class="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs sm:text-sm px-4 sm:px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-500/20 transition transform hover:-translate-y-0.5">
+          <i class="fa-solid fa-download"></i>
+          <span>Download Trial</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-36 pb-20 md:pt-44 md:pb-32 overflow-hidden z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      
+      <!-- Top Release Pill -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-card border-emerald-500/30 text-xs font-medium text-emerald-300 mb-8 animate-pulse">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span>Version 2026.1 Ready for Autodesk Revit 2025, 2026 &amp; 2027</span>
+        <i class="fa-solid fa-arrow-right text-[10px] text-emerald-400/70"></i>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-5xl mx-auto leading-[1.15]">
+        Master 3D Section Views in <span class="bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500 bg-clip-text text-transparent">Autodesk Revit</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="mt-6 text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed font-normal">
+        Eliminate the frustration of sluggish Revit section controls. BiruBox delivers intelligent one-click isolation, intuitive screen drawing, and instant millimeter-accurate offset sizing.
+      </p>
+
+      <!-- Hero Action Buttons -->
+      <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="downloads/BiruBox-Setup.msi" download class="w-full sm:w-auto flex items-center justify-center gap-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-8 py-4 rounded-xl shadow-xl shadow-emerald-500/25 transition transform hover:-translate-y-0.5 text-base">
+          <i class="fa-solid fa-download text-lg"></i>
+          <div class="text-left">
+            <div class="leading-none">Download 14-Day Free Trial</div>
+            <span class="text-[10px] font-mono text-emerald-950/80 font-normal">BiruBox-Setup.msi (~268 KB)</span>
+          </div>
+        </a>
+        <a href="#pricing" class="w-full sm:w-auto flex items-center justify-center gap-2 glass-card hover:bg-slate-800/80 text-white font-semibold px-7 py-4 rounded-xl border-slate-700 transition text-base">
+          <i class="fa-solid fa-tag text-slate-400"></i>
+          <span>View Licenses &amp; Pricing</span>
+        </a>
+      </div>
+
+      <!-- Micro Badges -->
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400">
+        <span class="flex items-center gap-2">
+          <i class="fa-solid fa-check text-emerald-400"></i> 14-Day Full Access Trial
+        </span>
+        <span class="flex items-center gap-2">
+          <i class="fa-solid fa-check text-emerald-400"></i> No Credit Card Required
+        </span>
+        <span class="flex items-center gap-2">
+          <i class="fa-solid fa-check text-emerald-400"></i> Instant Per-User MSI Install
+        </span>
+        <span class="flex items-center gap-2">
+          <i class="fa-solid fa-check text-emerald-400"></i> Works 100% Offline
+        </span>
+      </div>
+
+      <!-- App Preview / Ribbon Mockup -->
+      <div id="tools" class="mt-16 max-w-5xl mx-auto rounded-2xl glass-card p-3 sm:p-4 glow-emerald border border-slate-700/80 shadow-2xl relative">
+        <div class="bg-slate-950 rounded-xl overflow-hidden border border-slate-800">
+          
+          <!-- Mock Revit Ribbon Header -->
+          <div class="bg-slate-900/90 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+              <span class="ml-3 font-mono text-slate-400">Autodesk Revit — [BiruBox Ribbon Panel]</span>
+            </div>
+            <span class="font-mono text-emerald-400 text-[11px] bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded">
+              <i class="fa-solid fa-circle-check text-[10px] mr-1"></i> License Valid
+            </span>
+          </div>
+
+          <!-- Ribbon Tools Display -->
+          <div class="p-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            
+            <!-- Tool 1: AutoSectionBox -->
+            <div class="bg-slate-900/70 border border-slate-800 hover:border-emerald-500/60 rounded-xl p-4 flex flex-col items-center text-center group transition">
+              <div class="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-2 group-hover:scale-110 transition">
+                <img src="assets/icons/AutoSectionBox.svg" alt="AutoSectionBox" class="w-7 h-7">
+              </div>
+              <span class="text-xs font-bold text-white">Auto Section</span>
+              <span class="text-[10px] text-slate-400 mt-1">Smart Bounds</span>
+            </div>
+
+            <!-- Tool 2: DrawBox -->
+            <div class="bg-slate-900/70 border border-slate-800 hover:border-emerald-500/60 rounded-xl p-4 flex flex-col items-center text-center group transition">
+              <div class="w-12 h-12 rounded-lg bg-teal-500/10 flex items-center justify-center mb-2 group-hover:scale-110 transition">
+                <img src="assets/icons/DrawBox.svg" alt="DrawBox" class="w-7 h-7">
+              </div>
+              <span class="text-xs font-bold text-white">Draw Box</span>
+              <span class="text-[10px] text-slate-400 mt-1">Interactive Pick</span>
+            </div>
+
+            <!-- Tool 3: Quick Section -->
+            <div class="bg-slate-900/70 border border-slate-800 hover:border-emerald-500/60 rounded-xl p-4 flex flex-col items-center text-center group transition">
+              <div class="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-2 group-hover:scale-110 transition">
+                <img src="assets/icons/Quick.svg" alt="Quick" class="w-7 h-7">
+              </div>
+              <span class="text-xs font-bold text-white">Quick Box</span>
+              <span class="text-[10px] text-slate-400 mt-1">1-Click Selection</span>
+            </div>
+
+            <!-- Tool 4: Grow -->
+            <div class="bg-slate-900/70 border border-slate-800 hover:border-emerald-500/60 rounded-xl p-4 flex flex-col items-center text-center group transition">
+              <div class="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-2 group-hover:scale-110 transition">
+                <img src="assets/icons/Grow.svg" alt="Grow" class="w-7 h-7">
+              </div>
+              <span class="text-xs font-bold text-white">Grow Bounds</span>
+              <span class="text-[10px] text-slate-400 mt-1">Expand +Offset</span>
+            </div>
+
+            <!-- Tool 5: Shrink -->
+            <div class="bg-slate-900/70 border border-slate-800 hover:border-emerald-500/60 rounded-xl p-4 flex flex-col items-center text-center group transition">
+              <div class="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-2 group-hover:scale-110 transition">
+                <img src="assets/icons/Shrink.svg" alt="Shrink" class="w-7 h-7">
+              </div>
+              <span class="text-xs font-bold text-white">Shrink Bounds</span>
+              <span class="text-[10px] text-slate-400 mt-1">Tighten -Offset</span>
+            </div>
+
+            <!-- Tool 6: Toggle -->
+            <div class="bg-slate-900/70 border border-slate-800 hover:border-emerald-500/60 rounded-xl p-4 flex flex-col items-center text-center group transition">
+              <div class="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-2 group-hover:scale-110 transition">
+                <img src="assets/icons/Toggle.svg" alt="Toggle" class="w-7 h-7">
+              </div>
+              <span class="text-xs font-bold text-white">Toggle State</span>
+              <span class="text-[10px] text-slate-400 mt-1">Instant On/Off</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Feature Grid Section -->
+  <section id="features" class="py-24 border-t border-slate-800/80 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-emerald-400 mb-3 font-mono">Engineered for BIM Professionals</h2>
+        <p class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Why BIM modelers spend less time wrestling with Revit 3D views</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- Card 1 -->
+        <div class="glass-card rounded-2xl p-8 hover:border-emerald-500/50 transition">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-xl mb-6">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Zero Startup Latency</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Built with a non-blocking asynchronous licensing cache. Revit boots immediately without freezing your UI thread, letting you get straight to work.
+          </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="glass-card rounded-2xl p-8 hover:border-emerald-500/50 transition">
+          <div class="w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 text-xl mb-6">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Hardware-Bound Offline Security</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Cryptographically signed using RSA-2048 SHA-256 tokens tied to motherboard, CPU, and machine GUID. Work offline in trailers or high-security client offices with complete peace of mind.
+          </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="glass-card rounded-2xl p-8 hover:border-emerald-500/50 transition">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-xl mb-6">
+            <i class="fa-solid fa-crop-simple"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Interactive DrawBox</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Draw a selection rectangle directly on your floor plan or 3D view. BiruBox isolates the exact spatial volume you traced in real time.
+          </p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="glass-card rounded-2xl p-8 hover:border-emerald-500/50 transition">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-xl mb-6">
+            <i class="fa-solid fa-arrows-up-down-left-right"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Dynamic Offset Tuning</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Easily expand or shrink the section box margins (+100mm, +500mm, etc.) with simple hotkeys or ribbon clicks without disturbing the orientation.
+          </p>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="glass-card rounded-2xl p-8 hover:border-emerald-500/50 transition">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-xl mb-6">
+            <i class="fa-solid fa-cloud-arrow-down"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Silent Background Updates</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            In-app update engine checks for new builds and fixes directly against <code class="text-emerald-400 font-mono text-xs">api.ibrooni.com</code> without disrupting your active design sessions.
+          </p>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="glass-card rounded-2xl p-8 hover:border-emerald-500/50 transition">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-xl mb-6">
+            <i class="fa-solid fa-network-wired"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Multi-Seat Floating Licensing</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            BIM managers can pool licenses across teams. Workstations check out seats when Revit starts and automatically release them on exit.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Revit Compatibility Section -->
+  <section id="compatibility" class="py-20 bg-slate-900/40 border-t border-slate-800/80 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      
+      <h2 class="text-xs font-bold uppercase tracking-widest text-emerald-400 mb-3 font-mono">Universal Revit Compatibility</h2>
+      <p class="text-3xl font-extrabold text-white tracking-tight">Built natively on .NET 8 for the latest Autodesk releases</p>
+      
+      <div class="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <div class="glass-card p-6 rounded-2xl border-slate-800 text-center">
+          <div class="text-3xl font-black text-white mb-1">Revit 2025</div>
+          <span class="text-xs font-mono text-emerald-400 font-semibold">.NET 8.0 Supported</span>
+          <p class="text-xs text-slate-400 mt-2">Full sectioning &amp; view tools</p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl border-emerald-500/40 bg-emerald-950/20 text-center shadow-lg shadow-emerald-500/10">
+          <div class="text-3xl font-black text-emerald-300 mb-1">Revit 2026</div>
+          <span class="text-xs font-mono text-emerald-400 font-semibold">Primary Target</span>
+          <p class="text-xs text-slate-300 mt-2">Maximum optimization &amp; speed</p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl border-slate-800 text-center">
+          <div class="text-3xl font-black text-white mb-1">Revit 2027</div>
+          <span class="text-xs font-mono text-emerald-400 font-semibold">Future-Proof Architecture</span>
+          <p class="text-xs text-slate-400 mt-2">Forward-compatible manifests</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section id="pricing" class="py-24 border-t border-slate-800/80 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-emerald-400 mb-3 font-mono">Simple &amp; Flexible Licensing</h2>
+        <p class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Pick the license model that matches your workflow</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
+        
+        <!-- Tier 1: 14-Day Free Trial -->
+        <div class="glass-card rounded-2xl p-8 flex flex-col justify-between border-slate-800">
+          <div>
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-white">Free Trial</h3>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">14 Days</span>
+            </div>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="text-4xl font-black text-white">$0</span>
+              <span class="text-xs text-slate-400">/ 14 days</span>
+            </div>
+            <p class="mt-3 text-xs text-slate-400">Experience the full power of BiruBox before making any financial commitment.</p>
+            
+            <ul class="mt-6 space-y-3 text-xs text-slate-300">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> All BiruBox ribbon tools unlocked</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> 14-day continuous offline token</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Automatic in-app trial activation</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> No payment details required</li>
+            </ul>
+          </div>
+
+          <a href="downloads/BiruBox-Setup.msi" download class="mt-8 block text-center bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs py-3 px-4 rounded-xl transition">
+            Download Free Trial
+          </a>
+        </div>
+
+        <!-- Tier 2: Perpetual Pro (Featured) -->
+        <div class="glass-card rounded-2xl p-8 flex flex-col justify-between border-emerald-500/60 bg-emerald-950/10 relative glow-emerald">
+          <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-extrabold text-[10px] uppercase tracking-wider py-1 px-3 rounded-full shadow-md">
+            Most Popular
+          </div>
+          <div>
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-white">Perpetual Pro</h3>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Lifetime</span>
+            </div>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="text-4xl font-black text-white">$149</span>
+              <span class="text-xs text-slate-400">one-time</span>
+            </div>
+            <p class="mt-3 text-xs text-slate-400">Own your software forever. Node-locked to your primary workstation.</p>
+            
+            <ul class="mt-6 space-y-3 text-xs text-slate-300">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Permanent, non-expiring license</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> 1 Year free version updates included</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Cryptographic hardware binding</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Works 100% offline indefinitely</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Self-service seat deactivation &amp; transfer</li>
+            </ul>
+          </div>
+
+          <a href="mailto:biroonisoft@gmail.com?subject=Purchase%20BiruBox%20Perpetual%20License" class="mt-8 block text-center bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs py-3 px-4 rounded-xl shadow-lg shadow-emerald-500/20 transition">
+            Purchase Perpetual Pro
+          </a>
+        </div>
+
+        <!-- Tier 3: Enterprise Floating -->
+        <div class="glass-card rounded-2xl p-8 flex flex-col justify-between border-slate-800">
+          <div>
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-white">Floating / Team</h3>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">Multi-Seat</span>
+            </div>
+            <div class="mt-4 flex items-baseline gap-1">
+              <span class="text-4xl font-black text-white">$299</span>
+              <span class="text-xs text-slate-400">/ seat / year</span>
+            </div>
+            <p class="mt-3 text-xs text-slate-400">Designed for architecture firms and engineering teams needing flexible pooling.</p>
+            
+            <ul class="mt-6 space-y-3 text-xs text-slate-300">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Concurrent floating license pool</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Centralized Admin Dashboard access</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Automated MSI rollout support (GPO / InTune)</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Priority email and live onboarding SLA</li>
+            </ul>
+          </div>
+
+          <a href="mailto:biroonisoft@gmail.com?subject=Inquiry%20BiruBox%20Floating%20Licenses" class="mt-8 block text-center bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs py-3 px-4 rounded-xl transition">
+            Contact Enterprise Sales
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Download & Quickstart Section -->
+  <section id="download" class="py-24 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border-t border-slate-800/80 relative z-10">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="glass-card rounded-3xl p-8 sm:p-12 border-slate-700 text-center relative overflow-hidden">
+        <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-2xl mb-6 shadow-inner">
+          <i class="fa-solid fa-rocket"></i>
+        </div>
+
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Get Started with BiruBox in 30 Seconds</h2>
+        <p class="mt-4 text-slate-400 text-sm sm:text-base max-w-2xl mx-auto">
+          No administrator privileges required. The per-user installer automatically registers the add-in across your installed Revit 2025, 2026, and 2027 directories.
+        </p>
+
+        <!-- Steps -->
+        <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
+          <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-800">
+            <span class="font-mono text-emerald-400 font-bold text-xs">STEP 01</span>
+            <h4 class="text-sm font-bold text-white mt-1">Download Installer</h4>
+            <p class="text-xs text-slate-400 mt-1">Get the signed <code class="text-slate-200">BiruBox-Setup.msi</code> file.</p>
+          </div>
+          <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-800">
+            <span class="font-mono text-emerald-400 font-bold text-xs">STEP 02</span>
+            <h4 class="text-sm font-bold text-white mt-1">Run 5-Second Setup</h4>
+            <p class="text-xs text-slate-400 mt-1">Installs directly to your user profile without admin prompts.</p>
+          </div>
+          <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-800">
+            <span class="font-mono text-emerald-400 font-bold text-xs">STEP 03</span>
+            <h4 class="text-sm font-bold text-white mt-1">Launch Revit &amp; Create</h4>
+            <p class="text-xs text-slate-400 mt-1">Click the BiruBox tab on your ribbon to activate your 14-day trial.</p>
+          </div>
+        </div>
+
+        <!-- Download Action -->
+        <div class="mt-10">
+          <a href="downloads/BiruBox-Setup.msi" download class="inline-flex items-center gap-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-base px-8 py-4 rounded-xl shadow-xl shadow-emerald-500/30 transition transform hover:-translate-y-0.5">
+            <i class="fa-solid fa-download text-lg"></i>
+            <span>Download BiruBox-Setup.msi (268 KB)</span>
+          </a>
+          <p class="text-[11px] text-slate-500 mt-3 font-mono">Compatible with 64-bit Windows 10 &amp; 11 • Revit 2025–2027</p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="py-24 border-t border-slate-800/80 relative z-10">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center mb-16">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-emerald-400 mb-3 font-mono">Got Questions?</h2>
+        <p class="text-3xl font-extrabold text-white tracking-tight">Frequently Asked Questions</p>
+      </div>
+
+      <div class="space-y-4">
+        
+        <details class="glass-card rounded-2xl p-6 border-slate-800 group cursor-pointer" open>
+          <summary class="flex items-center justify-between text-base font-bold text-white list-none">
+            <span>How does the 14-day free trial work?</span>
+            <i class="fa-solid fa-chevron-down text-xs text-slate-400 group-open:rotate-180 transition"></i>
+          </summary>
+          <p class="mt-3 text-sm text-slate-400 leading-relaxed">
+            When you first install BiruBox and launch Autodesk Revit, our licensing engine automatically detects your device and generates a 14-day cryptographic trial lease via <code class="text-emerald-400 font-mono text-xs">api.ibrooni.com</code>. All features are 100% unlocked with no watermarks or limitations.
+          </p>
+        </details>
+
+        <details class="glass-card rounded-2xl p-6 border-slate-800 group cursor-pointer">
+          <summary class="flex items-center justify-between text-base font-bold text-white list-none">
+            <span>Can I use BiruBox without an internet connection?</span>
+            <i class="fa-solid fa-chevron-down text-xs text-slate-400 group-open:rotate-180 transition"></i>
+          </summary>
+          <p class="mt-3 text-sm text-slate-400 leading-relaxed">
+            Yes! BiruBox uses an offline-first RSA-2048 token cache. Once activated, your workstation retains a 14-day offline lease that revalidates silently in the background whenever an internet connection is detected. If you are traveling or on a restricted site, your tools continue running without interruption.
+          </p>
+        </details>
+
+        <details class="glass-card rounded-2xl p-6 border-slate-800 group cursor-pointer">
+          <summary class="flex items-center justify-between text-base font-bold text-white list-none">
+            <span>Can I transfer my perpetual license to a new PC?</span>
+            <i class="fa-solid fa-chevron-down text-xs text-slate-400 group-open:rotate-180 transition"></i>
+          </summary>
+          <p class="mt-3 text-sm text-slate-400 leading-relaxed">
+            Yes. You can deactivate your license directly within Revit using the BiruBox License Settings dialog, or through the central customer portal. Once deactivated, the seat is immediately freed and ready for activation on your new machine.
+          </p>
+        </details>
+
+        <details class="glass-card rounded-2xl p-6 border-slate-800 group cursor-pointer">
+          <summary class="flex items-center justify-between text-base font-bold text-white list-none">
+            <span>How are updates delivered?</span>
+            <i class="fa-solid fa-chevron-down text-xs text-slate-400 group-open:rotate-180 transition"></i>
+          </summary>
+          <p class="mt-3 text-sm text-slate-400 leading-relaxed">
+            BiruBox includes an automated update checker. When a new version or hotfix is published to our release registry, a subtle notification badge appears in Revit prompting you to update with one click.
+          </p>
+        </details>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 bg-slate-950 py-12 relative z-10 text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+      
+      <!-- Brand & Copyright -->
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+          <i class="fa-solid fa-cube text-sm"></i>
+        </div>
+        <div>
+          <span class="font-bold text-white text-sm">Birooni Tools</span>
+          <p class="text-[11px] text-slate-500">© 2026 Birooni Tools. All rights reserved.</p>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div class="flex flex-wrap items-center gap-6">
+        <a href="#features" class="hover:text-emerald-400 transition">Features</a>
+        <a href="#pricing" class="hover:text-emerald-400 transition">Pricing</a>
+        <a href="https://admin.ibrooni.com" target="_blank" class="hover:text-emerald-400 transition flex items-center gap-1">
+          <i class="fa-solid fa-lock text-[10px]"></i> Admin Portal
+        </a>
+        <a href="https://api.ibrooni.com/swagger" target="_blank" class="hover:text-emerald-400 transition">API Docs</a>
+        <a href="mailto:biroonisoft@gmail.com" class="hover:text-emerald-400 transition flex items-center gap-1">
+          <i class="fa-solid fa-envelope text-[10px]"></i> Contact Support
+        </a>
+      </div>
+
+    </div>
+  </footer>
+
+</body>
+</html>

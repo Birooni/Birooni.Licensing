@@ -1,0 +1,19 @@
+<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 3D Isometric Wireframe Cube in Cyan/Blue -->
+  <polygon points="16,5 25.5,10.5 16,16 6.5,10.5" stroke="#00B0FF" stroke-width="1.5" stroke-linejoin="round" />
+  <line x1="6.5" y1="10.5" x2="6.5" y2="21.5" stroke="#00B0FF" stroke-width="1.5" stroke-linecap="round" />
+  <line x1="25.5" y1="10.5" x2="25.5" y2="21.5" stroke="#00B0FF" stroke-width="1.5" stroke-linecap="round" />
+  <line x1="16" y1="16" x2="16" y2="27" stroke="#00B0FF" stroke-width="1.5" stroke-linecap="round" />
+  <polyline points="6.5,21.5 16,27 25.5,21.5" stroke="#00B0FF" stroke-width="1.5" stroke-linejoin="round" fill="none" />
+
+  <!-- Center Solid Cyan Cube/Cut Plane -->
+  <polygon points="16,9.5 21,12.5 16,15.5 11,12.5" fill="#00E5FF" stroke="#00B0FF" stroke-width="0.8" stroke-linejoin="round" />
+  <polygon points="11,12.5 16,15.5 16,21.5 11,18.5" fill="#00B0FF" stroke="#00B0FF" stroke-width="0.8" stroke-linejoin="round" />
+  <polygon points="16,15.5 21,12.5 21,18.5 16,21.5" fill="#0288D1" stroke="#00B0FF" stroke-width="0.8" stroke-linejoin="round" />
+
+  <!-- Corner Grips -->
+  <circle cx="16" cy="5" r="1.5" fill="#00E5FF" />
+  <circle cx="25.5" cy="10.5" r="1.5" fill="#00E5FF" />
+  <circle cx="6.5" cy="10.5" r="1.5" fill="#00E5FF" />
+  <circle cx="16" cy="27" r="1.5" fill="#00E5FF" />
+</svg>

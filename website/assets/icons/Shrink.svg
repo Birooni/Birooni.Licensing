@@ -1,0 +1,21 @@
+<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Center White Box with Blue Border -->
+  <rect x="12" y="12" width="8" height="8" rx="1" fill="#FFFFFF" stroke="#1976D2" stroke-width="1.5" />
+
+  <!-- 4 Orange Inward Arrows -->
+  <!-- Top Arrow -->
+  <line x1="16" y1="4.5" x2="16" y2="10" stroke="#FB8C00" stroke-width="1.8" stroke-linecap="round" />
+  <polygon points="16,11.5 13,8 19,8" fill="#FB8C00" />
+
+  <!-- Bottom Arrow -->
+  <line x1="16" y1="27.5" x2="16" y2="22" stroke="#FB8C00" stroke-width="1.8" stroke-linecap="round" />
+  <polygon points="16,20.5 13,24 19,24" fill="#FB8C00" />
+
+  <!-- Left Arrow -->
+  <line x1="4.5" y1="16" x2="10" y2="16" stroke="#FB8C00" stroke-width="1.8" stroke-linecap="round" />
+  <polygon points="11.5,16 8,13 8,19" fill="#FB8C00" />
+
+  <!-- Right Arrow -->
+  <line x1="27.5" y1="16" x2="22" y2="16" stroke="#FB8C00" stroke-width="1.8" stroke-linecap="round" />
+  <polygon points="20.5,16 24,13 24,19" fill="#FB8C00" />
+</svg>
