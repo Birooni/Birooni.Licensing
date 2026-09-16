@@ -3,60 +3,156 @@
            Manufacturer="Birooni"
            Version="1.0.0"
            UpgradeCode="c8f2b7a4-3e91-4d7a-8f19-0e5a9c4b7d22"
-           Scope="perMachine">
+           Scope="perUser">
     
     <MajorUpgrade DowngradeErrorMessage="A newer version of BiruBox is already installed." />
     <MediaTemplate EmbedCab="yes" />
 
-    <!-- Application Binary Folder: C:\Program Files\Birooni\BiruBox -->
-    <StandardDirectory Id="ProgramFiles64Folder">
-      <Directory Id="MANUFACTURERFOLDER" Name="Birooni">
-        <Directory Id="INSTALLFOLDER" Name="BiruBox">
-          <Component Id="BiruBoxDll" Guid="1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d">
-            <File Id="BiruBox.dll" Source="..\BiruBox\bin\Release\BiruBox.dll" KeyPath="yes" />
-          </Component>
-          <Component Id="BirooniClientDll" Guid="2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e">
-            <File Id="Birooni.Client.dll" Source="..\BiruBox\bin\Release\Birooni.Client.dll" KeyPath="yes" />
-          </Component>
-          <Component Id="SystemManagementDll" Guid="3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f">
-            <File Id="System.Management.dll" Source="..\BiruBox\bin\Release\System.Management.dll" KeyPath="yes" />
-          </Component>
-          <Component Id="BiruBoxDepsJson" Guid="4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a">
-            <File Id="BiruBox.deps.json" Source="..\BiruBox\bin\Release\BiruBox.deps.json" KeyPath="yes" />
-          </Component>
-        </Directory>
-      </Directory>
-    </StandardDirectory>
+    <Icon Id="BiruBoxIcon" SourceFile="..\BiruBox\Resources\BiruBox.ico" />
+    <Property Id="ARPPRODUCTICON" Value="BiruBoxIcon" />
+    <Property Id="ARPHELPLINK" Value="https://birooni.com" />
 
-    <!-- Autodesk Revit Addins Folder: C:\ProgramData\Autodesk\Revit\Addins\{Year} -->
-    <StandardDirectory Id="CommonAppDataFolder">
+    <!-- Destination: C:\Users\<user>\AppData\Roaming\Autodesk\Revit\Addins\{Year}\Birooni Tools\BiruBox -->
+    <StandardDirectory Id="AppDataFolder">
       <Directory Id="AutodeskFolder" Name="Autodesk">
         <Directory Id="RevitFolder" Name="Revit">
           <Directory Id="AddinsFolder" Name="Addins">
+            
             <!-- Revit 2025 -->
             <Directory Id="Revit2025Folder" Name="2025">
-              <Component Id="Revit2025Addin" Guid="5e6f7a8b-9c0d-1e2f-3a4b-5c6d7e8f9a0b">
-                <File Id="BiruBox2025.addin" Source="BiruBox.addin" Name="BiruBox.addin" KeyPath="yes" />
+              <Component Id="Addin2025Comp" Guid="94e593f0-1316-4ed5-826d-d2f52ae29d4d">
+                <RegistryValue Root="HKCU" Key="Software\Birooni\BiruBox\2025" Name="AddinInstalled" Type="integer" Value="1" KeyPath="yes" />
+                <File Id="Addin2025File" Source="BiruBox.addin" Name="BiruBox.addin" />
               </Component>
+
+              <Directory Id="BirooniTools2025Folder" Name="Birooni Tools">
+                <Directory Id="BiruBox2025Folder" Name="BiruBox">
+                  <Component Id="BiruBox2025Binaries" Guid="c64c5a81-e8b5-4ed0-a99a-ebc72559b77b">
+                    <RegistryValue Root="HKCU" Key="Software\Birooni\BiruBox\2025" Name="BinariesInstalled" Type="integer" Value="1" KeyPath="yes" />
+                    <File Id="BiruBox2025.dll" Source="..\BiruBox\bin\Release\BiruBox.dll" />
+                    <File Id="BirooniClient2025.dll" Source="..\BiruBox\bin\Release\Birooni.Client.dll" />
+                    <File Id="SystemManagement2025.dll" Source="..\BiruBox\bin\Release\System.Management.dll" />
+                    <File Id="BiruBoxDepsJson2025.json" Source="..\BiruBox\bin\Release\BiruBox.deps.json" />
+                    <RemoveFolder Id="RemoveBiruBox2025Folder" On="uninstall" />
+                    <RemoveFolder Id="RemoveBirooniTools2025Folder" Directory="BirooniTools2025Folder" On="uninstall" />
+                  </Component>
+
+                  <Directory Id="Runtimes2025Folder" Name="runtimes">
+                    <Directory Id="Win2025Folder" Name="win">
+                      <Directory Id="Lib2025Folder" Name="lib">
+                        <Directory Id="Net82025Folder" Name="net8.0">
+                          <Component Id="Runtimes2025Comp" Guid="3fd90775-270d-4f36-ad59-eaf6d3ce27c6">
+                            <RegistryValue Root="HKCU" Key="Software\Birooni\BiruBox\2025" Name="RuntimesInstalled" Type="integer" Value="1" KeyPath="yes" />
+                            <File Id="RuntimeSysMgmt2025.dll" Source="..\BiruBox\bin\Release\runtimes\win\lib\net8.0\System.Management.dll" />
+                            <RemoveFolder Id="RemoveNet82025Folder" On="uninstall" />
+                            <RemoveFolder Id="RemoveLib2025Folder" Directory="Lib2025Folder" On="uninstall" />
+                            <RemoveFolder Id="RemoveWin2025Folder" Directory="Win2025Folder" On="uninstall" />
+                            <RemoveFolder Id="RemoveRuntimes2025Folder" Directory="Runtimes2025Folder" On="uninstall" />
+                          </Component>
+                        </Directory>
+                      </Directory>
+                    </Directory>
+                  </Directory>
+                </Directory>
+              </Directory>
             </Directory>
+
             <!-- Revit 2026 -->
             <Directory Id="Revit2026Folder" Name="2026">
-              <Component Id="Revit2026Addin" Guid="6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c">
-                <File Id="BiruBox2026.addin" Source="BiruBox.addin" Name="BiruBox.addin" KeyPath="yes" />
+              <Component Id="Addin2026Comp" Guid="fa312f36-2877-410f-9f0f-1f06f104bb9e">
+                <RegistryValue Root="HKCU" Key="Software\Birooni\BiruBox\2026" Name="AddinInstalled" Type="integer" Value="1" KeyPath="yes" />
+                <File Id="Addin2026File" Source="BiruBox.addin" Name="BiruBox.addin" />
               </Component>
+
+              <Directory Id="BirooniTools2026Folder" Name="Birooni Tools">
+                <Directory Id="BiruBox2026Folder" Name="BiruBox">
+                  <Component Id="BiruBox2026Binaries" Guid="c3385014-1a63-4d6c-8a17-4db1ce2fa16c">
+                    <RegistryValue Root="HKCU" Key="Software\Birooni\BiruBox\2026" Name="BinariesInstalled" Type="integer" Value="1" KeyPath="yes" />
+                    <File Id="BiruBox2026.dll" Source="..\BiruBox\bin\Release\BiruBox.dll" />
+                    <File Id="BirooniClient2026.dll" Source="..\BiruBox\bin\Release\Birooni.Client.dll" />
+                    <File Id="SystemManagement2026.dll" Source="..\BiruBox\bin\Release\System.Management.dll" />
+                    <File Id="BiruBoxDepsJson2026.json" Source="..\BiruBox\bin\Release\BiruBox.deps.json" />
+                    <RemoveFolder Id="RemoveBiruBox2026Folder" On="uninstall" />
+                    <RemoveFolder Id="RemoveBirooniTools2026Folder" Directory="BirooniTools2026Folder" On="uninstall" />
+                  </Component>
+
+                  <Directory Id="Runtimes2026Folder" Name="runtimes">
+                    <Directory Id="Win2026Folder" Name="win">
+                      <Directory Id="Lib2026Folder" Name="lib">
+                        <Directory Id="Net82026Folder" Name="net8.0">
+                          <Component Id="Runtimes2026Comp" Guid="d1fa9f69-0e71-4382-9150-3823dbc7860c">
+                            <RegistryValue Root="HKCU" Key="Software\Birooni\BiruBox\2026" Name="RuntimesInstalled" Type="integer" Value="1" KeyPath="yes" />
+                            <File Id="RuntimeSysMgmt2026.dll" Source="..\BiruBox\bin\Release\runtimes\win\lib\net8.0\System.Management.dll" />
+                            <RemoveFolder Id="RemoveNet82026Folder" On="uninstall" />
+                            <RemoveFolder Id="RemoveLib2026Folder" Directory="Lib2026Folder" On="uninstall" />
+                            <RemoveFolder Id="RemoveWin2026Folder" Directory="Win2026Folder" On="uninstall" />
+                            <RemoveFolder Id="RemoveRuntimes2026Folder" Directory="Runtimes2026Folder" On="uninstall" />
+                          </Component>
+                        </Directory>
+                      </Directory>
+                    </Directory>
+                  </Directory>
+                </Directory>
+              </Directory>
             </Directory>
+
+            <!-- Revit 2027 -->
+            <Directory Id="Revit2027Folder" Name="2027">
+              <Component Id="Addin2027Comp" Guid="17f1a90a-c919-4a5f-ba2b-b66da9eef6ed">
+                <RegistryValue Root="HKCU" Key="Software\Birooni\BiruBox\2027" Name="AddinInstalled" Type="integer" Value="1" KeyPath="yes" />
+                <File Id="Addin2027File" Source="BiruBox.addin" Name="BiruBox.addin" />
+              </Component>
+
+              <Directory Id="BirooniTools2027Folder" Name="Birooni Tools">
+                <Directory Id="BiruBox2027Folder" Name="BiruBox">
+                  <Component Id="BiruBox2027Binaries" Guid="18dbe1a6-93e7-4057-a7a1-12b8dae77dd1">
+                    <RegistryValue Root="HKCU" Key="Software\Birooni\BiruBox\2027" Name="BinariesInstalled" Type="integer" Value="1" KeyPath="yes" />
+                    <File Id="BiruBox2027.dll" Source="..\BiruBox\bin\Release\BiruBox.dll" />
+                    <File Id="BirooniClient2027.dll" Source="..\BiruBox\bin\Release\Birooni.Client.dll" />
+                    <File Id="SystemManagement2027.dll" Source="..\BiruBox\bin\Release\System.Management.dll" />
+                    <File Id="BiruBoxDepsJson2027.json" Source="..\BiruBox\bin\Release\BiruBox.deps.json" />
+                    <RemoveFolder Id="RemoveBiruBox2027Folder" On="uninstall" />
+                    <RemoveFolder Id="RemoveBirooniTools2027Folder" Directory="BirooniTools2027Folder" On="uninstall" />
+                  </Component>
+
+                  <Directory Id="Runtimes2027Folder" Name="runtimes">
+                    <Directory Id="Win2027Folder" Name="win">
+                      <Directory Id="Lib2027Folder" Name="lib">
+                        <Directory Id="Net82027Folder" Name="net8.0">
+                          <Component Id="Runtimes2027Comp" Guid="f6bdf6c7-1aa1-4aaa-9857-cfd753eadf81">
+                            <RegistryValue Root="HKCU" Key="Software\Birooni\BiruBox\2027" Name="RuntimesInstalled" Type="integer" Value="1" KeyPath="yes" />
+                            <File Id="RuntimeSysMgmt2027.dll" Source="..\BiruBox\bin\Release\runtimes\win\lib\net8.0\System.Management.dll" />
+                            <RemoveFolder Id="RemoveNet82027Folder" On="uninstall" />
+                            <RemoveFolder Id="RemoveLib2027Folder" Directory="Lib2027Folder" On="uninstall" />
+                            <RemoveFolder Id="RemoveWin2027Folder" Directory="Win2027Folder" On="uninstall" />
+                            <RemoveFolder Id="RemoveRuntimes2027Folder" Directory="Runtimes2027Folder" On="uninstall" />
+                          </Component>
+                        </Directory>
+                      </Directory>
+                    </Directory>
+                  </Directory>
+                </Directory>
+              </Directory>
+            </Directory>
+
           </Directory>
         </Directory>
       </Directory>
     </StandardDirectory>
 
-    <Feature Id="MainFeature" Title="BiruBox for Autodesk Revit" Level="1">
-      <ComponentRef Id="BiruBoxDll" />
-      <ComponentRef Id="BirooniClientDll" />
-      <ComponentRef Id="SystemManagementDll" />
-      <ComponentRef Id="BiruBoxDepsJson" />
-      <ComponentRef Id="Revit2025Addin" />
-      <ComponentRef Id="Revit2026Addin" />
+    <Feature Id="MainFeature" Title="BiruBox for Autodesk Revit (2025-2027)" Level="1">
+      <!-- 2025 -->
+      <ComponentRef Id="Addin2025Comp" />
+      <ComponentRef Id="BiruBox2025Binaries" />
+      <ComponentRef Id="Runtimes2025Comp" />
+      <!-- 2026 -->
+      <ComponentRef Id="Addin2026Comp" />
+      <ComponentRef Id="BiruBox2026Binaries" />
+      <ComponentRef Id="Runtimes2026Comp" />
+      <!-- 2027 -->
+      <ComponentRef Id="Addin2027Comp" />
+      <ComponentRef Id="BiruBox2027Binaries" />
+      <ComponentRef Id="Runtimes2027Comp" />
     </Feature>
   </Package>
 </Wix>

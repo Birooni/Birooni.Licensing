@@ -2,7 +2,7 @@
 <RevitAddIns>
   <AddIn Type="Application">
     <Name>BiruBox</Name>
-    <Assembly>C:\Program Files\Birooni\BiruBox\BiruBox.dll</Assembly>
+    <Assembly>Birooni Tools\BiruBox\BiruBox.dll</Assembly>
     <FullClassName>BiruBox.App</FullClassName>
     <ClientId>e7c3d2a1-4b58-4f0e-9c71-8a6d2f1b0c44</ClientId>
     <VendorId>BIRU</VendorId>

@@ -40,10 +40,10 @@
 
   <ItemGroup>
     <None Include="BiruBox.addin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="install.ps1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Resources\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -54,13 +54,41 @@
     <PropertyGroup>
       <RevitAddins2025>$(AppData)\Autodesk\Revit\Addins\2025</RevitAddins2025>
       <RevitAddins2026>$(AppData)\Autodesk\Revit\Addins\2026</RevitAddins2026>
+      <RevitAddins2027>$(AppData)\Autodesk\Revit\Addins\2027</RevitAddins2027>
+
+      <BiruBoxFolder2025>$(RevitAddins2025)\Birooni Tools\BiruBox</BiruBoxFolder2025>
+      <BiruBoxFolder2026>$(RevitAddins2026)\Birooni Tools\BiruBox</BiruBoxFolder2026>
+      <BiruBoxFolder2027>$(RevitAddins2027)\Birooni Tools\BiruBox</BiruBoxFolder2027>
     </PropertyGroup>
-    <Copy SourceFiles="$(TargetDir)BiruBox.dll" DestinationFolder="$(RevitAddins2025)" Condition="Exists('$(RevitAddins2025)')" ContinueOnError="true" />
-    <Copy SourceFiles="$(TargetDir)Birooni.Client.dll" DestinationFolder="$(RevitAddins2025)" Condition="Exists('$(RevitAddins2025)')" ContinueOnError="true" />
+
+    <ItemGroup>
+      <RuntimeFiles Include="$(TargetDir)runtimes\**\*.*" />
+    </ItemGroup>
+
+    <!-- Revit 2025 -->
     <Copy SourceFiles="$(TargetDir)BiruBox.addin" DestinationFolder="$(RevitAddins2025)" Condition="Exists('$(RevitAddins2025)')" ContinueOnError="true" />
-    <Copy SourceFiles="$(TargetDir)BiruBox.dll" DestinationFolder="$(RevitAddins2026)" Condition="Exists('$(RevitAddins2026)')" ContinueOnError="true" />
-    <Copy SourceFiles="$(TargetDir)Birooni.Client.dll" DestinationFolder="$(RevitAddins2026)" Condition="Exists('$(RevitAddins2026)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)BiruBox.dll" DestinationFolder="$(BiruBoxFolder2025)" Condition="Exists('$(RevitAddins2025)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)Birooni.Client.dll" DestinationFolder="$(BiruBoxFolder2025)" Condition="Exists('$(RevitAddins2025)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)System.Management.dll" DestinationFolder="$(BiruBoxFolder2025)" Condition="Exists('$(RevitAddins2025)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)BiruBox.deps.json" DestinationFolder="$(BiruBoxFolder2025)" Condition="Exists('$(RevitAddins2025)')" ContinueOnError="true" />
+    <Copy SourceFiles="@(RuntimeFiles)" DestinationFiles="@(RuntimeFiles->'$(BiruBoxFolder2025)\runtimes\%(RecursiveDir)%(Filename)%(Extension)')" Condition="Exists('$(RevitAddins2025)')" ContinueOnError="true" />
+
+    <!-- Revit 2026 -->
     <Copy SourceFiles="$(TargetDir)BiruBox.addin" DestinationFolder="$(RevitAddins2026)" Condition="Exists('$(RevitAddins2026)')" ContinueOnError="true" />
-    <Message Text="[BiruBox] Automatically deployed to $(RevitAddins2025)" Importance="high" Condition="Exists('$(RevitAddins2025)')" />
+    <Copy SourceFiles="$(TargetDir)BiruBox.dll" DestinationFolder="$(BiruBoxFolder2026)" Condition="Exists('$(RevitAddins2026)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)Birooni.Client.dll" DestinationFolder="$(BiruBoxFolder2026)" Condition="Exists('$(RevitAddins2026)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)System.Management.dll" DestinationFolder="$(BiruBoxFolder2026)" Condition="Exists('$(RevitAddins2026)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)BiruBox.deps.json" DestinationFolder="$(BiruBoxFolder2026)" Condition="Exists('$(RevitAddins2026)')" ContinueOnError="true" />
+    <Copy SourceFiles="@(RuntimeFiles)" DestinationFiles="@(RuntimeFiles->'$(BiruBoxFolder2026)\runtimes\%(RecursiveDir)%(Filename)%(Extension)')" Condition="Exists('$(RevitAddins2026)')" ContinueOnError="true" />
+
+    <!-- Revit 2027 -->
+    <Copy SourceFiles="$(TargetDir)BiruBox.addin" DestinationFolder="$(RevitAddins2027)" Condition="Exists('$(RevitAddins2027)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)BiruBox.dll" DestinationFolder="$(BiruBoxFolder2027)" Condition="Exists('$(RevitAddins2027)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)Birooni.Client.dll" DestinationFolder="$(BiruBoxFolder2027)" Condition="Exists('$(RevitAddins2027)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)System.Management.dll" DestinationFolder="$(BiruBoxFolder2027)" Condition="Exists('$(RevitAddins2027)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)BiruBox.deps.json" DestinationFolder="$(BiruBoxFolder2027)" Condition="Exists('$(RevitAddins2027)')" ContinueOnError="true" />
+    <Copy SourceFiles="@(RuntimeFiles)" DestinationFiles="@(RuntimeFiles->'$(BiruBoxFolder2027)\runtimes\%(RecursiveDir)%(Filename)%(Extension)')" Condition="Exists('$(RevitAddins2027)')" ContinueOnError="true" />
+
+    <Message Text="[BiruBox] Deployed to $(BiruBoxFolder2025)" Importance="high" Condition="Exists('$(RevitAddins2025)')" />
   </Target>
 </Project>
