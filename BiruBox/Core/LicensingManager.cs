@@ -8,7 +8,7 @@ namespace BiruBox.Core;
 
 public static class LicensingManager
 {
-    public const string ApiBaseUrl = "https://birooni-licensing.onrender.com";
+    public const string ApiBaseUrl = "https://api.ibrooni.com";
 
     public const string PublicKeyPem = """
         -----BEGIN PUBLIC KEY-----

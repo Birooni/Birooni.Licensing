@@ -39,7 +39,7 @@
           <div class="hidden sm:flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-700 text-xs text-slate-300">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span class="text-slate-400">API:</span>
-            <input id="apiBaseUrl" type="text" value="https://birooni-licensing.onrender.com" class="bg-transparent border-none text-xs focus:outline-none w-56 text-slate-200" onchange="saveApiUrl()">
+            <input id="apiBaseUrl" type="text" value="https://api.ibrooni.com" class="bg-transparent border-none text-xs focus:outline-none w-56 text-slate-200" onchange="saveApiUrl()">
           </div>
 
           <!-- Auth Status & Key Button -->
@@ -361,7 +361,7 @@
   <script>
     const DEFAULT_KEY = "birooni-admin-secret-2026";
     let adminKey = localStorage.getItem("birooni_admin_key") || DEFAULT_KEY;
-    let apiBase = localStorage.getItem("birooni_api_url") || "https://birooni-licensing.onrender.com";
+    let apiBase = localStorage.getItem("birooni_api_url") || "https://api.ibrooni.com";
 
     document.getElementById("apiBaseUrl").value = apiBase;
 
