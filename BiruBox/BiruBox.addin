@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>BiruBox</Name>
+    <Assembly>BiruBox.dll</Assembly>
+    <FullClassName>BiruBox.App</FullClassName>
+    <ClientId>e7c3d2a1-4b58-4f0e-9c71-8a6d2f1b0c44</ClientId>
+    <VendorId>BIRU</VendorId>
+    <VendorDescription>BiruBox — Auto-Section Box for Revit</VendorDescription>
+  </AddIn>
+</RevitAddIns>

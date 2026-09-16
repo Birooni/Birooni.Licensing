@@ -1,0 +1,62 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="BiruBox for Autodesk Revit"
+           Manufacturer="Birooni"
+           Version="1.0.0"
+           UpgradeCode="c8f2b7a4-3e91-4d7a-8f19-0e5a9c4b7d22"
+           Scope="perMachine">
+    
+    <MajorUpgrade DowngradeErrorMessage="A newer version of BiruBox is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Application Binary Folder: C:\Program Files\Birooni\BiruBox -->
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="MANUFACTURERFOLDER" Name="Birooni">
+        <Directory Id="INSTALLFOLDER" Name="BiruBox">
+          <Component Id="BiruBoxDll" Guid="1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d">
+            <File Id="BiruBox.dll" Source="..\BiruBox\bin\Release\BiruBox.dll" KeyPath="yes" />
+          </Component>
+          <Component Id="BirooniClientDll" Guid="2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e">
+            <File Id="Birooni.Client.dll" Source="..\BiruBox\bin\Release\Birooni.Client.dll" KeyPath="yes" />
+          </Component>
+          <Component Id="SystemManagementDll" Guid="3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f">
+            <File Id="System.Management.dll" Source="..\BiruBox\bin\Release\System.Management.dll" KeyPath="yes" />
+          </Component>
+          <Component Id="BiruBoxDepsJson" Guid="4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a">
+            <File Id="BiruBox.deps.json" Source="..\BiruBox\bin\Release\BiruBox.deps.json" KeyPath="yes" />
+          </Component>
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+
+    <!-- Autodesk Revit Addins Folder: C:\ProgramData\Autodesk\Revit\Addins\{Year} -->
+    <StandardDirectory Id="CommonAppDataFolder">
+      <Directory Id="AutodeskFolder" Name="Autodesk">
+        <Directory Id="RevitFolder" Name="Revit">
+          <Directory Id="AddinsFolder" Name="Addins">
+            <!-- Revit 2025 -->
+            <Directory Id="Revit2025Folder" Name="2025">
+              <Component Id="Revit2025Addin" Guid="5e6f7a8b-9c0d-1e2f-3a4b-5c6d7e8f9a0b">
+                <File Id="BiruBox2025.addin" Source="BiruBox.addin" Name="BiruBox.addin" KeyPath="yes" />
+              </Component>
+            </Directory>
+            <!-- Revit 2026 -->
+            <Directory Id="Revit2026Folder" Name="2026">
+              <Component Id="Revit2026Addin" Guid="6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c">
+                <File Id="BiruBox2026.addin" Source="BiruBox.addin" Name="BiruBox.addin" KeyPath="yes" />
+              </Component>
+            </Directory>
+          </Directory>
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+
+    <Feature Id="MainFeature" Title="BiruBox for Autodesk Revit" Level="1">
+      <ComponentRef Id="BiruBoxDll" />
+      <ComponentRef Id="BirooniClientDll" />
+      <ComponentRef Id="SystemManagementDll" />
+      <ComponentRef Id="BiruBoxDepsJson" />
+      <ComponentRef Id="Revit2025Addin" />
+      <ComponentRef Id="Revit2026Addin" />
+    </Feature>
+  </Package>
+</Wix>

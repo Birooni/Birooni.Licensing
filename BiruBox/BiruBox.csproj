@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RevitVersion Condition="'$(RevitVersion)' == ''">2025</RevitVersion>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <LangVersion>latest</LangVersion>
+    <PlatformTarget>x64</PlatformTarget>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Configurations>Debug;Release</Configurations>
+    <AssemblyName>BiruBox</AssemblyName>
+    <RootNamespace>BiruBox</RootNamespace>
+    <Product>BiruBox</Product>
+    <Description>Auto-Section Box add-in for Autodesk Revit</Description>
+    <Version>1.0.0</Version>
+    <ApplicationIcon>Resources\BiruBox.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <!-- Revit 2024: /p:RevitVersion=2024 and change TargetFramework to net48 -->
+  <PropertyGroup Condition="'$(RevitVersion)' == '2024'">
+    <TargetFramework>net48</TargetFramework>
+    <Nullable>annotations</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Birooni.Client\Birooni.Client.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
+    <PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="BiruBox.addin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="install.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="DeployToRevitAddins" AfterTargets="Build">
+    <PropertyGroup>
+      <RevitAddins2025>$(AppData)\Autodesk\Revit\Addins\2025</RevitAddins2025>
+      <RevitAddins2026>$(AppData)\Autodesk\Revit\Addins\2026</RevitAddins2026>
+    </PropertyGroup>
+    <Copy SourceFiles="$(TargetDir)BiruBox.dll" DestinationFolder="$(RevitAddins2025)" Condition="Exists('$(RevitAddins2025)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)Birooni.Client.dll" DestinationFolder="$(RevitAddins2025)" Condition="Exists('$(RevitAddins2025)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)BiruBox.addin" DestinationFolder="$(RevitAddins2025)" Condition="Exists('$(RevitAddins2025)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)BiruBox.dll" DestinationFolder="$(RevitAddins2026)" Condition="Exists('$(RevitAddins2026)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)Birooni.Client.dll" DestinationFolder="$(RevitAddins2026)" Condition="Exists('$(RevitAddins2026)')" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)BiruBox.addin" DestinationFolder="$(RevitAddins2026)" Condition="Exists('$(RevitAddins2026)')" ContinueOnError="true" />
+    <Message Text="[BiruBox] Automatically deployed to $(RevitAddins2025)" Importance="high" Condition="Exists('$(RevitAddins2025)')" />
+  </Target>
+</Project>

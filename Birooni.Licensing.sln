@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Birooni.Licensing.Api.Tests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Birooni.Client", "Birooni.Client\Birooni.Client.csproj", "{2083B2F1-479F-4416-A7C3-18B882100E03}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiruBox", "BiruBox\BiruBox.csproj", "{046420B8-3163-4FD9-B627-29D2BF036FEA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{2083B2F1-479F-4416-A7C3-18B882100E03}.Release|x64.Build.0 = Release|Any CPU
 		{2083B2F1-479F-4416-A7C3-18B882100E03}.Release|x86.ActiveCfg = Release|Any CPU
 		{2083B2F1-479F-4416-A7C3-18B882100E03}.Release|x86.Build.0 = Release|Any CPU
+		{046420B8-3163-4FD9-B627-29D2BF036FEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{046420B8-3163-4FD9-B627-29D2BF036FEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{046420B8-3163-4FD9-B627-29D2BF036FEA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{046420B8-3163-4FD9-B627-29D2BF036FEA}.Debug|x64.Build.0 = Debug|Any CPU
+		{046420B8-3163-4FD9-B627-29D2BF036FEA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{046420B8-3163-4FD9-B627-29D2BF036FEA}.Debug|x86.Build.0 = Debug|Any CPU
+		{046420B8-3163-4FD9-B627-29D2BF036FEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{046420B8-3163-4FD9-B627-29D2BF036FEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{046420B8-3163-4FD9-B627-29D2BF036FEA}.Release|x64.ActiveCfg = Release|Any CPU
+		{046420B8-3163-4FD9-B627-29D2BF036FEA}.Release|x64.Build.0 = Release|Any CPU
+		{046420B8-3163-4FD9-B627-29D2BF036FEA}.Release|x86.ActiveCfg = Release|Any CPU
+		{046420B8-3163-4FD9-B627-29D2BF036FEA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
