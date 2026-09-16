@@ -12,13 +12,13 @@ public static class LicensingManager
 
     public const string PublicKeyPem = """
         -----BEGIN PUBLIC KEY-----
-        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0SlDylVCS5rtXZLToBOn
-        0FuWUHdUHI95nykc0ZbQHs92ElQLujBKtZ5cbD3htdhZAUJvuATtLGdLHsTYUKIL
-        XW+gtA5lV05cGjVrGDvg/d9VD5zfusKYZxz9FEAwmAnfWe7x/BXCU519rjCsfcNn
-        fAdK2TtRyP5T7qi+G8vzrD0s92vcNNsGAi0BNmDlYZp4RAKZ/YWmLgmLhWXgjOyw
-        obIs4mOnLIZD5yxr81f3GEZyFrQ9XAxO/eTecXXELOyC7lrjHNAUblxd9QY6e6AA
-        8zj8+Ajz9QmqZj+S5eXTEZ1cHuphr7PsU6UkuV48/Fn1rj5v0mq610E9dmUtqCei
-        nQIDAQAB
+        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Hf8aMkNF3xvChyRR6Zl
+        eScGi9JzYqc0Ap0IkuNB194E1xUDzaZrFcILFkVycnu6mpsrFF2D4gi1hFwUnUIX
+        6NXeEBpFqma9Rd5tLHf08zAccKStBtOh0phsnkoP0Nz5FiqrB/63/chCxM3qWrHH
+        MihZ0HQ27qkJYzKmNsci3vMTzNBTZVBYJDjzOR9Bqc24o4d63BibriDOxUdlkkN0
+        +s25UwQka+bBUMBTx1bKLgeyd7FgmMFXtG+JYc6rBBrbLFvYLmfNoPgpMjBbfoM2
+        LFrFZ/qqCKnA6ZpWR0OBdH/VdkXXT574zwlDNNQfb6xillUj2egldQvTrpPIG51z
+        HQIDAQAB
         -----END PUBLIC KEY-----
         """;
 

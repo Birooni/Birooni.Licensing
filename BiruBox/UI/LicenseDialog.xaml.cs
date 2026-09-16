@@ -86,7 +86,7 @@ public partial class LicenseDialog : Window
 
         BtnActivate.IsEnabled = false;
         BtnActivate.Content = "Activating...";
-        TxtStatusMessage.Text = "Connecting to licensing server...";
+        TxtStatusMessage.Text = "Connecting to licensing server (waking server if needed, ~20s)...";
 
         try
         {
@@ -134,8 +134,8 @@ public partial class LicenseDialog : Window
         }
 
         BtnClaimTrial.IsEnabled = false;
-        BtnClaimTrial.Content = "Claiming 14-Day Trial...";
-        TxtStatusMessage.Text = "Registering trial with server...";
+        BtnClaimTrial.Content = "Connecting...";
+        TxtStatusMessage.Text = "Connecting to licensing server (waking server if needed, ~20s)...";
 
         try
         {

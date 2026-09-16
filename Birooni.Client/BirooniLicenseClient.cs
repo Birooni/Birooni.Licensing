@@ -32,7 +32,7 @@ public class BirooniLicenseClient
     {
         ApiBaseUrl = apiBaseUrl.TrimEnd('/');
         _pluginVersion = pluginVersion;
-        _httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+        _httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
         _cacheManager = cacheManager ?? new LicenseCacheManager();
         _validator = new OfflineTokenValidator(publicKeyPem);
 
