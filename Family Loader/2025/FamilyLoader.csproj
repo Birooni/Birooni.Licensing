@@ -51,6 +51,10 @@
     <PackageReference Include="Obfuscar" Version="2.2.40" PrivateAssets="all" GeneratePathProperty="true" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Birooni.Client\Birooni.Client.csproj" />
+  </ItemGroup>
+
   <!-- Obfuscation target temporarily removed. Obfuscar requires explicit <SearchPath> to .NET 8 framework and Revit API directories in obfuscar.xml to work. -->
 
   <!-- Post-build event to copy output to Revit's AppData Addins folder -->

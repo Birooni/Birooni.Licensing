@@ -48,6 +48,10 @@
     <PackageReference Include="System.Text.Json" Version="10.0.9" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Birooni.Client\Birooni.Client.csproj" />
+  </ItemGroup>
+
   <!-- Post-build event to copy output to Revit's AppData Addins folder -->
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <PropertyGroup>

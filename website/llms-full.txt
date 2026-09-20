@@ -1,46 +1,78 @@
-# Birooni / BiruBox Full Documentation for AI Search Engines
+# Birooni Suite Full Technical & Architectural Documentation for AI Search Engines
 
-## Product Information
-- **Title:** BiruBox — Intelligent 3D Section Box Suite for Autodesk Revit
-- **Brand:** Birooni
+## Product Overview & Brand
+- **Brand / Publisher:** Birooni Tools
 - **Domain:** https://ibrooni.com
-- **Target Audience:** BIM Managers, BIM Coordinators, Architects, MEP Engineers, Structural Engineers using Autodesk Revit.
+- **Licensing API:** https://api.ibrooni.com
+- **Admin Management Portal:** https://admin.ibrooni.com
+- **Target Audience:** BIM Managers, BIM Coordinators, Architects, MEP Engineers, Structural Engineers, and VDC Professionals using Autodesk Revit.
 
-## Detailed Tool Breakdown
+---
 
-### 1. AutoSectionBox
-Calculates the minimal oriented bounding box or aligned axis bounding box around the user's currently selected elements in Autodesk Revit. If multiple rooms or levels are selected, it encompasses the composite union bounding box with configurable padding rules.
+## 1. Product: BiruBox
 
-### 2. DrawBox
-Allows the user to click two diagonal points in any plan, section, or 3D isometric view. BiruBox constructs an active 3D section box encompassing the drawn volume, applying vertical height limits based on current floor-to-ceiling elevation.
+### 1.1 Summary
+BiruBox is an intelligent 3D section box and view navigation add-in for Autodesk Revit 2025, 2026, and 2027. It eliminates manual grip manipulation by enabling 1-click element isolation, intuitive diagonal screen box drawing, dynamic millimeter-increment boundaries, and persistent section box state toggling.
 
-### 3. Quick AutoSection
-A zero-dialog shortcut. Select one or more elements in any view and click Quick Box (or use hotkey). The active 3D view immediately crops to the selection with default clearance offsets.
+### 1.2 Tool Specifications
+- **AutoSectionBox**: Computes minimal oriented bounding box or aligned axis bounding box around active element selections, rooms, or systems.
+- **DrawBox**: Two-click diagonal bounding volume construction in 2D plan, section, or 3D views with automatic floor-to-ceiling elevation limits.
+- **Quick AutoSection**: Zero-dialog instant section box cropping around selected Revit elements.
+- **Grow Bounds & Shrink Bounds**: Discrete millimeter-step expansion/contraction (+100mm, -100mm) without manual grip dragging.
+- **Toggle State**: Toggles `View3D.IsSectionBoxActive` while retaining custom bounding coordinates in memory.
 
-### 4. Grow Bounds & Shrink Bounds
-Eliminates manually dragging the blue triangular grip controls in Revit 3D views. BiruBox modifies the bounding box vectors programmatically in discrete millimeter increments (+100mm, -100mm, etc.), maintaining coordinate alignment.
+### 1.3 System & Architecture
+- **Installer:** `BiruBox-Setup.msi` (Per-user deployment to `%AppData%\Autodesk\Revit\Addins` and `%LocalAppData%\Birooni Tools`).
+- **Runtime:** .NET 8.0 for Autodesk Revit 2025–2027 on Windows 10 & 11 (64-bit).
+- **Auto-Updater:** `AutoUpdateManager` in `Birooni.Client` checks release registry on startup, downloads `BiruBox-update.zip`, and stages PowerShell exit script.
 
-### 5. Toggle State
-Saves the active SectionBox parameters to memory and toggles `View3D.IsSectionBoxActive`. Allows engineers to quickly toggle full model context on and off without losing their customized bounding box coordinates.
+---
 
-## Installation & System Requirements
-- **OS:** Microsoft Windows 10 (64-bit) or Windows 11 (64-bit).
-- **Target Host:** Autodesk Revit 2025, Autodesk Revit 2026, or Autodesk Revit 2027.
-- **Runtime:** .NET 8.0 (Revit 2025+ runs natively on .NET 8).
-- **Installer Type:** Windows MSI package (`BiruBox-Setup.msi`), per-user deployment into `%AppData%\Autodesk\Revit\Addins` and `%LocalAppData%\Birooni Tools`.
+## 2. Product: Family Loader
 
-## Licensing Engine Specifications
+### 2.1 Summary
+Family Loader is an advanced ribbon generator and family deployment system for Autodesk Revit. It converts local and networked `.rfa` libraries into custom interactive Revit ribbon tabs, panels, and type buttons with automatic 3D thumbnail extraction and one-click model placement.
+
+### 2.2 Tool Specifications
+- **Dynamic Ribbon Builder**: Visual WPF studio allowing unlimited nested tabs and panels mapped to office libraries.
+- **1-Click Interactive Placement**: Loads RFA and invokes Revit interactive placement cursor directly in the active view with zero intermediate dialogs.
+- **Automatic 3D Thumbnail Extraction**: Binary extraction of authentic Revit 3D preview thumbnails directly from `.rfa` headers, or custom PNG/ICO assignment.
+- **"Types as Push Button" & Multi-Row Stacking**: Exposes specific family types as dedicated buttons stacked 1, 2, or 3 rows per ribbon column for ultimate screen efficiency.
+- **Drag & Drop Organization**: Reorder tabs, panels, and family buttons interactively.
+- **Team Import / Export**: Clean JSON configuration export and deployment to standardize library access across design firms.
+- **Immutable Bootstrapper Loader**: `FamilyLoader.Loader.dll` acts as a permanent proxy loader so auto-updates never invalidate the user's "Always Load" security trust choice.
+
+### 2.3 System & Architecture
+- **Installer:** `FamilyLoader-Setup.msi` (Per-user deployment to `%AppData%\Autodesk\Revit\Addins` and `%LocalAppData%\Birooni Tools`).
+- **Runtime Multi-Targeting:**
+  - Modern: .NET 8.0 for Autodesk Revit 2025, 2026, 2027
+  - Legacy: .NET Framework 4.8 for Autodesk Revit 2020, 2021, 2022, 2023, 2024
+- **Auto-Updater:** Automated background release checking via `Birooni.Client`, staging `FamilyLoader-update.zip`, and updating on Revit shutdown.
+
+---
+
+## 3. Cryptographic Licensing Engine Specifications
+
 - **Provider:** Birooni Licensing Infrastructure (`Birooni.Licensing.Api`).
-- **Signature Algorithm:** RSA-2048 SHA-256 with PKCS#1 v1.5 padding.
-- **Device Fingerprinting:** Deterministic SHA-256 hashing derived from:
+- **Algorithm:** RSA-2048 SHA-256 with PKCS#1 v1.5 padding.
+- **Device Fingerprinting:** Deterministic SHA-256 hash derived from:
   - Motherboard Serial Number (`Win32_BaseBoard.SerialNumber`)
   - CPU Processor ID (`Win32_Processor.ProcessorId`)
   - Windows Machine GUID (`HKLM\SOFTWARE\Microsoft\Cryptography\MachineGuid`)
-- **Offline Token Storage:** `%ProgramData%\Birooni\license.lic`.
-- **Trial Policy:** 14 days full access, automatically provisioned upon first startup. Duplicate trials per unique hardware fingerprint are blocked.
-- **Seat Transfers:** Perpetual and Annual licenses can be deactivated within Revit or via the web admin portal to release the seat.
+- **Offline Token Storage:**
+  - BiruBox: `%ProgramData%\Birooni\license.lic`
+  - Family Loader: `%ProgramData%\Birooni\familyloader.lic`
+- **Trial Policy:** 14-day full access, automatically provisioned upon first startup. Trials are scoped independently per product.
+- **License Tiers (Per Product):**
+  - **14-Day Free Trial:** $0 (Automatic hardware activation, full feature access)
+  - **Perpetual Pro:** $149 one-time (Lifetime usage, node-locked, 1-year free updates included)
+  - **Enterprise Floating:** $299 / seat / year (Concurrent network license pool, central admin dashboard)
 
-## Contacts & Support
+---
+
+## 4. Contacts & Official Links
 - General Support: biroonisoft@gmail.com
 - Main Site: https://ibrooni.com
+- Family Loader Page: https://ibrooni.com/family-loader.html
 - Admin Portal: https://admin.ibrooni.com
+- API Documentation: https://api.ibrooni.com/swagger

@@ -7,7 +7,7 @@ public class LicenseCacheManager
 {
     public string LicenseFilePath { get; }
 
-    public LicenseCacheManager(string? customFilePath = null)
+    public LicenseCacheManager(string? customFilePath = null, string? productName = null)
     {
         if (!string.IsNullOrWhiteSpace(customFilePath))
         {
@@ -16,9 +16,14 @@ public class LicenseCacheManager
         else
         {
             var programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            LicenseFilePath = Path.Combine(programData, "Birooni", "license.lic");
+            var fileName = string.IsNullOrWhiteSpace(productName) || productName.Equals("BiruBox", StringComparison.OrdinalIgnoreCase)
+                ? "license.lic"
+                : $"{productName.Trim().ToLowerInvariant()}.lic";
+            LicenseFilePath = Path.Combine(programData, "Birooni", fileName);
         }
     }
+
+    public static LicenseCacheManager ForProduct(string productName) => new(productName: productName);
 
     public CachedToken? LoadToken()
     {

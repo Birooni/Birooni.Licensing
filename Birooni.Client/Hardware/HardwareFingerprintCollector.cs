@@ -20,10 +20,19 @@ public static class HardwareFingerprintCollector
         var machineGuid = GetWindowsMachineGuid();
 
         var composite = $"{motherboardSerial.Trim()}|{cpuProcessorId.Trim()}|{machineGuid.Trim()}";
+#if NET8_0_OR_GREATER
         var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(composite));
         var hex = Convert.ToHexString(hashBytes);
+#else
+        byte[] hashBytes;
+        using (var sha = SHA256.Create())
+        {
+            hashBytes = sha.ComputeHash(Encoding.UTF8.GetBytes(composite));
+        }
+        var hex = BitConverter.ToString(hashBytes).Replace("-", "");
+#endif
 
-        return $"HW-{hex[..16]}";
+        return $"HW-{hex.Substring(0, Math.Min(16, hex.Length))}";
     }
 
     private static string GetMotherboardSerial()

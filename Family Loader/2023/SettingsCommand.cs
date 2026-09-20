@@ -15,6 +15,11 @@ namespace FamilyLoader
         {
             try
             {
+                if (!FamilyLoader.Core.LicensingManager.EnsureLicense())
+                {
+                    return Result.Cancelled;
+                }
+
                 var window = new SettingsWindow();
                 
                 // Set the owner window to Revit's main window handle

@@ -281,16 +281,18 @@ public class LicensingService : ILicensingService
     {
         var deviceId = request.DeviceId.Trim();
 
-        // Ensure a device cannot claim multiple trials
+        var targetProduct = request.Product.Trim();
+
+        // Ensure a device cannot claim multiple trials for the same product
         var existingTrialActivation = await _context.Activations
             .Include(a => a.License)
-            .Where(a => a.DeviceId == deviceId && a.License != null && a.License.LicenseType == "Trial")
+            .Where(a => a.DeviceId == deviceId && a.License != null && a.License.LicenseType == "Trial" && a.License.Product.ToLower() == targetProduct.ToLower())
             .FirstOrDefaultAsync(cancellationToken);
 
         if (existingTrialActivation != null)
         {
             await LogValidationAsync(existingTrialActivation.LicenseId, deviceId, "TrialAlreadyClaimed", ipAddress, cancellationToken);
-            return LicenseResult.Fail($"A trial license has already been issued for device '{deviceId}'.", existingTrialActivation.License?.LicenseKey);
+            return LicenseResult.Fail($"A trial license has already been issued for product '{targetProduct}' on device '{deviceId}'.", existingTrialActivation.License?.LicenseKey);
         }
 
         // Generate 14-day trial license

@@ -17,8 +17,76 @@ public class OfflineTokenValidator
         }
 
         _rsa = RSA.Create();
+#if NET8_0_OR_GREATER
         _rsa.ImportFromPem(publicKeyPem.Trim());
+#else
+        ImportPemPublicKeyNet48(_rsa, publicKeyPem.Trim());
+#endif
     }
+
+#if !NET8_0_OR_GREATER
+    private static void ImportPemPublicKeyNet48(RSA rsa, string pem)
+    {
+        var base64 = pem
+            .Replace("-----BEGIN PUBLIC KEY-----", "")
+            .Replace("-----END PUBLIC KEY-----", "")
+            .Replace("\r", "")
+            .Replace("\n", "")
+            .Trim();
+        byte[] der = Convert.FromBase64String(base64);
+
+        using var ms = new MemoryStream(der);
+        using var reader = new BinaryReader(ms);
+
+        if (reader.ReadByte() != 0x30) throw new CryptographicException("Invalid PEM DER: Expected Sequence");
+        ReadLength(reader);
+
+        if (reader.ReadByte() != 0x30) throw new CryptographicException("Invalid PEM DER: Expected Algorithm Sequence");
+        int algLen = ReadLength(reader);
+        reader.ReadBytes(algLen);
+
+        if (reader.ReadByte() != 0x03) throw new CryptographicException("Invalid PEM DER: Expected Bit String");
+        ReadLength(reader);
+        reader.ReadByte();
+
+        if (reader.ReadByte() != 0x30) throw new CryptographicException("Invalid PEM DER: Expected RSAPublicKey Sequence");
+        ReadLength(reader);
+
+        if (reader.ReadByte() != 0x02) throw new CryptographicException("Invalid PEM DER: Expected Modulus Integer");
+        int modLen = ReadLength(reader);
+        byte[] modulus = reader.ReadBytes(modLen);
+        if (modulus.Length > 0 && modulus[0] == 0x00)
+        {
+            byte[] trimmed = new byte[modulus.Length - 1];
+            Buffer.BlockCopy(modulus, 1, trimmed, 0, trimmed.Length);
+            modulus = trimmed;
+        }
+
+        if (reader.ReadByte() != 0x02) throw new CryptographicException("Invalid PEM DER: Expected Exponent Integer");
+        int expLen = ReadLength(reader);
+        byte[] exponent = reader.ReadBytes(expLen);
+
+        var rsaParams = new RSAParameters
+        {
+            Modulus = modulus,
+            Exponent = exponent
+        };
+        rsa.ImportParameters(rsaParams);
+    }
+
+    private static int ReadLength(BinaryReader reader)
+    {
+        byte b = reader.ReadByte();
+        if ((b & 0x80) == 0) return b;
+        int count = b & 0x7F;
+        int len = 0;
+        for (int i = 0; i < count; i++)
+        {
+            len = (len << 8) | reader.ReadByte();
+        }
+        return len;
+    }
+#endif
 
     public LicenseValidationResult Validate(CachedToken? token, string currentDeviceId)
     {

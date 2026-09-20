@@ -44,13 +44,22 @@ namespace FamilyLoader
         {
             try
             {
+                // 1. Non-blocking licensing initialization & auto-update check
+                _ = FamilyLoader.Core.LicensingManager.InitializeAsync();
+
+                // Listen for background auto-update staging notifications
+                FamilyLoader.Core.LicensingManager.UpdateStaged += (_, update) =>
+                {
+                    Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() => NotifyUpdateStaged(update)));
+                };
+
                 ConfigManager.RevitVersion = application.ControlledApplication.VersionNumber;
                 var config = ConfigManager.Load();
                 _commandMappings.Clear();
                 _iconOnlyButtonNames.Clear();
                 int commandIndex = 1;
 
-                // Create Settings button in Add-Ins tab -> Birooni Tools panel
+                // Create Settings & License buttons in Add-Ins tab -> Birooni Tools panel
                 string addInsPanelName = "Birooni Tools";
                 RibbonPanel? settingsPanel = application.GetRibbonPanels(Tab.AddIns)
                                                 .FirstOrDefault(p => p.Name.Equals(addInsPanelName, StringComparison.OrdinalIgnoreCase));
@@ -78,6 +87,25 @@ namespace FamilyLoader
                 catch (Autodesk.Revit.Exceptions.ArgumentException)
                 {
                     // Settings button already exists on a shared Birooni Tools panel.
+                }
+
+                PushButtonData licenseBtnData = new PushButtonData(
+                    "FamilyLoaderLicense",
+                    "License",
+                    assemblyPath,
+                    typeof(LicenseCommand).FullName)
+                {
+                    LargeImage = GetLicenseImage(32),
+                    Image = GetLicenseImage(16),
+                    ToolTip = "View Family Loader license status, activate key, or start a 14-day free trial."
+                };
+                try
+                {
+                    settingsPanel.AddItem(licenseBtnData);
+                }
+                catch (Autodesk.Revit.Exceptions.ArgumentException)
+                {
+                    // License button already exists on panel.
                 }
 
                 int familyIndex = 1;
@@ -714,6 +742,51 @@ namespace FamilyLoader
             rtb.Render(drawingVisual);
             rtb.Freeze();
             return rtb;
+        }
+
+        private static ImageSource GetLicenseImage(int size)
+        {
+            DrawingVisual drawingVisual = new DrawingVisual();
+            using (DrawingContext dc = drawingVisual.RenderOpen())
+            {
+                double padding = size * 0.15;
+                Rect rect = new Rect(padding, padding, size - 2 * padding, size - 2 * padding);
+                
+                PathGeometry shield = new PathGeometry();
+                PathFigure figure = new PathFigure { StartPoint = new Point(rect.Left, rect.Top) };
+                figure.Segments.Add(new LineSegment(new Point(rect.Right, rect.Top), true));
+                figure.Segments.Add(new LineSegment(new Point(rect.Right, rect.Top + rect.Height * 0.5), true));
+                figure.Segments.Add(new QuadraticBezierSegment(new Point(rect.Left + rect.Width * 0.5, rect.Bottom), new Point(rect.Left, rect.Top + rect.Height * 0.5), true));
+                figure.IsClosed = true;
+                shield.Figures.Add(figure);
+
+                dc.DrawGeometry(new SolidColorBrush(Color.FromRgb(2, 132, 199)), new Pen(new SolidColorBrush(Color.FromRgb(56, 189, 248)), size * 0.05), shield);
+
+                dc.DrawEllipse(new SolidColorBrush(Colors.White), null, new Point(rect.Left + rect.Width * 0.5, rect.Top + rect.Height * 0.35), size * 0.12, size * 0.12);
+                dc.DrawRectangle(new SolidColorBrush(Colors.White), null, new Rect(rect.Left + rect.Width * 0.45, rect.Top + rect.Height * 0.45, rect.Width * 0.1, rect.Height * 0.25));
+            }
+
+            RenderTargetBitmap rtb = new RenderTargetBitmap(size, size, 96, 96, PixelFormats.Pbgra32);
+            rtb.Render(drawingVisual);
+            rtb.Freeze();
+            return rtb;
+        }
+
+        private static void NotifyUpdateStaged(Birooni.Client.Updates.AppUpdateInfo update)
+        {
+            try
+            {
+                var notes = string.IsNullOrWhiteSpace(update.ReleaseNotes) ? "" : $"\n\nWhat's new in v{update.LatestVersion}:\n{update.ReleaseNotes}";
+                MessageBox.Show(
+                    $"Family Loader has automatically downloaded the v{update.LatestVersion} update in the background!{notes}\n\nThe update is staged and will apply automatically when you close Revit.",
+                    "Family Loader Auto-Update",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            catch
+            {
+                // Silently ignore
+            }
         }
     }
 }

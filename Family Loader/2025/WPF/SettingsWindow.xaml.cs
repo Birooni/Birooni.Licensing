@@ -109,5 +109,12 @@ namespace FamilyLoader.WPF
                 }
             }
         }
+
+        private void BtnLicense_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new FamilyLoader.UI.LicenseDialog();
+            dlg.Owner = this;
+            dlg.ShowDialog();
+        }
     }
 }

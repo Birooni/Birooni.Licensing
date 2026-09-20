@@ -10,3 +10,11 @@
 /downloads/BiruBox-update.zip
   Content-Disposition: attachment; filename="BiruBox-update.zip"
   Cache-Control: public, max-age=0, must-revalidate
+
+/downloads/FamilyLoader-Setup.msi
+  Content-Disposition: attachment; filename="FamilyLoader-Setup.msi"
+  Cache-Control: public, max-age=60
+
+/downloads/FamilyLoader-update.zip
+  Content-Disposition: attachment; filename="FamilyLoader-update.zip"
+  Cache-Control: public, max-age=0, must-revalidate

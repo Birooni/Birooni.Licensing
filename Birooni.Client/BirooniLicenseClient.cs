@@ -28,12 +28,13 @@ public class BirooniLicenseClient
         string publicKeyPem,
         string pluginVersion = "2026.1.0",
         HttpClient? httpClient = null,
-        LicenseCacheManager? cacheManager = null)
+        LicenseCacheManager? cacheManager = null,
+        string? productName = null)
     {
         ApiBaseUrl = apiBaseUrl.TrimEnd('/');
         _pluginVersion = pluginVersion;
         _httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
-        _cacheManager = cacheManager ?? new LicenseCacheManager();
+        _cacheManager = cacheManager ?? new LicenseCacheManager(productName: productName);
         _validator = new OfflineTokenValidator(publicKeyPem);
 
         DeviceFingerprint = HardwareFingerprintCollector.GetDeviceFingerprint();
@@ -98,7 +99,11 @@ public class BirooniLicenseClient
             };
 
             var response = await _httpClient.PostAsJsonAsync($"{ApiBaseUrl}/api/license/activate", request, cancellationToken);
+#if NET8_0_OR_GREATER
             var content = await response.Content.ReadAsStringAsync(cancellationToken);
+#else
+            var content = await response.Content.ReadAsStringAsync();
+#endif
 
             var apiResult = JsonSerializer.Deserialize<ServerLicenseResponse>(content, new JsonSerializerOptions
             {
@@ -152,7 +157,11 @@ public class BirooniLicenseClient
             };
 
             var response = await _httpClient.PostAsJsonAsync($"{ApiBaseUrl}/api/license/trial", request, cancellationToken);
+#if NET8_0_OR_GREATER
             var content = await response.Content.ReadAsStringAsync(cancellationToken);
+#else
+            var content = await response.Content.ReadAsStringAsync();
+#endif
 
             var apiResult = JsonSerializer.Deserialize<ServerLicenseResponse>(content, new JsonSerializerOptions
             {

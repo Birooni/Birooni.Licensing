@@ -19,6 +19,11 @@ namespace FamilyLoader
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            if (!FamilyLoader.Core.LicensingManager.EnsureLicense())
+            {
+                return Result.Cancelled;
+            }
+
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             if (uidoc == null)
             {

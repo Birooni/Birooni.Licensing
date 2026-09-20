@@ -2,8 +2,8 @@
 <RevitAddIns>
   <AddIn Type="Application">
     <Name>Family Loader</Name>
-    <Assembly>Family Loader/FamilyLoader.dll</Assembly>
-    <FullClassName>FamilyLoader.App</FullClassName>
+    <Assembly>Family Loader/FamilyLoader.Loader.dll</Assembly>
+    <FullClassName>FamilyLoader.Loader.AppLoader</FullClassName>
     <ClientId>c1b61922-263a-4db3-96b7-84950db8182b</ClientId>
     <VendorId>Birooni</VendorId>
     <VendorDescription>Birooni Tools for Revit</VendorDescription>

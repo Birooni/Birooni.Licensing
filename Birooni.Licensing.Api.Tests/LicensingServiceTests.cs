@@ -102,6 +102,35 @@ public class LicensingServiceTests
     }
 
     [Fact]
+    public async Task Trial_AllowsIndependentTrialsForDifferentProductsOnSameDevice()
+    {
+        using var context = CreateInMemoryDbContext(nameof(Trial_AllowsIndependentTrialsForDifferentProductsOnSameDevice));
+        using var signer = CreateTokenSigner();
+        var service = new LicensingService(context, signer, NullLogger<LicensingService>.Instance);
+
+        // Claim trial for BiruBox
+        var resBiruBox = await service.TrialAsync(new TrialLicenseRequest
+        {
+            CustomerName = "Architect",
+            CustomerEmail = "arch@example.com",
+            DeviceId = "SHARED-PC-100",
+            Product = "BiruBox",
+        }, "127.0.0.1");
+        Assert.True(resBiruBox.Success);
+
+        // Claim trial for FamilyLoader on the same device -> should succeed
+        var resFamilyLoader = await service.TrialAsync(new TrialLicenseRequest
+        {
+            CustomerName = "Architect",
+            CustomerEmail = "arch@example.com",
+            DeviceId = "SHARED-PC-100",
+            Product = "FamilyLoader",
+        }, "127.0.0.1");
+        Assert.True(resFamilyLoader.Success);
+        Assert.Equal("FamilyLoader", resFamilyLoader.Product);
+    }
+
+    [Fact]
     public async Task Activate_EnforcesMaxActivationsLimit()
     {
         using var context = CreateInMemoryDbContext(nameof(Activate_EnforcesMaxActivationsLimit));

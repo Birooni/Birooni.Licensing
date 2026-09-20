@@ -1,18 +1,29 @@
+param(
+    [string]$Configuration = "Release"
+)
+
 $ErrorActionPreference = "Stop"
 $Root = $PSScriptRoot
 Set-Location $Root
 
-Write-Host "Building 2023 (Revit 2020-2024) and 2025 (Revit 2025-2027)..."
-dotnet build "$Root\2023\FamilyLoader.csproj" -c Debug -p:Platform=x64
+Write-Host "==================================================" -ForegroundColor Cyan
+Write-Host " 1. Building FamilyLoader.Loader & Projects ($Configuration)..." -ForegroundColor Cyan
+Write-Host "==================================================" -ForegroundColor Cyan
+
+dotnet build "$Root\FamilyLoader.Loader\FamilyLoader.Loader.csproj" -c $Configuration
+if ($LASTEXITCODE -ne 0) { throw "FamilyLoader.Loader build failed" }
+
+dotnet build "$Root\2023\FamilyLoader.csproj" -c $Configuration -p:Platform=x64
 if ($LASTEXITCODE -ne 0) { throw "2023 build failed" }
-dotnet build "$Root\2025\FamilyLoader.csproj" -c Debug -p:Platform=x64
+
+dotnet build "$Root\2025\FamilyLoader.csproj" -c $Configuration -p:Platform=x64
 if ($LASTEXITCODE -ne 0) { throw "2025 build failed" }
 
-Write-Host "Installing WiX UI Extension..."
+Write-Host "`nInstalling WiX UI Extension..."
 if (Test-Path ".wix") { Remove-Item ".wix" -Recurse -Force }
 try { wix extension add WixToolset.UI.wixext/4.0.5 } catch {}
 
-Write-Host "Setting up Source Directories..."
+Write-Host "`nSetting up Source Directories..."
 $SourceDir = "SourceDir"
 if (Test-Path $SourceDir) { Remove-Item $SourceDir -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $SourceDir | Out-Null
@@ -37,12 +48,25 @@ foreach ($v in $versions) {
     New-Item -ItemType Directory -Force -Path $appDir | Out-Null
     
     Copy-Item "$srcFolder\FamilyLoader.addin" -Destination "$verDir\" -Force
-    $binDir = "$srcFolder\bin\x64\Debug"
+    
+    $binDir = "$srcFolder\bin\x64\$Configuration"
+    if (-not (Test-Path $binDir)) { $binDir = "$srcFolder\bin\$Configuration" }
+    if (-not (Test-Path $binDir)) { $binDir = "$srcFolder\bin\x64\Debug" }
     if (-not (Test-Path $binDir)) { $binDir = "$srcFolder\bin\Debug" }
     Get-ChildItem $binDir -File | Copy-Item -Destination $appDir -Force
+
+    # Copy immutable bootstrapper loader DLL
+    $loaderTfm = if ($srcFolder -eq "2025") { "net8.0-windows" } else { "net48" }
+    $loaderDll = "$Root\FamilyLoader.Loader\bin\$Configuration\$loaderTfm\FamilyLoader.Loader.dll"
+    if (-not (Test-Path $loaderDll)) {
+        $loaderDll = "$Root\FamilyLoader.Loader\bin\Debug\$loaderTfm\FamilyLoader.Loader.dll"
+    }
+    if (Test-Path $loaderDll) {
+        Copy-Item $loaderDll -Destination $appDir -Force
+    }
 }
 
-Write-Host "Generating Components.wxs..."
+Write-Host "`nGenerating Components.wxs..."
 
 $xml = @"
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -124,7 +148,39 @@ $features
 
 Set-Content -Path "Components.wxs" -Value $xml
 
-Write-Host "Running WiX build..."
-wix build Installer.wxs Components.wxs CustomUI.wxs -ext WixToolset.UI.wixext -out Output\FamilyLoader_Setup.msi
+if (-not (Test-Path "Output")) { New-Item -ItemType Directory -Path "Output" | Out-Null }
 
-Write-Host "Done! MSI created in Output\FamilyLoader_Setup.msi"
+Write-Host "`n==================================================" -ForegroundColor Cyan
+Write-Host " 2. Building Family Loader MSI Installer..." -ForegroundColor Cyan
+Write-Host "==================================================" -ForegroundColor Cyan
+
+wix build Installer.wxs Components.wxs CustomUI.wxs -ext WixToolset.UI.wixext -out Output\FamilyLoader_Setup.msi
+if ($LASTEXITCODE -ne 0) { throw "WiX build failed" }
+
+Write-Host "[SUCCESS] Output\FamilyLoader_Setup.msi built successfully!" -ForegroundColor Green
+
+Write-Host "`n==================================================" -ForegroundColor Cyan
+Write-Host " 3. Packaging FamilyLoader-update.zip for Auto-Updater..." -ForegroundColor Cyan
+Write-Host "==================================================" -ForegroundColor Cyan
+
+$updateZip = "$Root\Output\FamilyLoader-update.zip"
+if (Test-Path $updateZip) { Remove-Item $updateZip -Force }
+
+$bin2025 = "$Root\2025\bin\x64\$Configuration"
+if (-not (Test-Path $bin2025)) { $bin2025 = "$Root\2025\bin\$Configuration" }
+$zipItems = @(
+    (Join-Path $bin2025 "FamilyLoader.dll"),
+    (Join-Path $bin2025 "Birooni.Client.dll"),
+    (Join-Path $bin2025 "OpenMcdf.dll")
+)
+
+Compress-Archive -Path $zipItems -DestinationPath $updateZip -Force
+Write-Host "[SUCCESS] Packaged $updateZip" -ForegroundColor Green
+
+$webDownloads = "$Root\..\website\downloads"
+if (Test-Path $webDownloads) {
+    Copy-Item "$Root\Output\FamilyLoader_Setup.msi" (Join-Path $webDownloads "FamilyLoader_Setup.msi") -Force
+    Copy-Item "$Root\Output\FamilyLoader_Setup.msi" (Join-Path $webDownloads "FamilyLoader-Setup.msi") -Force
+    Copy-Item $updateZip (Join-Path $webDownloads "FamilyLoader-update.zip") -Force
+    Write-Host "`n[SUCCESS] Deployed FamilyLoader-Setup.msi, FamilyLoader_Setup.msi, and FamilyLoader-update.zip to $webDownloads" -ForegroundColor Green
+}
