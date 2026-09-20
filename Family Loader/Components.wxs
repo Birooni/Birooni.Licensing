@@ -1,0 +1,371 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <SetDirectory Id="ADDINROOTFOLDER" Action="SetRootPerMachine" Value="[CommonAppDataFolder]Autodesk" Condition="INSTALL_SCOPE_SELECTION=&quot;2&quot;" />
+    <SetDirectory Id="ADDINROOTFOLDER" Action="SetRootPerUser" Value="[AppDataFolder]Autodesk" Condition="INSTALL_SCOPE_SELECTION=&quot;1&quot;" />
+    
+    <StandardDirectory Id="TARGETDIR">
+      <Directory Id="ADDINROOTFOLDER" Name="Autodesk">
+        <Directory Id="REVITFOLDER" Name="Revit">
+          <Directory Id="ADDINSFOLDER" Name="Addins">            <Directory Id="DIR_REVIT_2020" Name="2020">
+              <Component Id="Comp_1" Guid="2b1e9341-a05a-4ab1-a72e-281a2ab91af8" Condition="REVIT_2020 = &quot;1&quot;">
+                <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2020\FamilyLoader.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Family Loader">
+                <Component Id="Comp_2" Guid="2e4b320d-c7b8-4dd9-ab51-17719c2279fa" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2020\Family Loader\FamilyLoader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_3" Guid="b8a88131-0870-4c57-b5ae-4c5c9806779e" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2020\Family Loader\Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_4" Guid="f80d07dd-1cd8-49de-8074-381087940a1e" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2020\Family Loader\OpenMcdf.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_5" Guid="c7f0eb5c-3731-4a94-9067-6a22c3fd3ae3" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2020\Family Loader\System.Buffers.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_6" Guid="f5b3e599-07f2-456a-9c54-e9b2d2618f92" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2020\Family Loader\System.IO.Pipelines.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_7" Guid="c163e552-e37a-449d-9ad3-d2b8830c47de" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2020\Family Loader\System.Memory.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_8" Guid="0cd97b2c-2d50-4fdc-b612-710e84755705" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2020\Family Loader\System.Numerics.Vectors.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_9" Guid="6bb732c8-8ad4-4ce1-8f31-631de063895f" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2020\Family Loader\System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_10" Guid="4ef63fd6-cac0-4f22-bf4d-4d7353cd97a0" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2020\Family Loader\System.Text.Encodings.Web.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_11" Guid="830f31bf-c32f-4a02-bf16-1cfb4fa3f9f1" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2020\Family Loader\System.Text.Json.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_12" Guid="da488e08-e994-4080-8cea-a63083984e16" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2020\Family Loader\System.Threading.Tasks.Extensions.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+            <Directory Id="DIR_REVIT_2021" Name="2021">
+              <Component Id="Comp_13" Guid="f35b1f7f-e767-4330-9aac-27dfeee9d022" Condition="REVIT_2021 = &quot;1&quot;">
+                <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2021\FamilyLoader.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Family Loader">
+                <Component Id="Comp_14" Guid="9ad2be20-10c2-42a7-97ac-b18ad5c63036" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2021\Family Loader\FamilyLoader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_15" Guid="ca950657-8bf6-4519-951a-3004c2ace198" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2021\Family Loader\Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_16" Guid="af529320-d44e-4268-9a2c-5645c14fe151" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2021\Family Loader\OpenMcdf.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_17" Guid="d1f021a0-b312-46a3-ae2c-20fe5715e1d8" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2021\Family Loader\System.Buffers.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_18" Guid="7bac1e12-f599-4246-afa6-5efadbd2f03d" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2021\Family Loader\System.IO.Pipelines.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_19" Guid="f0545bdd-21d2-4302-8ef7-b82be357747e" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2021\Family Loader\System.Memory.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_20" Guid="47887e89-1434-42cd-a402-05644b43ddcb" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2021\Family Loader\System.Numerics.Vectors.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_21" Guid="ba6d1079-10b2-4bc6-968d-b9464ef11668" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2021\Family Loader\System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_22" Guid="0c24fb1e-6184-4464-b263-d7af9e95f72f" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2021\Family Loader\System.Text.Encodings.Web.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_23" Guid="3b741e70-8335-424b-8cf5-4aa724997394" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2021\Family Loader\System.Text.Json.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_24" Guid="2a525f75-7011-445e-b8d5-3bcc8950045d" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2021\Family Loader\System.Threading.Tasks.Extensions.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+            <Directory Id="DIR_REVIT_2022" Name="2022">
+              <Component Id="Comp_25" Guid="5039f71e-691f-4877-8cf9-1e3443f01708" Condition="REVIT_2022 = &quot;1&quot;">
+                <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2022\FamilyLoader.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Family Loader">
+                <Component Id="Comp_26" Guid="bc67e46e-332c-48d9-bc8c-0433e698da2f" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2022\Family Loader\FamilyLoader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_27" Guid="1ea84964-0e26-45bc-9501-ab67848ceac4" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2022\Family Loader\Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_28" Guid="0fb80ece-42c4-49dc-9501-0f552161ad48" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2022\Family Loader\OpenMcdf.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_29" Guid="e1dac8df-608b-4bd8-b2b2-ba92fcb9c5f8" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2022\Family Loader\System.Buffers.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_30" Guid="a3a63ec8-0b53-46c5-b363-d1887cfabffa" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2022\Family Loader\System.IO.Pipelines.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_31" Guid="32eeac64-d9fa-47ce-a973-59aee325933f" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2022\Family Loader\System.Memory.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_32" Guid="49fb6d55-57d4-4699-8014-c7ec6e58fbc1" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2022\Family Loader\System.Numerics.Vectors.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_33" Guid="885cedce-8c37-4b95-a0c5-9b410d54c9df" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2022\Family Loader\System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_34" Guid="e7ceeaf5-2734-440e-9c04-59e89fbf964c" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2022\Family Loader\System.Text.Encodings.Web.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_35" Guid="898bc7a9-e90c-49db-be17-034d5bc4a5f6" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2022\Family Loader\System.Text.Json.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_36" Guid="339f4963-e99a-45dd-a15f-b2a9e8138f9f" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2022\Family Loader\System.Threading.Tasks.Extensions.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+            <Directory Id="DIR_REVIT_2023" Name="2023">
+              <Component Id="Comp_37" Guid="f1e0fc2a-5392-4c95-bb8d-ed5030a806e3" Condition="REVIT_2023 = &quot;1&quot;">
+                <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2023\FamilyLoader.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Family Loader">
+                <Component Id="Comp_38" Guid="3e6e45a1-0841-4a64-a18e-0f9a0dc2b970" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2023\Family Loader\FamilyLoader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_39" Guid="365f3bea-2f25-405f-986c-994e912ea879" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2023\Family Loader\Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_40" Guid="61c2a1dc-c2e3-4286-974a-f2ffbab36501" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2023\Family Loader\OpenMcdf.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_41" Guid="4d255a3e-4437-481c-8b68-06fd2a4cfadf" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2023\Family Loader\System.Buffers.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_42" Guid="8a17525c-66f6-4715-afe7-7614c26cb50f" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2023\Family Loader\System.IO.Pipelines.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_43" Guid="19ccbf7b-0abb-4561-a7c0-849cf7dc31f4" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2023\Family Loader\System.Memory.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_44" Guid="384a7ec9-a8a0-4998-a525-2c7fb971fd66" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2023\Family Loader\System.Numerics.Vectors.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_45" Guid="95e88113-6c8f-4427-9078-5bddccc50ae1" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2023\Family Loader\System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_46" Guid="216ab6a6-5978-4df8-83b5-d0cbfda9c78f" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2023\Family Loader\System.Text.Encodings.Web.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_47" Guid="5cb3cea0-7ba6-4794-a102-fad10bfede47" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2023\Family Loader\System.Text.Json.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_48" Guid="45d028de-f3b6-421c-9a26-d02128c8dd60" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2023\Family Loader\System.Threading.Tasks.Extensions.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+            <Directory Id="DIR_REVIT_2024" Name="2024">
+              <Component Id="Comp_49" Guid="d245cd8e-5923-49ee-a709-751437afeccf" Condition="REVIT_2024 = &quot;1&quot;">
+                <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2024\FamilyLoader.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Family Loader">
+                <Component Id="Comp_50" Guid="23c88f96-7b04-46f1-8eaa-0977943879f6" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2024\Family Loader\FamilyLoader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_51" Guid="0e973e7e-27d8-4d57-bf39-f2bd7821c5e0" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2024\Family Loader\Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_52" Guid="a6b1f8aa-f43b-48f6-b22d-0e048b1b5006" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2024\Family Loader\OpenMcdf.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_53" Guid="fa1e3c34-3a78-428a-bcc0-70d29e7ded26" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2024\Family Loader\System.Buffers.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_54" Guid="8c30a133-8366-446a-aa9e-acfb24dc6e99" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2024\Family Loader\System.IO.Pipelines.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_55" Guid="83fc683b-0423-4d6f-ad38-5be1ce693a19" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2024\Family Loader\System.Memory.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_56" Guid="536dcf21-0c91-43a1-b88f-2dac67240f73" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2024\Family Loader\System.Numerics.Vectors.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_57" Guid="e3c914c9-60ac-49cf-96ad-77942cad04ed" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2024\Family Loader\System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_58" Guid="045e4049-748a-4787-8780-2628b4b76c19" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2024\Family Loader\System.Text.Encodings.Web.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_59" Guid="17ee07a0-25e9-44f9-bf62-d56735b43b39" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2024\Family Loader\System.Text.Json.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_60" Guid="6a903969-9db1-45b3-9173-05f02a89e055" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2024\Family Loader\System.Threading.Tasks.Extensions.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+            <Directory Id="DIR_REVIT_2025" Name="2025">
+              <Component Id="Comp_61" Guid="2bff2bce-1f1f-44c3-9d3e-71a5ac4f2025" Condition="REVIT_2025 = &quot;1&quot;">
+                <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2025\FamilyLoader.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Family Loader">
+                <Component Id="Comp_62" Guid="124b57cc-f123-4a60-bb43-e385c5ce6910" Condition="REVIT_2025 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2025\Family Loader\FamilyLoader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_63" Guid="667ed512-6fd5-4c56-a7f4-c70f40e93402" Condition="REVIT_2025 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2025\Family Loader\OpenMcdf.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+            <Directory Id="DIR_REVIT_2026" Name="2026">
+              <Component Id="Comp_64" Guid="cfd23a30-6724-4b78-813f-f9b9825b68d8" Condition="REVIT_2026 = &quot;1&quot;">
+                <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2026\FamilyLoader.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Family Loader">
+                <Component Id="Comp_65" Guid="4e07d314-ab2d-4bcf-8ca2-7dfa6f06a2e0" Condition="REVIT_2026 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2026\Family Loader\FamilyLoader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_66" Guid="a2777f44-5fa2-4afd-b45c-f1d61b0f0648" Condition="REVIT_2026 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2026\Family Loader\OpenMcdf.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+            <Directory Id="DIR_REVIT_2027" Name="2027">
+              <Component Id="Comp_67" Guid="e639a6bb-9c99-476c-8f27-eb47b2c265e2" Condition="REVIT_2027 = &quot;1&quot;">
+                <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2027\FamilyLoader.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Family Loader">
+                <Component Id="Comp_68" Guid="ff21a80b-63a6-4724-8ec7-84e07cb19315" Condition="REVIT_2027 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2027\Family Loader\FamilyLoader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_69" Guid="aa36dc3f-0b6e-49db-a9ba-e85e5f5e75ad" Condition="REVIT_2027 = &quot;1&quot;">
+                  <File Source="D:\Software\Antigravity\Birooni Tools\Family Loader\SourceDir\2027\Family Loader\OpenMcdf.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+          </Directory>
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+
+    <ComponentGroup Id="Group_2020">
+      <ComponentRef Id="Comp_1" />
+      <ComponentRef Id="Comp_2" />
+      <ComponentRef Id="Comp_3" />
+      <ComponentRef Id="Comp_4" />
+      <ComponentRef Id="Comp_5" />
+      <ComponentRef Id="Comp_6" />
+      <ComponentRef Id="Comp_7" />
+      <ComponentRef Id="Comp_8" />
+      <ComponentRef Id="Comp_9" />
+      <ComponentRef Id="Comp_10" />
+      <ComponentRef Id="Comp_11" />
+      <ComponentRef Id="Comp_12" />
+    </ComponentGroup>
+    <ComponentGroup Id="Group_2021">
+      <ComponentRef Id="Comp_13" />
+      <ComponentRef Id="Comp_14" />
+      <ComponentRef Id="Comp_15" />
+      <ComponentRef Id="Comp_16" />
+      <ComponentRef Id="Comp_17" />
+      <ComponentRef Id="Comp_18" />
+      <ComponentRef Id="Comp_19" />
+      <ComponentRef Id="Comp_20" />
+      <ComponentRef Id="Comp_21" />
+      <ComponentRef Id="Comp_22" />
+      <ComponentRef Id="Comp_23" />
+      <ComponentRef Id="Comp_24" />
+    </ComponentGroup>
+    <ComponentGroup Id="Group_2022">
+      <ComponentRef Id="Comp_25" />
+      <ComponentRef Id="Comp_26" />
+      <ComponentRef Id="Comp_27" />
+      <ComponentRef Id="Comp_28" />
+      <ComponentRef Id="Comp_29" />
+      <ComponentRef Id="Comp_30" />
+      <ComponentRef Id="Comp_31" />
+      <ComponentRef Id="Comp_32" />
+      <ComponentRef Id="Comp_33" />
+      <ComponentRef Id="Comp_34" />
+      <ComponentRef Id="Comp_35" />
+      <ComponentRef Id="Comp_36" />
+    </ComponentGroup>
+    <ComponentGroup Id="Group_2023">
+      <ComponentRef Id="Comp_37" />
+      <ComponentRef Id="Comp_38" />
+      <ComponentRef Id="Comp_39" />
+      <ComponentRef Id="Comp_40" />
+      <ComponentRef Id="Comp_41" />
+      <ComponentRef Id="Comp_42" />
+      <ComponentRef Id="Comp_43" />
+      <ComponentRef Id="Comp_44" />
+      <ComponentRef Id="Comp_45" />
+      <ComponentRef Id="Comp_46" />
+      <ComponentRef Id="Comp_47" />
+      <ComponentRef Id="Comp_48" />
+    </ComponentGroup>
+    <ComponentGroup Id="Group_2024">
+      <ComponentRef Id="Comp_49" />
+      <ComponentRef Id="Comp_50" />
+      <ComponentRef Id="Comp_51" />
+      <ComponentRef Id="Comp_52" />
+      <ComponentRef Id="Comp_53" />
+      <ComponentRef Id="Comp_54" />
+      <ComponentRef Id="Comp_55" />
+      <ComponentRef Id="Comp_56" />
+      <ComponentRef Id="Comp_57" />
+      <ComponentRef Id="Comp_58" />
+      <ComponentRef Id="Comp_59" />
+      <ComponentRef Id="Comp_60" />
+    </ComponentGroup>
+    <ComponentGroup Id="Group_2025">
+      <ComponentRef Id="Comp_61" />
+      <ComponentRef Id="Comp_62" />
+      <ComponentRef Id="Comp_63" />
+    </ComponentGroup>
+    <ComponentGroup Id="Group_2026">
+      <ComponentRef Id="Comp_64" />
+      <ComponentRef Id="Comp_65" />
+      <ComponentRef Id="Comp_66" />
+    </ComponentGroup>
+    <ComponentGroup Id="Group_2027">
+      <ComponentRef Id="Comp_67" />
+      <ComponentRef Id="Comp_68" />
+      <ComponentRef Id="Comp_69" />
+    </ComponentGroup>
+
+
+  </Fragment>
+
+  <Fragment>
+    <FeatureGroup Id="AllFeatures">
+    <Feature Id="Feature_2020" Title="Revit 2020" Level="1">
+      <ComponentGroupRef Id="Group_2020" />
+    </Feature>
+    <Feature Id="Feature_2021" Title="Revit 2021" Level="1">
+      <ComponentGroupRef Id="Group_2021" />
+    </Feature>
+    <Feature Id="Feature_2022" Title="Revit 2022" Level="1">
+      <ComponentGroupRef Id="Group_2022" />
+    </Feature>
+    <Feature Id="Feature_2023" Title="Revit 2023" Level="1">
+      <ComponentGroupRef Id="Group_2023" />
+    </Feature>
+    <Feature Id="Feature_2024" Title="Revit 2024" Level="1">
+      <ComponentGroupRef Id="Group_2024" />
+    </Feature>
+    <Feature Id="Feature_2025" Title="Revit 2025" Level="1">
+      <ComponentGroupRef Id="Group_2025" />
+    </Feature>
+    <Feature Id="Feature_2026" Title="Revit 2026" Level="1">
+      <ComponentGroupRef Id="Group_2026" />
+    </Feature>
+    <Feature Id="Feature_2027" Title="Revit 2027" Level="1">
+      <ComponentGroupRef Id="Group_2027" />
+    </Feature>
+
+    </FeatureGroup>
+  </Fragment>
+</Wix>

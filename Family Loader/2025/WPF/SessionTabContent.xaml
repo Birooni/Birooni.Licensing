@@ -1,0 +1,103 @@
+<UserControl x:Class="FamilyLoader.WPF.SessionTabContent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:FamilyLoader.WPF">
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Session Action Bar -->
+        <Border Grid.Row="0" Background="{DynamicResource CardBrush}" Padding="10" CornerRadius="6,6,0,0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,1,1,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Session Name:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}"/>
+                    <!-- UpdateSourceTrigger=PropertyChanged ensures live updates as user types -->
+                    <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Width="150" />
+                </StackPanel>
+
+                <!-- DataContext is SessionViewModel -->
+                <Button Grid.Column="1" Command="{Binding AddFamilyCommand}" Content="+ Add Family" Style="{DynamicResource PrimaryButton}" Padding="10,6" />
+            </Grid>
+        </Border>
+
+        <!-- Families DataGrid -->
+        <DataGrid Grid.Row="1" Margin="0,10,0,0" MinHeight="100" 
+                  ItemsSource="{Binding Families}" 
+                  AutoGenerateColumns="False" CanUserAddRows="False" 
+                  GridLinesVisibility="None" HeadersVisibility="Column">
+            <DataGrid.Columns>
+                <!-- RFA path with browse button -->
+                <DataGridTemplateColumn Header="Revit Family File (.rfa)" Width="2.5*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <!-- DataContext is FamilyItemViewModel -->
+                            <Grid Margin="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding RfaPath, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="0,0,5,0" Height="28" VerticalContentAlignment="Center"/>
+                                <Button Grid.Column="1" Command="{Binding BrowseRfaCommand}" Content="Browse..." Style="{DynamicResource IconBrowseButton}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Family Name -->
+                <DataGridTemplateColumn Header="Family Name" Width="1.5*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding FamilyName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2" Height="28" VerticalContentAlignment="Center"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Icon Option (ComboBox) -->
+                <DataGridTemplateColumn Header="Icon Style" Width="1.2*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox SelectedValue="{Binding IconOption, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectedValuePath="Tag" Height="28" Margin="2" VerticalContentAlignment="Center">
+                                <ComboBoxItem Content="No Icon" Tag="NoIcon"/>
+                                <ComboBoxItem Content="By Revit" Tag="ByRevit"/>
+                                <ComboBoxItem Content="By User" Tag="ByUser"/>
+                            </ComboBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Icon Path with browse button -->
+                <DataGridTemplateColumn Header="Icon Path" Width="2*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid Margin="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding IconPath, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding IsIconPathEnabled}" Margin="0,0,5,0" Height="28" VerticalContentAlignment="Center"/>
+                                <Button Grid.Column="1" Command="{Binding BrowseIconCommand}" Content="Browse..." IsEnabled="{Binding IsIconPathEnabled}" Style="{DynamicResource IconBrowseButton}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Delete Action Button -->
+                <DataGridTemplateColumn Header="" Width="0.5*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Command="{Binding DeleteCommand}" Content="Delete" Style="{DynamicResource DangerButton}" Height="28" VerticalAlignment="Center" Margin="2"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationPackage SchemaVersion="1.0" AutodeskProduct="Revit" Name="Family Loader" AppVersion="1.0.0" Description="A tool to quickly load families into Revit." Author="Birooni Tools">
+  <CompanyDetails Name="Birooni Tools" Url="http://www.biroonitools.com" Email="support@biroonitools.com" />
+  
+  <Components Description="Revit 2020 to 2024">
+    <RuntimeRequirements OS="Win64" Platform="Revit" SeriesMin="R2020" SeriesMax="R2024" />
+    <ComponentEntry AppName="Family Loader 2023" Version="1.0.0" ModuleName="./Contents/2023/FamilyLoader.addin" AppDescription="Family Loader for Revit 2020-2024" LoadOnRevitStartup="True" />
+  </Components>
+
+  <Components Description="Revit 2025 to 2027">
+    <RuntimeRequirements OS="Win64" Platform="Revit" SeriesMin="R2025" SeriesMax="R2027" />
+    <ComponentEntry AppName="Family Loader 2025" Version="1.0.0" ModuleName="./Contents/2025/FamilyLoader.addin" AppDescription="Family Loader for Revit 2025-2027" LoadOnRevitStartup="True" />
+  </Components>
+</ApplicationPackage>

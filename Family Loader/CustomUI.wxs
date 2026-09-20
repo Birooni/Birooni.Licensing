@@ -1,0 +1,118 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <!-- Define Default Checkbox Properties (1 means checked) -->
+    <Property Id="REVIT_2020" Value="1" Secure="yes" />
+    <Property Id="REVIT_2021" Value="1" Secure="yes" />
+    <Property Id="REVIT_2022" Value="1" Secure="yes" />
+    <Property Id="REVIT_2023" Value="1" Secure="yes" />
+    <Property Id="REVIT_2024" Value="1" Secure="yes" />
+    <Property Id="REVIT_2025" Value="1" Secure="yes" />
+    <Property Id="REVIT_2026" Value="1" Secure="yes" />
+    <Property Id="REVIT_2027" Value="1" Secure="yes" />
+
+    <!-- Radio Button Property (1 for Single User, 2 for All Users) -->
+    <Property Id="INSTALL_SCOPE_SELECTION" Value="1" Secure="yes" />
+
+    <UI Id="WixUI_Custom">
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+      <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+      <Property Id="WixUI_Mode" Value="Custom" />
+
+      <DialogRef Id="BrowseDlg" />
+      <DialogRef Id="DiskCostDlg" />
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <DialogRef Id="PrepareDlg" />
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ResumeDlg" />
+      <DialogRef Id="UserExit" />
+      <DialogRef Id="MaintenanceWelcomeDlg" />
+      <DialogRef Id="MaintenanceTypeDlg" />
+
+      <!-- Custom Install Scope Dialog -->
+      <Dialog Id="MyScopeDlg" Width="370" Height="270" Title="Installation Scope">
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
+          <Publish Event="DoAction" Value="SetRootPerUser" Condition="INSTALL_SCOPE_SELECTION=&quot;1&quot;" />
+          <Publish Event="DoAction" Value="SetRootPerMachine" Condition="INSTALL_SCOPE_SELECTION=&quot;2&quot;" />
+          <Publish Event="NewDialog" Value="RevitVersionsDlg" />
+        </Control>
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)">
+          <Publish Event="NewDialog" Value="LicenseAgreementDlg" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+        
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="{\WixUI_Font_Title}Installation Scope" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="Choose who you want to install this application for." />
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+
+        <Control Id="ScopeRadioGroup" Type="RadioButtonGroup" X="25" Y="80" Width="300" Height="50" Property="INSTALL_SCOPE_SELECTION">
+          <RadioButtonGroup Property="INSTALL_SCOPE_SELECTION">
+            <RadioButton Value="1" X="0" Y="0" Width="300" Height="15" Text="Single User (Only for me)" />
+            <RadioButton Value="2" X="0" Y="20" Width="300" Height="15" Text="Entire System (All users on this computer)" />
+          </RadioButtonGroup>
+        </Control>
+      </Dialog>
+
+      <!-- Custom Revit Versions Dialog -->
+      <Dialog Id="RevitVersionsDlg" Width="370" Height="270" Title="Select Revit Versions">
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
+          <Publish Event="NewDialog" Value="VerifyReadyDlg" />
+        </Control>
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)">
+          <Publish Event="NewDialog" Value="MyScopeDlg" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+        
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="{\WixUI_Font_Title}Select Revit Versions" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="Select which versions of Revit you want to install for." />
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+
+        <Control Id="chk2020" Type="CheckBox" X="25" Y="60" Width="200" Height="15" Property="REVIT_2020" CheckBoxValue="1" Text="Revit 2020" />
+        <Control Id="chk2021" Type="CheckBox" X="25" Y="80" Width="200" Height="15" Property="REVIT_2021" CheckBoxValue="1" Text="Revit 2021" />
+        <Control Id="chk2022" Type="CheckBox" X="25" Y="100" Width="200" Height="15" Property="REVIT_2022" CheckBoxValue="1" Text="Revit 2022" />
+        <Control Id="chk2023" Type="CheckBox" X="25" Y="120" Width="200" Height="15" Property="REVIT_2023" CheckBoxValue="1" Text="Revit 2023" />
+        <Control Id="chk2024" Type="CheckBox" X="25" Y="140" Width="200" Height="15" Property="REVIT_2024" CheckBoxValue="1" Text="Revit 2024" />
+        <Control Id="chk2025" Type="CheckBox" X="25" Y="160" Width="200" Height="15" Property="REVIT_2025" CheckBoxValue="1" Text="Revit 2025" />
+        <Control Id="chk2026" Type="CheckBox" X="25" Y="180" Width="200" Height="15" Property="REVIT_2026" CheckBoxValue="1" Text="Revit 2026" />
+        <Control Id="chk2027" Type="CheckBox" X="25" Y="200" Width="200" Height="15" Property="REVIT_2027" CheckBoxValue="1" Text="Revit 2027" />
+      </Dialog>
+
+      <!-- Standard Sequence Hooks -->
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg" Condition="NOT Installed" />
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Condition="Installed AND PATCH" />
+
+      <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" />
+      <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="MyScopeDlg" Condition="LicenseAccepted = &quot;1&quot;" />
+
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="RevitVersionsDlg" Condition="NOT Installed" />
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Condition="Installed AND NOT PATCH AND NOT WIX_UPGRADE_DETECTED" />
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Condition="Installed AND PATCH" />
+
+      <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg" />
+
+      <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg" />
+      <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg" />
+      <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg" />
+    </UI>
+
+    <UIRef Id="WixUI_Common" />
+
+    <InstallUISequence>
+      <Show Dialog="WelcomeDlg" Before="ProgressDlg" Condition="NOT Installed OR WIX_UPGRADE_DETECTED" />
+      <Show Dialog="MaintenanceWelcomeDlg" Before="ProgressDlg" Condition="Installed AND NOT RESUME AND NOT Preselected AND NOT WIX_UPGRADE_DETECTED" />
+      <Show Dialog="ResumeDlg" Before="ProgressDlg" Condition="Installed AND (RESUME OR Preselected)" />
+    </InstallUISequence>
+  </Fragment>
+</Wix>
