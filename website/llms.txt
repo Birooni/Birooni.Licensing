@@ -1,0 +1,39 @@
+# Birooni / BiruBox
+
+> The Intelligent 3D Section Box & View Navigation Suite for Autodesk Revit 2025, 2026, and 2027.
+
+## Overview
+BiruBox is a professional Autodesk Revit add-in engineered for BIM modelers, architects, and structural engineers. It eliminates the frustration of dragging native Revit section box handles by providing intelligent one-click isolation, freehand screen drawing, and instant millimeter-accurate offset sizing.
+
+- **Website:** https://ibrooni.com
+- **Product Name:** BiruBox
+- **Developer / Publisher:** Birooni Tools
+- **Installer:** Windows MSI (Per-User installation, no admin rights required)
+- **Direct Download:** https://ibrooni.com/downloads/BiruBox-Setup.msi
+- **Current Version:** 2026.1.0
+- **Supported Revit Versions:** Autodesk Revit 2025, Autodesk Revit 2026, Autodesk Revit 2027 (.NET 8.0)
+- **Supported OS:** Windows 10 & 11 (64-bit)
+
+## Core Tools
+- **AutoSectionBox**: Intelligent bounding box generation around selected model elements, rooms, or entire systems.
+- **DrawBox**: Freehand 3D bounding box drawing directly in plan views or 3D views to isolate specific project areas.
+- **Quick AutoSection**: One-click immediate 3D section box around the active Revit selection.
+- **Grow Bounds**: Expand section box margins dynamically (+100mm, +500mm, etc.) with ribbon controls or custom hotkeys.
+- **Shrink Bounds**: Contract section box margins dynamically to tighten view boundaries without losing orientation.
+- **Toggle State**: Instantly toggle section box visibility and active clipping on/off without opening Revit View Properties.
+
+## Architecture & Security
+- **Startup:** Non-blocking asynchronous licensing cache. Revit launches in milliseconds without startup lag or frozen UI threads.
+- **Offline Support:** Cryptographically signed RSA-2048 SHA-256 node-locked licenses tied to hardware fingerprints (Motherboard, CPU, Machine GUID). Works 100% offline without continuous internet access.
+- **Automated Updates:** Built-in background update engine checks for new builds and Revit year compatibility via https://api.ibrooni.com.
+
+## Licensing & Pricing
+- **14-Day Free Trial:** $0 (Full access to all ribbon tools, instant automated hardware activation, no credit card required).
+- **Perpetual Pro:** $149 one-time (Lifetime usage, node-locked, 1-year free updates included, offline capable).
+- **Enterprise / Floating:** $299 / seat / year (Concurrent network license pool, central admin portal, priority SLA).
+
+## Official Endpoints & Links
+- **Public Website:** https://ibrooni.com
+- **Admin Management Portal:** https://admin.ibrooni.com
+- **Licensing API:** https://api.ibrooni.com
+- **Support Contact:** biroonisoft@gmail.com

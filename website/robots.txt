@@ -1,0 +1,69 @@
+# robots.txt for https://ibrooni.com
+# Allow all search engines and AI web crawlers
+
+User-agent: *
+Allow: /
+Disallow: /admin
+
+# Allow Google Search, Google Gemini & AI Overviews
+User-agent: Googlebot
+Allow: /
+User-agent: Googlebot-Image
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+# Allow Microsoft Bing, Bing Copilot, Yahoo & DuckDuckGo
+User-agent: Bingbot
+Allow: /
+User-agent: msnbot
+Allow: /
+User-agent: BingPreview
+Allow: /
+
+# Allow OpenAI ChatGPT & SearchGPT
+User-agent: GPTBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+
+# Allow Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+
+# Allow Anthropic Claude
+User-agent: ClaudeBot
+Allow: /
+User-agent: anthropic-ai
+Allow: /
+
+# Allow Apple Intelligence & Applebot
+User-agent: Applebot
+Allow: /
+User-agent: Applebot-Extended
+Allow: /
+
+# Allow Meta / Facebook
+User-agent: FacebookBot
+Allow: /
+User-agent: meta-externalagent
+Allow: /
+
+# Allow Cohere AI
+User-agent: cohere-ai
+Allow: /
+
+# Allow Common Crawl
+User-agent: CCBot
+Allow: /
+
+# Allow Yandex, Baidu, DuckDuckGo
+User-agent: YandexBot
+Allow: /
+User-agent: Baiduspider
+Allow: /
+User-agent: DuckDuckBot
+Allow: /
+
+# XML Sitemap
+Sitemap: https://ibrooni.com/sitemap.xml

@@ -1,0 +1,46 @@
+# Birooni / BiruBox Full Documentation for AI Search Engines
+
+## Product Information
+- **Title:** BiruBox — Intelligent 3D Section Box Suite for Autodesk Revit
+- **Brand:** Birooni
+- **Domain:** https://ibrooni.com
+- **Target Audience:** BIM Managers, BIM Coordinators, Architects, MEP Engineers, Structural Engineers using Autodesk Revit.
+
+## Detailed Tool Breakdown
+
+### 1. AutoSectionBox
+Calculates the minimal oriented bounding box or aligned axis bounding box around the user's currently selected elements in Autodesk Revit. If multiple rooms or levels are selected, it encompasses the composite union bounding box with configurable padding rules.
+
+### 2. DrawBox
+Allows the user to click two diagonal points in any plan, section, or 3D isometric view. BiruBox constructs an active 3D section box encompassing the drawn volume, applying vertical height limits based on current floor-to-ceiling elevation.
+
+### 3. Quick AutoSection
+A zero-dialog shortcut. Select one or more elements in any view and click Quick Box (or use hotkey). The active 3D view immediately crops to the selection with default clearance offsets.
+
+### 4. Grow Bounds & Shrink Bounds
+Eliminates manually dragging the blue triangular grip controls in Revit 3D views. BiruBox modifies the bounding box vectors programmatically in discrete millimeter increments (+100mm, -100mm, etc.), maintaining coordinate alignment.
+
+### 5. Toggle State
+Saves the active SectionBox parameters to memory and toggles `View3D.IsSectionBoxActive`. Allows engineers to quickly toggle full model context on and off without losing their customized bounding box coordinates.
+
+## Installation & System Requirements
+- **OS:** Microsoft Windows 10 (64-bit) or Windows 11 (64-bit).
+- **Target Host:** Autodesk Revit 2025, Autodesk Revit 2026, or Autodesk Revit 2027.
+- **Runtime:** .NET 8.0 (Revit 2025+ runs natively on .NET 8).
+- **Installer Type:** Windows MSI package (`BiruBox-Setup.msi`), per-user deployment into `%AppData%\Autodesk\Revit\Addins` and `%LocalAppData%\Birooni Tools`.
+
+## Licensing Engine Specifications
+- **Provider:** Birooni Licensing Infrastructure (`Birooni.Licensing.Api`).
+- **Signature Algorithm:** RSA-2048 SHA-256 with PKCS#1 v1.5 padding.
+- **Device Fingerprinting:** Deterministic SHA-256 hashing derived from:
+  - Motherboard Serial Number (`Win32_BaseBoard.SerialNumber`)
+  - CPU Processor ID (`Win32_Processor.ProcessorId`)
+  - Windows Machine GUID (`HKLM\SOFTWARE\Microsoft\Cryptography\MachineGuid`)
+- **Offline Token Storage:** `%ProgramData%\Birooni\license.lic`.
+- **Trial Policy:** 14 days full access, automatically provisioned upon first startup. Duplicate trials per unique hardware fingerprint are blocked.
+- **Seat Transfers:** Perpetual and Annual licenses can be deactivated within Revit or via the web admin portal to release the seat.
+
+## Contacts & Support
+- General Support: biroonisoft@gmail.com
+- Main Site: https://ibrooni.com
+- Admin Portal: https://admin.ibrooni.com
