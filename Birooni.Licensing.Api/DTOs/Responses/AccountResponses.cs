@@ -19,8 +19,9 @@ public class AuthResponse
     public string? FamilyLoaderKey { get; set; }
     public bool RequiresVerification { get; set; }
     public bool EmailSent { get; set; } = true;
+    public string? VerificationLink { get; set; }
 
-    public static AuthResponse Ok(string message, string? token, AccountProfileDto? account, string? familyLoaderKey = null, bool requiresVerification = false, bool emailSent = true) =>
+    public static AuthResponse Ok(string message, string? token, AccountProfileDto? account, string? familyLoaderKey = null, bool requiresVerification = false, bool emailSent = true, string? verificationLink = null) =>
         new()
         {
             Success = true,
@@ -29,7 +30,8 @@ public class AuthResponse
             Account = account,
             FamilyLoaderKey = familyLoaderKey,
             RequiresVerification = requiresVerification,
-            EmailSent = emailSent
+            EmailSent = emailSent,
+            VerificationLink = verificationLink
         };
 
     public static AuthResponse Fail(string message, bool requiresVerification = false) =>

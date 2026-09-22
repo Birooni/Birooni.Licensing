@@ -60,19 +60,20 @@ public class AccountService : IAccountService
         account.EmailVerified = false;
 
         _db.CustomerAccounts.Add(account);
-        var sent = await IssueVerificationAsync(account, cancellationToken);
+        var (sent, link) = await IssueVerificationAsync(account, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
 
         var message = sent
             ? $"Check {email} (and spam) and click the Ibrooni verification link. Family Loader is issued only after the address is confirmed."
-            : "Account created, but the verification email could not be sent. Click Resend. If it still fails, SMTP is not connected on the API server.";
+            : "Mail is not connected on the server yet. Use the Verify now button below.";
 
         return AuthResponse.Ok(
             message,
             token: null,
             account: ToProfile(account),
             requiresVerification: true,
-            emailSent: sent);
+            emailSent: sent,
+            verificationLink: sent ? null : link);
     }
 
     public async Task<AuthResponse> SigninAsync(SigninRequest request, CancellationToken cancellationToken = default)
@@ -92,15 +93,19 @@ public class AccountService : IAccountService
 
         if (!account.EmailVerified)
         {
-            if (account.VerificationSentAt is null || account.VerificationSentAt < DateTimeOffset.UtcNow.AddMinutes(-2))
-            {
-                await IssueVerificationAsync(account, cancellationToken);
-                await _db.SaveChangesAsync(cancellationToken);
-            }
+            var (sent, link) = await IssueVerificationAsync(account, cancellationToken);
+            await _db.SaveChangesAsync(cancellationToken);
 
-            return AuthResponse.Fail(
-                "Confirm this email first. Open the Ibrooni message we sent and click Verify. We can send another link if you did not receive it.",
-                requiresVerification: true);
+            return new AuthResponse
+            {
+                Success = false,
+                RequiresVerification = true,
+                EmailSent = sent,
+                VerificationLink = sent ? null : link,
+                Message = sent
+                    ? "Confirm this email first. Open the Ibrooni message and click Verify."
+                    : "Confirm this email first. Mail is not connected — use Verify now."
+            };
         }
 
         account.LastLoginAt = DateTimeOffset.UtcNow;
@@ -169,16 +174,17 @@ public class AccountService : IAccountService
             return AuthResponse.Ok("If that email is registered and still unverified, a new link is on its way.", null, null, requiresVerification: true);
         }
 
-        var sent = await IssueVerificationAsync(account, cancellationToken);
+        var (sent, link) = await IssueVerificationAsync(account, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
         return AuthResponse.Ok(
             sent
                 ? "If that email is registered and still unverified, a new link is on its way. Check spam."
-                : "The mail server could not send the verification email. Set SMTP_HOST, SMTP_USER, and SMTP_PASSWORD (Gmail App Password) on Render.",
+                : "Mail is not connected on the server yet. Use the Verify now button below.",
             null,
             null,
             requiresVerification: true,
-            emailSent: sent);
+            emailSent: sent,
+            verificationLink: sent ? null : link);
     }
 
     public async Task<AccountProfileDto?> GetProfileAsync(Guid accountId, CancellationToken cancellationToken = default)
@@ -334,7 +340,7 @@ public class AccountService : IAccountService
         return $"FAMILY-{hex[..4]}-{hex[4..8]}-{hex[8..12]}";
     }
 
-    private async Task<bool> IssueVerificationAsync(CustomerAccount account, CancellationToken cancellationToken)
+    private async Task<(bool Sent, string Link)> IssueVerificationAsync(CustomerAccount account, CancellationToken cancellationToken)
     {
         var rawToken = CreateToken();
         account.VerificationTokenHash = HashToken(rawToken);
@@ -356,11 +362,11 @@ public class AccountService : IAccountService
         try
         {
             await _email.SendAsync(account.Email, "Verify your Ibrooni email", html, cancellationToken);
-            return true;
+            return (true, link);
         }
         catch (Exception)
         {
-            return false;
+            return (false, link);
         }
     }
 
