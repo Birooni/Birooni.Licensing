@@ -95,7 +95,9 @@ var jwtService = new JwtTokenService(
 builder.Services.AddSingleton<IJwtTokenService>(jwtService);
 builder.Services.AddScoped<ILicensingService, LicensingService>();
 builder.Services.AddScoped<IUpdateService, UpdateService>();
-builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
+builder.Services.AddScoped<ResendEmailSender>();
+builder.Services.AddScoped<SmtpEmailSender>();
+builder.Services.AddScoped<IEmailSender, CompositeEmailSender>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

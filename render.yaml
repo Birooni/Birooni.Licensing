@@ -22,5 +22,9 @@ services:
         sync: false
       - key: SMTP_FROM
         sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM
+        value: Ibrooni <beth.t@example.com>
       - key: PUBLIC_WEB_URL
         value: https://ibrooni.com
