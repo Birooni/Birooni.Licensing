@@ -51,6 +51,28 @@ public static class DatabaseInitializer
                 CREATE INDEX IF NOT EXISTS idx_floating_sessions_lic ON floating_sessions(license_id);
                 CREATE INDEX IF NOT EXISTS idx_floating_sessions_lic_dev ON floating_sessions(license_id, device_id);
                 CREATE INDEX IF NOT EXISTS idx_floating_sessions_exp ON floating_sessions(expires_at);
+
+                CREATE TABLE IF NOT EXISTS customer_accounts (
+                    id UUID PRIMARY KEY,
+                    email VARCHAR(200) NOT NULL UNIQUE,
+                    password_hash VARCHAR(500) NOT NULL,
+                    full_name VARCHAR(200) NOT NULL,
+                    company VARCHAR(200),
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                    last_login_at TIMESTAMPTZ
+                );
+
+                CREATE INDEX IF NOT EXISTS idx_customer_accounts_email ON customer_accounts(email);
+
+                ALTER TABLE customer_accounts ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT FALSE;
+                ALTER TABLE customer_accounts ADD COLUMN IF NOT EXISTS verification_token_hash VARCHAR(128);
+                ALTER TABLE customer_accounts ADD COLUMN IF NOT EXISTS verification_expires_at TIMESTAMPTZ;
+                ALTER TABLE customer_accounts ADD COLUMN IF NOT EXISTS verification_sent_at TIMESTAMPTZ;
+                CREATE INDEX IF NOT EXISTS idx_customer_accounts_verify ON customer_accounts(verification_token_hash);
+
+                UPDATE customer_accounts
+                SET email_verified = TRUE
+                WHERE email_verified = FALSE AND last_login_at IS NOT NULL;
                 """;
 
             await db.Database.ExecuteSqlRawAsync(sql);

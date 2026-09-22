@@ -14,16 +14,46 @@ public class AdminController : ControllerBase
 {
     private readonly ILicensingService _licensingService;
     private readonly IUpdateService _updateService;
+    private readonly IEmailSender _email;
     private readonly ILogger<AdminController> _logger;
 
     public AdminController(
         ILicensingService licensingService,
         IUpdateService updateService,
+        IEmailSender email,
         ILogger<AdminController> logger)
     {
         _licensingService = licensingService;
         _updateService = updateService;
+        _email = email;
         _logger = logger;
+    }
+
+    [HttpGet("smtp-status")]
+    public IActionResult SmtpStatus() => Ok(new { configured = _email.IsConfigured });
+
+    [HttpPost("test-email")]
+    public async Task<IActionResult> TestEmail([FromBody] TestEmailRequest request, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(request.To) || !request.To.Contains('@'))
+        {
+            return BadRequest(new { error = "Provide a valid 'to' address." });
+        }
+
+        try
+        {
+            await _email.SendAsync(
+                request.To.Trim(),
+                "Ibrooni SMTP test",
+                "<p>If you received this, verification mail can send.</p>",
+                cancellationToken);
+            return Ok(new { success = true, message = "Test email sent." });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "SMTP test failed");
+            return StatusCode(500, new { error = "SMTP send failed: " + ex.Message });
+        }
     }
 
     /// <summary>

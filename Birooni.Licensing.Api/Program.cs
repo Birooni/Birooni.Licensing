@@ -1,7 +1,9 @@
 using Birooni.Licensing.Api.Common;
 using Birooni.Licensing.Api.Data;
 using Birooni.Licensing.Api.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,6 +39,16 @@ builder.Services.AddSwaggerGen(options =>
         Name = "X-Admin-Key",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "Customer account JWT. Paste the token from /api/account/signin.",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -77,8 +89,30 @@ builder.Services.AddDbContext<LicensingDbContext>(options =>
 
 // 3. Register Domain and Cryptographic Services
 builder.Services.AddSingleton<ITokenSigner, TokenSigner>();
+var jwtService = new JwtTokenService(
+    builder.Configuration,
+    LoggerFactory.Create(b => b.AddConsole()).CreateLogger<JwtTokenService>());
+builder.Services.AddSingleton<IJwtTokenService>(jwtService);
 builder.Services.AddScoped<ILicensingService, LicensingService>();
 builder.Services.AddScoped<IUpdateService, UpdateService>();
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = true,
+            ValidIssuer = JwtTokenService.Issuer,
+            ValidAudience = JwtTokenService.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(jwtService.GetSigningKeyBytes()),
+            ClockSkew = TimeSpan.FromMinutes(2)
+        };
+    });
 
 var app = builder.Build();
 
@@ -103,6 +137,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

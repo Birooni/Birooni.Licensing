@@ -14,6 +14,7 @@ public class LicensingDbContext : DbContext
     public DbSet<ValidationLog> ValidationLogs => Set<ValidationLog>();
     public DbSet<ProductRelease> ProductReleases => Set<ProductRelease>();
     public DbSet<FloatingSession> FloatingSessions => Set<FloatingSession>();
+    public DbSet<CustomerAccount> CustomerAccounts => Set<CustomerAccount>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -137,6 +138,25 @@ public class LicensingDbContext : DbContext
             entity.HasIndex(e => e.LicenseId);
             entity.HasIndex(e => new { e.LicenseId, e.DeviceId });
             entity.HasIndex(e => e.ExpiresAt);
+        });
+
+        modelBuilder.Entity<CustomerAccount>(entity =>
+        {
+            entity.ToTable("customer_accounts");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Email).HasColumnName("email").IsRequired().HasMaxLength(200);
+            entity.Property(e => e.PasswordHash).HasColumnName("password_hash").IsRequired().HasMaxLength(500);
+            entity.Property(e => e.FullName).HasColumnName("full_name").IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Company).HasColumnName("company").HasMaxLength(200);
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.LastLoginAt).HasColumnName("last_login_at");
+            entity.Property(e => e.EmailVerified).HasColumnName("email_verified").HasDefaultValue(false);
+            entity.Property(e => e.VerificationTokenHash).HasColumnName("verification_token_hash").HasMaxLength(128);
+            entity.Property(e => e.VerificationExpiresAt).HasColumnName("verification_expires_at");
+            entity.Property(e => e.VerificationSentAt).HasColumnName("verification_sent_at");
+            entity.HasIndex(e => e.Email).IsUnique();
+            entity.HasIndex(e => e.VerificationTokenHash);
         });
     }
 }
