@@ -21,7 +21,7 @@ public class ResendEmailSender : IEmailSender
     private string? ApiKey => Environment.GetEnvironmentVariable("RESEND_API_KEY") ?? _configuration["Resend:ApiKey"];
     private string From => Environment.GetEnvironmentVariable("RESEND_FROM")
                            ?? _configuration["Resend:From"]
-                           ?? "Ibrooni <beth.t@example.com>";
+                           ?? "Ibrooni <info@ibrooni.com>";
 
     public async Task SendAsync(string toEmail, string subject, string htmlBody, CancellationToken cancellationToken = default)
     {
@@ -30,6 +30,7 @@ public class ResendEmailSender : IEmailSender
             throw new InvalidOperationException("RESEND_API_KEY is not set.");
         }
 
+        var verifyUrl = ExtractFirstHref(htmlBody);
         using var req = new HttpRequestMessage(HttpMethod.Post, "https://api.resend.com/emails");
         req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ApiKey);
         var payload = new
@@ -37,7 +38,8 @@ public class ResendEmailSender : IEmailSender
             from = From,
             to = new[] { toEmail },
             subject,
-            html = htmlBody
+            html = htmlBody,
+            text = "Verify your Ibrooni email by opening this link:\n\n" + verifyUrl + "\n\nThis link expires in 24 hours. You can sign in only after you verify."
         };
         req.Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
 
@@ -50,5 +52,18 @@ public class ResendEmailSender : IEmailSender
         }
 
         _logger.LogInformation("Resend accepted mail to {Email}", toEmail);
+    }
+
+    private static string ExtractFirstHref(string html)
+    {
+        var start = html.IndexOf("href=\"", StringComparison.OrdinalIgnoreCase);
+        if (start < 0)
+        {
+            return "https://ibrooni.com/account.html";
+        }
+
+        start += 6;
+        var end = html.IndexOf('"', start);
+        return end < 0 ? "https://ibrooni.com/account.html" : html[start..end];
     }
 }

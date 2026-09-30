@@ -60,12 +60,12 @@ public class AccountService : IAccountService
         account.EmailVerified = false;
 
         _db.CustomerAccounts.Add(account);
-        var (sent, link) = await IssueVerificationAsync(account, cancellationToken);
+        var (sent, _) = await IssueVerificationAsync(account, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
 
         var message = sent
-            ? $"Check {email} (and spam) and click the Ibrooni verification link. Family Loader is issued only after the address is confirmed."
-            : "Mail is not connected on the server yet. Use the Verify now button below.";
+            ? $"Check {email} (and spam) for a message from info@ibrooni.com. Click Verify email in that message. You can sign in only after that."
+            : "Verification mail could not be sent. Wait a minute and use Resend verification email.";
 
         return AuthResponse.Ok(
             message,
@@ -73,7 +73,7 @@ public class AccountService : IAccountService
             account: ToProfile(account),
             requiresVerification: true,
             emailSent: sent,
-            verificationLink: sent ? null : link);
+            verificationLink: null);
     }
 
     public async Task<AuthResponse> SigninAsync(SigninRequest request, CancellationToken cancellationToken = default)
@@ -93,7 +93,7 @@ public class AccountService : IAccountService
 
         if (!account.EmailVerified)
         {
-            var (sent, link) = await IssueVerificationAsync(account, cancellationToken);
+            var (sent, _) = await IssueVerificationAsync(account, cancellationToken);
             await _db.SaveChangesAsync(cancellationToken);
 
             return new AuthResponse
@@ -101,10 +101,10 @@ public class AccountService : IAccountService
                 Success = false,
                 RequiresVerification = true,
                 EmailSent = sent,
-                VerificationLink = sent ? null : link,
+                VerificationLink = null,
                 Message = sent
-                    ? "Confirm this email first. Open the Ibrooni message and click Verify."
-                    : "Confirm this email first. Mail is not connected — use Verify now."
+                    ? "Confirm this email first. Open the Ibrooni message from info@ibrooni.com and click Verify email."
+                    : "Confirm this email first. Wait a minute, then use Resend verification email."
             };
         }
 
@@ -174,17 +174,17 @@ public class AccountService : IAccountService
             return AuthResponse.Ok("If that email is registered and still unverified, a new link is on its way.", null, null, requiresVerification: true);
         }
 
-        var (sent, link) = await IssueVerificationAsync(account, cancellationToken);
+        var (sent, _) = await IssueVerificationAsync(account, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
         return AuthResponse.Ok(
             sent
-                ? "If that email is registered and still unverified, a new link is on its way. Check spam."
-                : "Mail is not connected on the server yet. Use the Verify now button below.",
+                ? "If that email is registered and still unverified, a new Verify email link is on its way. Check inbox and spam."
+                : "Verification mail could not be sent. Wait a minute and try Resend verification email again.",
             null,
             null,
             requiresVerification: true,
             emailSent: sent,
-            verificationLink: sent ? null : link);
+            verificationLink: null);
     }
 
     public async Task<AccountProfileDto?> GetProfileAsync(Guid accountId, CancellationToken cancellationToken = default)
@@ -352,11 +352,29 @@ public class AccountService : IAccountService
                    ?? "https://ibrooni.com").TrimEnd('/');
         var link = $"{web}/account.html?verify={Uri.EscapeDataString(rawToken)}";
 
+        var name = System.Net.WebUtility.HtmlEncode(account.FullName);
         var html = $"""
-            <p>Hello {System.Net.WebUtility.HtmlEncode(account.FullName)},</p>
-            <p>Confirm this email for your Ibrooni account. Family Loader is issued only after this step.</p>
-            <p><a href="{link}">Verify email address</a></p>
-            <p>This link expires in 24 hours. If you did not create an Ibrooni account, ignore this message.</p>
+            <!DOCTYPE html>
+            <html>
+            <body style="margin:0;padding:0;background:#070b12;font-family:Arial,Helvetica,sans-serif;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#070b12;padding:32px 16px;">
+                <tr><td align="center">
+                  <table role="presentation" width="560" cellspacing="0" cellpadding="0" style="background:#111827;border-radius:12px;padding:32px;">
+                    <tr><td style="color:#e8eef5;font-size:16px;line-height:1.55;">
+                      <p style="margin:0 0 16px;">Hello {name},</p>
+                      <p style="margin:0 0 16px;">Confirm this email for your Ibrooni account. You can sign in only after you click the button below.</p>
+                      <p style="margin:28px 0;">
+                        <a href="{link}" style="display:inline-block;background:#2F8A96;color:#ffffff;text-decoration:none;font-weight:700;padding:14px 28px;border-radius:8px;">Verify email</a>
+                      </p>
+                      <p style="margin:0 0 8px;color:#9aa7b5;font-size:14px;">If the button does not work, copy and paste this link into your browser:</p>
+                      <p style="margin:0 0 24px;word-break:break-all;font-size:14px;"><a href="{link}" style="color:#2F8A96;">{link}</a></p>
+                      <p style="margin:0;color:#9aa7b5;font-size:13px;">This link expires in 24 hours. If you did not create an Ibrooni account, ignore this message.</p>
+                    </td></tr>
+                  </table>
+                </td></tr>
+              </table>
+            </body>
+            </html>
             """;
 
         try

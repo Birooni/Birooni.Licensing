@@ -77,6 +77,11 @@ public class AccountServiceTests
         });
         Assert.False(blocked.Success);
         Assert.True(blocked.RequiresVerification);
+        Assert.True(string.IsNullOrWhiteSpace(blocked.Token));
+        Assert.True(string.IsNullOrWhiteSpace(blocked.VerificationLink));
+        Assert.Contains("verify=", email.LastHtml);
+        Assert.Contains("Verify email", email.LastHtml);
+        Assert.Contains("https://ibrooni.com/account.html?verify=", email.LastHtml);
 
         var verified = await service.VerifyEmailAsync(email.LastToken!);
         Assert.True(verified.Success);
