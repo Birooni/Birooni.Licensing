@@ -155,8 +155,12 @@ public class LicensingDbContext : DbContext
             entity.Property(e => e.VerificationTokenHash).HasColumnName("verification_token_hash").HasMaxLength(128);
             entity.Property(e => e.VerificationExpiresAt).HasColumnName("verification_expires_at");
             entity.Property(e => e.VerificationSentAt).HasColumnName("verification_sent_at");
+            entity.Property(e => e.PasswordResetTokenHash).HasColumnName("password_reset_token_hash").HasMaxLength(128);
+            entity.Property(e => e.PasswordResetExpiresAt).HasColumnName("password_reset_expires_at");
+            entity.Property(e => e.PasswordResetSentAt).HasColumnName("password_reset_sent_at");
             entity.HasIndex(e => e.Email).IsUnique();
             entity.HasIndex(e => e.VerificationTokenHash);
+            entity.HasIndex(e => e.PasswordResetTokenHash);
         });
     }
 }

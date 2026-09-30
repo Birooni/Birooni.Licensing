@@ -68,7 +68,11 @@ public static class DatabaseInitializer
                 ALTER TABLE customer_accounts ADD COLUMN IF NOT EXISTS verification_token_hash VARCHAR(128);
                 ALTER TABLE customer_accounts ADD COLUMN IF NOT EXISTS verification_expires_at TIMESTAMPTZ;
                 ALTER TABLE customer_accounts ADD COLUMN IF NOT EXISTS verification_sent_at TIMESTAMPTZ;
+                ALTER TABLE customer_accounts ADD COLUMN IF NOT EXISTS password_reset_token_hash VARCHAR(128);
+                ALTER TABLE customer_accounts ADD COLUMN IF NOT EXISTS password_reset_expires_at TIMESTAMPTZ;
+                ALTER TABLE customer_accounts ADD COLUMN IF NOT EXISTS password_reset_sent_at TIMESTAMPTZ;
                 CREATE INDEX IF NOT EXISTS idx_customer_accounts_verify ON customer_accounts(verification_token_hash);
+                CREATE INDEX IF NOT EXISTS idx_customer_accounts_reset ON customer_accounts(password_reset_token_hash);
 
                 UPDATE customer_accounts
                 SET email_verified = TRUE

@@ -35,7 +35,7 @@ public class AccountController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(AuthResponse.Fail("Please provide your name, email, and a password of at least 8 characters."));
+            return BadRequest(AuthResponse.Fail("Please provide your name, email, a password of at least 8 characters, and the same password in Confirm password."));
         }
 
         var result = await _accounts.SignupAsync(request, cancellationToken);
@@ -109,6 +109,36 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> Resend([FromBody] ResendVerificationRequest request, CancellationToken cancellationToken)
     {
         var result = await _accounts.ResendVerificationAsync(request.Email, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(AuthResponse.Fail("Enter the Mail ID for this account."));
+        }
+
+        var result = await _accounts.ForgotPasswordAsync(request.Email, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(AuthResponse.Fail("Enter a new password of at least 8 characters, twice."));
+        }
+
+        var result = await _accounts.ResetPasswordAsync(request, cancellationToken);
+        if (!result.Success) return BadRequest(result);
         return Ok(result);
     }
 

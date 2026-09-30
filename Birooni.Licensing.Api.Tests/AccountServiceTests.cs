@@ -27,6 +27,16 @@ public class AccountServiceTests
             }
         }
 
+        public string? LastResetToken
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(LastHtml)) return null;
+                var match = Regex.Match(LastHtml, @"reset=([^""&\s]+)");
+                return match.Success ? Uri.UnescapeDataString(match.Groups[1].Value) : null;
+            }
+        }
+
         public Task SendAsync(string toEmail, string subject, string htmlBody, CancellationToken cancellationToken = default)
         {
             LastHtml = htmlBody;
@@ -61,6 +71,7 @@ public class AccountServiceTests
             FullName = "Ada Khan",
             Email = "ada@studio.com",
             Password = "secret123",
+            ConfirmPassword = "secret123",
             Company = "Studio"
         });
 
@@ -105,7 +116,8 @@ public class AccountServiceTests
         {
             FullName = "Ada",
             Email = "ada@studio.com",
-            Password = "secret123"
+            Password = "secret123",
+            ConfirmPassword = "secret123"
         });
         Assert.True(first.Success);
 
@@ -113,7 +125,8 @@ public class AccountServiceTests
         {
             FullName = "Ada 2",
             Email = "ada@studio.com",
-            Password = "secret123"
+            Password = "secret123",
+            ConfirmPassword = "secret123"
         });
         Assert.False(second.Success);
         Assert.Contains("already exists", second.Message);
@@ -127,7 +140,8 @@ public class AccountServiceTests
         {
             FullName = "Ada Khan",
             Email = "ada@studio.com",
-            Password = "secret123"
+            Password = "secret123",
+            ConfirmPassword = "secret123"
         });
         Assert.True(signup.Success);
         Assert.Empty(db.Licenses);
@@ -171,7 +185,8 @@ public class AccountServiceTests
         {
             FullName = "Sara",
             Email = "sara@studio.com",
-            Password = "secret123"
+            Password = "secret123",
+            ConfirmPassword = "secret123"
         });
         await service.VerifyEmailAsync(mail.LastToken!);
 
@@ -191,6 +206,7 @@ public class AccountServiceTests
             FullName = "Sara",
             Email = "sara@gensler.com",
             Password = "secret123",
+            ConfirmPassword = "secret123",
             Company = "Gensler"
         });
         Assert.True(signup.Success);
@@ -251,5 +267,62 @@ public class AccountServiceTests
         };
         Assert.True(AccountService.MatchesPurchase(site, "sara@gensler.com", "@gensler.com", null));
         Assert.False(AccountService.MatchesPurchase(site, "sara@example.com", "@example.com", null));
+    }
+
+    [Fact]
+    public async Task Signup_MismatchedConfirmPassword_Fails()
+    {
+        var (_, service, _) = Create();
+        var result = await service.SignupAsync(new SignupRequest
+        {
+            FullName = "Ada",
+            Email = "ada@studio.com",
+            Password = "secret123",
+            ConfirmPassword = "secret999"
+        });
+        Assert.False(result.Success);
+        Assert.Contains("must match", result.Message);
+    }
+
+    [Fact]
+    public async Task ForgotPassword_Then_Reset_AllowsSignin()
+    {
+        var (_, service, mail) = Create();
+        await service.SignupAsync(new SignupRequest
+        {
+            FullName = "Ada",
+            Email = "ada@studio.com",
+            Password = "secret123",
+            ConfirmPassword = "secret123"
+        });
+        await service.VerifyEmailAsync(mail.LastToken!);
+
+        var forgot = await service.ForgotPasswordAsync("ada@studio.com");
+        Assert.True(forgot.Success);
+        Assert.False(string.IsNullOrWhiteSpace(mail.LastResetToken));
+        Assert.Contains("Reset password", mail.LastHtml);
+
+        var reset = await service.ResetPasswordAsync(new ResetPasswordRequest
+        {
+            Token = mail.LastResetToken!,
+            Password = "newpass123",
+            ConfirmPassword = "newpass123"
+        });
+        Assert.True(reset.Success);
+
+        var oldPass = await service.SigninAsync(new SigninRequest
+        {
+            Email = "ada@studio.com",
+            Password = "secret123"
+        });
+        Assert.False(oldPass.Success);
+
+        var signin = await service.SigninAsync(new SigninRequest
+        {
+            Email = "ada@studio.com",
+            Password = "newpass123"
+        });
+        Assert.True(signin.Success);
+        Assert.False(string.IsNullOrWhiteSpace(signin.Token));
     }
 }

@@ -48,4 +48,14 @@ public class CustomerAccount
 
     [Column("verification_sent_at")]
     public DateTimeOffset? VerificationSentAt { get; set; }
+
+    [MaxLength(128)]
+    [Column("password_reset_token_hash")]
+    public string? PasswordResetTokenHash { get; set; }
+
+    [Column("password_reset_expires_at")]
+    public DateTimeOffset? PasswordResetExpiresAt { get; set; }
+
+    [Column("password_reset_sent_at")]
+    public DateTimeOffset? PasswordResetSentAt { get; set; }
 }

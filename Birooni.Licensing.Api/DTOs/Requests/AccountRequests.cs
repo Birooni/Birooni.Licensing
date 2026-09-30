@@ -18,6 +18,12 @@ public class SignupRequest
     [MaxLength(200)]
     public string Password { get; set; } = string.Empty;
 
+    [Required]
+    [MinLength(8)]
+    [MaxLength(200)]
+    [Compare(nameof(Password), ErrorMessage = "Password and confirm password must match.")]
+    public string ConfirmPassword { get; set; } = string.Empty;
+
     [MaxLength(200)]
     public string? Company { get; set; }
 }
@@ -43,6 +49,30 @@ public class ResendVerificationRequest
     [Required]
     [EmailAddress]
     public string Email { get; set; } = string.Empty;
+}
+
+public class ForgotPasswordRequest
+{
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; } = string.Empty;
+}
+
+public class ResetPasswordRequest
+{
+    [Required]
+    public string Token { get; set; } = string.Empty;
+
+    [Required]
+    [MinLength(8)]
+    [MaxLength(200)]
+    public string Password { get; set; } = string.Empty;
+
+    [Required]
+    [MinLength(8)]
+    [MaxLength(200)]
+    [Compare(nameof(Password), ErrorMessage = "Password and confirm password must match.")]
+    public string ConfirmPassword { get; set; } = string.Empty;
 }
 
 public class TestEmailRequest
