@@ -115,6 +115,7 @@ public class AccountService : IAccountService
 
         account.LastLoginAt = DateTimeOffset.UtcNow;
         var familyKey = await EnsureFamilyLoaderLicenseAsync(account, cancellationToken);
+        await EnsureViewReferenceRobotLicenseAsync(account, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
 
         return AuthResponse.Ok("Signed in.", _jwt.CreateToken(account), ToProfile(account), familyKey);
@@ -139,6 +140,7 @@ public class AccountService : IAccountService
         if (account.EmailVerified)
         {
             var existingKey = await EnsureFamilyLoaderLicenseAsync(account, cancellationToken);
+            await EnsureViewReferenceRobotLicenseAsync(account, cancellationToken);
             await _db.SaveChangesAsync(cancellationToken);
             return AuthResponse.Ok("Email is already verified. You can sign in.", _jwt.CreateToken(account), ToProfile(account), existingKey);
         }
@@ -154,6 +156,7 @@ public class AccountService : IAccountService
         account.LastLoginAt = DateTimeOffset.UtcNow;
 
         var familyKey = await EnsureFamilyLoaderLicenseAsync(account, cancellationToken);
+        await EnsureViewReferenceRobotLicenseAsync(account, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
 
         return AuthResponse.Ok(
@@ -360,6 +363,8 @@ public class AccountService : IAccountService
     }
 
     public const string FamilyLoaderProduct = "FamilyLoader";
+    public const string ViewReferenceRobotProduct = "ViewReferenceRobot";
+    public const int ViewReferenceRobotFounderCap = 100;
 
     /// <summary>
     /// Registered Ibrooni accounts receive a perpetual Family Loader license.
@@ -417,6 +422,64 @@ public class AccountService : IAccountService
         RandomNumberGenerator.Fill(randomBytes);
         var hex = Convert.ToHexString(randomBytes);
         return $"FAMILY-{hex[..4]}-{hex[4..8]}-{hex[8..12]}";
+    }
+
+    /// <summary>
+    /// Everyone may use View Reference Robot until 31 January 2027 without a key.
+    /// The first 100 verified accounts also receive a six-month Founder license that
+    /// can continue past that date.
+    /// </summary>
+    public async Task<string?> EnsureViewReferenceRobotLicenseAsync(CustomerAccount account, CancellationToken cancellationToken = default)
+    {
+        var email = account.Email;
+        var existing = await _db.Licenses
+            .Where(l => l.Product.ToLower() == ViewReferenceRobotProduct.ToLower() && l.CustomerEmail.ToLower() == email)
+            .OrderByDescending(l => l.IsActive)
+            .ThenByDescending(l => l.CreatedAt)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (existing != null)
+        {
+            return existing.LicenseKey;
+        }
+
+        var grantedCount = await _db.Licenses
+            .Where(l => l.Product.ToLower() == ViewReferenceRobotProduct.ToLower())
+            .Select(l => l.CustomerEmail.ToLower())
+            .Distinct()
+            .CountAsync(cancellationToken);
+
+        if (grantedCount >= ViewReferenceRobotFounderCap)
+        {
+            return null;
+        }
+
+        var license = new License
+        {
+            Id = Guid.NewGuid(),
+            LicenseKey = GenerateViewReferenceRobotKey(),
+            Product = ViewReferenceRobotProduct,
+            CustomerName = account.FullName,
+            CustomerEmail = email,
+            Company = account.Company,
+            LicenseType = "Founder",
+            LicenseMode = "Individual",
+            MaxActivations = 2,
+            IsActive = true,
+            ExpiresAt = DateTimeOffset.UtcNow.AddMonths(6),
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+        _db.Licenses.Add(license);
+        await _db.SaveChangesAsync(cancellationToken);
+        return license.LicenseKey;
+    }
+
+    private static string GenerateViewReferenceRobotKey()
+    {
+        Span<byte> randomBytes = stackalloc byte[6];
+        RandomNumberGenerator.Fill(randomBytes);
+        var hex = Convert.ToHexString(randomBytes);
+        return $"ROBOT-{hex[..4]}-{hex[4..8]}-{hex[8..12]}";
     }
 
     private async Task<(bool Sent, string Link)> IssueVerificationAsync(CustomerAccount account, CancellationToken cancellationToken)

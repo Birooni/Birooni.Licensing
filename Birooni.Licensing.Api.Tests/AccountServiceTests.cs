@@ -147,7 +147,7 @@ public class AccountServiceTests
         Assert.Empty(db.Licenses);
 
         var verified = await service.VerifyEmailAsync(mail.LastToken!);
-        var license = Assert.Single(db.Licenses);
+        var license = Assert.Single(db.Licenses.Where(l => l.Product == "FamilyLoader"));
         Assert.Equal("FamilyLoader", license.Product);
         Assert.Equal("Registered", license.LicenseType);
         Assert.Null(license.ExpiresAt);
@@ -160,7 +160,76 @@ public class AccountServiceTests
             Password = "secret123"
         });
         Assert.Equal(verified.FamilyLoaderKey, again.FamilyLoaderKey);
-        Assert.Equal(1, db.Licenses.Count());
+        Assert.Equal(1, db.Licenses.Count(l => l.Product == "FamilyLoader"));
+    }
+
+    [Fact]
+    public async Task Verify_GrantsSixMonthViewReferenceRobotLicenseToFirst100()
+    {
+        var (db, service, mail) = Create();
+        await service.SignupAsync(new SignupRequest
+        {
+            FullName = "Ada Khan",
+            Email = "ada@studio.com",
+            Password = "secret123",
+            ConfirmPassword = "secret123"
+        });
+        await service.VerifyEmailAsync(mail.LastToken!);
+
+        var license = Assert.Single(db.Licenses.Where(l => l.Product == "ViewReferenceRobot"));
+        Assert.StartsWith("ROBOT-", license.LicenseKey);
+        Assert.Equal("Founder", license.LicenseType);
+        Assert.Equal("Individual", license.LicenseMode);
+        Assert.Equal(2, license.MaxActivations);
+        Assert.True(license.IsActive);
+        Assert.NotNull(license.ExpiresAt);
+        Assert.True(license.ExpiresAt > DateTimeOffset.UtcNow.AddMonths(5));
+        Assert.True(license.ExpiresAt < DateTimeOffset.UtcNow.AddMonths(7));
+
+        var again = await service.SigninAsync(new SigninRequest
+        {
+            Email = "ada@studio.com",
+            Password = "secret123"
+        });
+        Assert.True(again.Success);
+        Assert.Equal(1, db.Licenses.Count(l => l.Product == "ViewReferenceRobot"));
+        Assert.Equal(license.LicenseKey, db.Licenses.Single(l => l.Product == "ViewReferenceRobot").LicenseKey);
+    }
+
+    [Fact]
+    public async Task Verify_DoesNotGrantViewReferenceRobotAfterFirst100()
+    {
+        var (db, service, mail) = Create();
+        for (var i = 0; i < 100; i++)
+        {
+            db.Licenses.Add(new License
+            {
+                LicenseKey = $"ROBOT-SEED-{i:D4}-AAAA",
+                Product = "ViewReferenceRobot",
+                CustomerName = $"User {i}",
+                CustomerEmail = $"user{i}@studio.com",
+                LicenseType = "Founder",
+                LicenseMode = "Individual",
+                MaxActivations = 2,
+                IsActive = true,
+                ExpiresAt = DateTimeOffset.UtcNow.AddMonths(6)
+            });
+        }
+        await db.SaveChangesAsync();
+
+        await service.SignupAsync(new SignupRequest
+        {
+            FullName = "Late User",
+            Email = "late@studio.com",
+            Password = "secret123",
+            ConfirmPassword = "secret123"
+        });
+        await service.VerifyEmailAsync(mail.LastToken!);
+
+        Assert.DoesNotContain(db.Licenses, l =>
+            l.Product == "ViewReferenceRobot" &&
+            l.CustomerEmail == "late@studio.com");
+        Assert.Equal(100, db.Licenses.Count(l => l.Product == "ViewReferenceRobot"));
     }
 
     [Fact]
@@ -190,7 +259,7 @@ public class AccountServiceTests
         });
         await service.VerifyEmailAsync(mail.LastToken!);
 
-        var license = Assert.Single(db.Licenses);
+        var license = Assert.Single(db.Licenses.Where(l => l.Product == "FamilyLoader"));
         Assert.Equal("TRIAL-OLD-KEY", license.LicenseKey);
         Assert.Equal("Registered", license.LicenseType);
         Assert.Null(license.ExpiresAt);
