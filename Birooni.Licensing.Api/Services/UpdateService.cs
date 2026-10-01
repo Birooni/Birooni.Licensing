@@ -44,6 +44,19 @@ public class UpdateService : IUpdateService
             };
         }
 
+        // Mixed TFM products publish per-year URLs. An "All" net8 zip must not win
+        // over an exact-year net48 zip when both exist at the same version.
+        if (!string.Equals(cleanRev, "All", StringComparison.OrdinalIgnoreCase))
+        {
+            var exactYear = candidates
+                .Where(r => string.Equals(r.RevitVersion, cleanRev, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            if (exactYear.Count > 0)
+            {
+                candidates = exactYear;
+            }
+        }
+
         // Find the release with the highest semantic version
         ProductRelease? latestRelease = null;
         Version? highestParsedVersion = null;

@@ -85,4 +85,34 @@ public class UpdateServiceTests
         Assert.True(response2026.UpdateAvailable);
         Assert.Equal("2.0.0", response2026.LatestVersion);
     }
+
+    [Fact]
+    public async Task CheckForUpdate_PrefersExactRevitYearOverAll()
+    {
+        using var db = CreateInMemoryDbContext();
+        var service = new UpdateService(db, NullLogger<UpdateService>.Instance);
+
+        await service.CreateReleaseAsync(new CreateReleaseRequest
+        {
+            Product = "BiruBox",
+            Version = "1.0.8",
+            RevitVersion = "2024",
+            DownloadUrl = "https://ibrooni.com/downloads/BiruBox-update-net48.zip"
+        });
+        await service.CreateReleaseAsync(new CreateReleaseRequest
+        {
+            Product = "BiruBox",
+            Version = "1.0.8",
+            RevitVersion = "All",
+            DownloadUrl = "https://ibrooni.com/downloads/BiruBox-update.zip"
+        });
+
+        var response2024 = await service.CheckForUpdateAsync("BiruBox", "1.0.7", "2024");
+        Assert.True(response2024.UpdateAvailable);
+        Assert.Equal("https://ibrooni.com/downloads/BiruBox-update-net48.zip", response2024.DownloadUrl);
+
+        var response2025 = await service.CheckForUpdateAsync("BiruBox", "1.0.7", "2025");
+        Assert.True(response2025.UpdateAvailable);
+        Assert.Equal("https://ibrooni.com/downloads/BiruBox-update.zip", response2025.DownloadUrl);
+    }
 }
