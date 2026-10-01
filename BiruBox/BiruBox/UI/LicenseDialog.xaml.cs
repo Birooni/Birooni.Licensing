@@ -16,6 +16,12 @@ public partial class LicenseDialog : Window
     private void LicenseDialog_Loaded(object sender, RoutedEventArgs e)
     {
         TxtHardwareId.Text = LicensingManager.Client.DeviceFingerprint;
+        var savedMail = Birooni.Client.Storage.LicenseCacheManager.LoadMailId();
+        if (!string.IsNullOrWhiteSpace(savedMail))
+        {
+            TxtMailId.Text = savedMail;
+            TxtTrialEmail.Text = savedMail;
+        }
         RefreshUiState();
     }
 
@@ -86,9 +92,16 @@ public partial class LicenseDialog : Window
     private async void BtnActivate_Click(object sender, RoutedEventArgs e)
     {
         var key = TxtLicenseKey.Text.Trim();
+        var mailId = TxtMailId.Text.Trim();
         if (string.IsNullOrWhiteSpace(key) || key == "BIROONI-")
         {
             MessageBox.Show("Please enter a valid license key.", "BiruBox Licensing", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(mailId) || mailId.IndexOf('@') < 1)
+        {
+            MessageBox.Show("Enter your Mail ID (office email). Site licenses require it so the key can match your company domain.", "BiruBox Licensing", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -98,7 +111,7 @@ public partial class LicenseDialog : Window
 
         try
         {
-            var result = await LicensingManager.Client.ActivateLicenseAsync(key);
+            var result = await LicensingManager.Client.ActivateLicenseAsync(key, userEmail: mailId);
             LicensingManager.UpdateStatus(result);
             RefreshUiState();
 

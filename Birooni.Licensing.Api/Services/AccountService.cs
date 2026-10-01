@@ -284,30 +284,25 @@ public class AccountService : IAccountService
 
         var email = account.Email;
         var domain = GetEmailDomain(email);
-        var company = account.Company?.Trim();
 
         var licenses = await _db.Licenses
             .Include(l => l.Activations)
             .AsNoTracking()
+            .Where(l =>
+                l.CustomerEmail.ToLower() == email.ToLower()
+                || l.LicenseMode == "SiteLicense")
             .ToListAsync(cancellationToken);
 
         return licenses
-            .Where(l => MatchesPurchase(l, email, domain, company))
+            .Where(l => MatchesPurchase(l, email, domain))
             .OrderByDescending(l => l.CreatedAt)
             .Select(l => ToPurchase(l, email))
             .ToList();
     }
 
-    public static bool MatchesPurchase(License license, string email, string domain, string? company)
+    public static bool MatchesPurchase(License license, string email, string domain)
     {
         if (string.Equals(license.CustomerEmail, email, StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
-        }
-
-        if (!string.IsNullOrWhiteSpace(company)
-            && !string.IsNullOrWhiteSpace(license.Company)
-            && string.Equals(license.Company.Trim(), company, StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }

@@ -17,6 +17,12 @@ namespace FamilyLoader.UI
         private void LicenseDialog_Loaded(object sender, RoutedEventArgs e)
         {
             TxtHardwareId.Text = LicensingManager.Client.DeviceFingerprint;
+            var savedMail = Birooni.Client.Storage.LicenseCacheManager.LoadMailId();
+            if (!string.IsNullOrWhiteSpace(savedMail))
+            {
+                TxtMailId.Text = savedMail;
+                TxtTrialEmail.Text = savedMail;
+            }
             RefreshUiState();
         }
 
@@ -87,9 +93,16 @@ namespace FamilyLoader.UI
         private async void BtnActivate_Click(object sender, RoutedEventArgs e)
         {
             var key = TxtLicenseKey.Text.Trim();
+            var mailId = TxtMailId.Text.Trim();
             if (string.IsNullOrWhiteSpace(key) || key == "BIROONI-")
             {
                 MessageBox.Show("Please enter a valid license key.", "Family Loader Licensing", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(mailId) || mailId.IndexOf('@') < 1)
+            {
+                MessageBox.Show("Enter your Mail ID (office email). Site licenses require it so the key can match your company domain.", "Family Loader Licensing", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -99,7 +112,7 @@ namespace FamilyLoader.UI
 
             try
             {
-                var result = await LicensingManager.Client.ActivateLicenseAsync(key);
+                var result = await LicensingManager.Client.ActivateLicenseAsync(key, userEmail: mailId);
                 LicensingManager.UpdateStatus(result);
                 RefreshUiState();
 

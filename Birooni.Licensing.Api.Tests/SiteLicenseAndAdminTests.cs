@@ -95,6 +95,36 @@ public class SiteLicenseAndAdminTests
     }
 
     [Fact]
+    public async Task SiteLicense_RejectsActivation_WhenUserEmailMissing()
+    {
+        var (db, service) = CreateTestContext();
+
+        db.Licenses.Add(new License
+        {
+            Id = Guid.NewGuid(),
+            LicenseKey = "SITE-GENSLER-2026",
+            Product = "Biruscan",
+            CustomerName = "Gensler BIM Team",
+            CustomerEmail = "bim-lead@gensler.com",
+            LicenseType = "Commercial",
+            LicenseMode = "SiteLicense",
+            AllowedDomain = "@gensler.com",
+            MaxActivations = 100,
+            IsActive = true
+        });
+        await db.SaveChangesAsync();
+
+        var result = await service.ActivateAsync(new ActivateLicenseRequest
+        {
+            LicenseKey = "SITE-GENSLER-2026",
+            DeviceId = "DEV-NO-MAIL"
+        }, null);
+
+        Assert.False(result.Success);
+        Assert.Contains("corporate domain", result.Message);
+    }
+
+    [Fact]
     public async Task Admin_CreateCustomLicense_GeneratesKeyAndSavesRecord()
     {
         var (db, service) = CreateTestContext();
@@ -118,6 +148,38 @@ public class SiteLicenseAndAdminTests
         Assert.NotNull(saved);
         Assert.Equal("Foster + Partners", saved.Company);
         Assert.Equal(5, saved.MaxActivations);
+    }
+
+    [Fact]
+    public async Task Admin_CreateSiteLicense_RequiresAuthorizedDomain()
+    {
+        var (db, service) = CreateTestContext();
+
+        var missing = await service.CreateCustomLicenseAsync(new CreateCustomLicenseRequest
+        {
+            Product = "Biruscan",
+            CustomerName = "Gensler BIM",
+            CustomerEmail = "bim@gensler.com",
+            LicenseMode = "SiteLicense",
+            MaxActivations = 50
+        });
+        Assert.False(missing.Success);
+
+        var created = await service.CreateCustomLicenseAsync(new CreateCustomLicenseRequest
+        {
+            Product = "Biruscan",
+            CustomerName = "Gensler BIM",
+            CustomerEmail = "bim@gensler.com",
+            Company = "Gensler",
+            LicenseMode = "SiteLicense",
+            AllowedDomain = "gensler.com",
+            MaxActivations = 50
+        });
+        Assert.True(created.Success);
+        Assert.StartsWith("SCAN-", created.LicenseKey);
+        var saved = await db.Licenses.FirstAsync(l => l.LicenseKey == created.LicenseKey);
+        Assert.Equal("@gensler.com", saved.AllowedDomain);
+        Assert.Equal("Biruscan", saved.Product);
     }
 
     [Fact]

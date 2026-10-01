@@ -442,6 +442,17 @@ public class AccountServiceTests
             LicenseMode = "Individual",
             IsActive = true
         });
+        db.Licenses.Add(new License
+        {
+            LicenseKey = "COMPANY-LEAK",
+            Product = "Biruscan",
+            CustomerName = "Other Gensler staff",
+            CustomerEmail = "alex@gensler.com",
+            Company = "Gensler",
+            LicenseType = "Commercial",
+            LicenseMode = "Individual",
+            IsActive = true
+        });
         await db.SaveChangesAsync();
 
         var purchases = await service.GetPurchasesAsync(signup.Account!.Id);
@@ -449,6 +460,7 @@ public class AccountServiceTests
         Assert.Contains(purchases, p => p.LicenseKey == "SITE-1" && p.Ownership == "company");
         Assert.Contains(purchases, p => p.Product == "FamilyLoader" && p.LicenseType == "Registered");
         Assert.DoesNotContain(purchases, p => p.LicenseKey == "OTHER-1");
+        Assert.DoesNotContain(purchases, p => p.LicenseKey == "COMPANY-LEAK");
     }
 
     [Fact]
@@ -460,8 +472,20 @@ public class AccountServiceTests
             LicenseMode = "SiteLicense",
             AllowedDomain = "@gensler.com"
         };
-        Assert.True(AccountService.MatchesPurchase(site, "sara@gensler.com", "@gensler.com", null));
-        Assert.False(AccountService.MatchesPurchase(site, "sara@example.com", "@example.com", null));
+        Assert.True(AccountService.MatchesPurchase(site, "sara@gensler.com", "@gensler.com"));
+        Assert.False(AccountService.MatchesPurchase(site, "sara@example.com", "@example.com"));
+    }
+
+    [Fact]
+    public void MatchesPurchase_IgnoresCompanyNameOnIndividualLicenses()
+    {
+        var personal = new License
+        {
+            CustomerEmail = "alex@gensler.com",
+            Company = "Gensler",
+            LicenseMode = "Individual"
+        };
+        Assert.False(AccountService.MatchesPurchase(personal, "sara@gensler.com", "@gensler.com"));
     }
 
     [Fact]

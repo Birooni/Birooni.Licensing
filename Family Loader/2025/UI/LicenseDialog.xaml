@@ -84,10 +84,12 @@
             <!-- TAB 1: Activate License -->
             <TabItem Header="Activate License">
                 <StackPanel Margin="16">
+                    <TextBlock Text="Mail ID:" FontWeight="SemiBold" Foreground="#1E293B" Margin="0,0,0,6"/>
+                    <TextBox x:Name="TxtMailId" Margin="0,0,0,12" />
                     <TextBlock Text="Enter your Family Loader License Key:" FontWeight="SemiBold" Foreground="#1E293B" Margin="0,0,0,6"/>
                     <TextBox x:Name="TxtLicenseKey" Margin="0,0,0,14" FontFamily="Consolas" Text="BIROONI-"/>
                     <Button x:Name="BtnActivate" Content="Activate License" Height="36" Click="BtnActivate_Click"/>
-                    <TextBlock Text="Requires an internet connection once during initial activation." FontSize="11" Foreground="#64748B" Margin="0,10,0,0"/>
+                    <TextBlock Text="Mail ID is required for a company site license (@yourfirm.com). Individual keys still activate with it filled in." FontSize="11" Foreground="#64748B" TextWrapping="Wrap" Margin="0,10,0,0"/>
                 </StackPanel>
             </TabItem>
 
@@ -99,7 +101,7 @@
                     <TextBlock Text="Your Name:" FontWeight="SemiBold" Foreground="#1E293B" Margin="0,0,0,4"/>
                     <TextBox x:Name="TxtTrialName" Margin="0,0,0,10"/>
 
-                    <TextBlock Text="Your Work Email:" FontWeight="SemiBold" Foreground="#1E293B" Margin="0,0,0,4"/>
+                    <TextBlock Text="Mail ID:" FontWeight="SemiBold" Foreground="#1E293B" Margin="0,0,0,4"/>
                     <TextBox x:Name="TxtTrialEmail" Margin="0,0,0,14"/>
 
                     <Button x:Name="BtnClaimTrial" Content="Claim 14-Day Free Trial" Height="36" Background="#16A34A" Click="BtnClaimTrial_Click"/>

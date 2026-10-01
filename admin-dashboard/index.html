@@ -269,11 +269,11 @@
             <div>
               <label class="block text-slate-400 font-medium mb-1">Product</label>
               <select id="inpProduct" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
-                <option value="BiruBox">BiruBox (Section Box)</option>
+                <option value="BiruBox">BiruBox</option>
+                <option value="VerticalHostPlacer">Vertical Host Placer</option>
                 <option value="FamilyLoader">Family Loader</option>
-                <option value="BirooniSuite">BirooniSuite (All-in-One)</option>
-                <option value="Robot">View Reference Robot</option>
-                <option value="ProjectSetupTools">Project Setup Tools</option>
+                <option value="Biruscan">Biruscan</option>
+                <option value="ViewReferenceRobot">View Reference Robot</option>
               </select>
             </div>
             <div>
@@ -348,9 +348,10 @@
               <label class="block text-slate-400 font-medium mb-1">Product</label>
               <select id="relProduct" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
                 <option value="BiruBox">BiruBox</option>
+                <option value="VerticalHostPlacer">Vertical Host Placer</option>
                 <option value="FamilyLoader">Family Loader</option>
-                <option value="BirooniSuite">BirooniSuite</option>
-                <option value="Robot">Robot</option>
+                <option value="Biruscan">Biruscan</option>
+                <option value="ViewReferenceRobot">View Reference Robot</option>
               </select>
             </div>
             <div>
@@ -766,6 +767,10 @@
         customKey: document.getElementById("inpCustomKey").value.trim() || null,
         licenseType: "Commercial"
       };
+      if (payload.licenseMode === "SiteLicense" && !payload.allowedDomain) {
+        alert("Enter the authorized domain for a site license, e.g. @firm.com");
+        return;
+      }
 
       try {
         const res = await fetch(`${apiBase}/api/admin/licenses`, {

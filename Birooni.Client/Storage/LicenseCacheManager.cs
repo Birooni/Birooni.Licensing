@@ -88,4 +88,54 @@ public class LicenseCacheManager
             // Ignore failure on cleanup
         }
     }
+
+    public static string MailIdFilePath
+    {
+        get
+        {
+            var programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            return Path.Combine(programData, "Birooni", "mail-id.txt");
+        }
+    }
+
+    public static string? LoadMailId()
+    {
+        try
+        {
+            if (!File.Exists(MailIdFilePath))
+            {
+                return null;
+            }
+
+            var value = File.ReadAllText(MailIdFilePath).Trim();
+            return value.IndexOf('@') > 0 ? value : null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public static void SaveMailId(string? email)
+    {
+        if (string.IsNullOrWhiteSpace(email) || email.IndexOf('@') < 1)
+        {
+            return;
+        }
+
+        try
+        {
+            var directory = Path.GetDirectoryName(MailIdFilePath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            File.WriteAllText(MailIdFilePath, email.Trim());
+        }
+        catch
+        {
+            // Identity cache is optional
+        }
+    }
 }

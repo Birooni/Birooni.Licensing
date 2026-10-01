@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account — Sign in to Ibrooni</title>
+  <meta name="description" content="Sign in or create an Ibrooni account. Confirm your email to receive a free Family Loader license and view company purchases.">
+  <meta name="author" content="Ibrooni">
+  <link rel="canonical" href="https://ibrooni.com/account.html">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=6">
+  <link rel="apple-touch-icon" href="assets/logo-mark-light.jpg">
+  <meta name="theme-color" content="#070b12">
+  <meta name="robots" content="noindex, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ibrooni.com/account.html">
+  <meta property="og:site_name" content="Ibrooni">
+  <meta property="og:title" content="Account — Sign in to Ibrooni">
+  <meta property="og:description" content="Verify your email, then view Family Loader and other licenses on your Ibrooni account.">
+  <meta property="og:image" content="https://ibrooni.com/assets/hero-studio.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/brand.css?v=12">
+</head>
+<body class="ibrooni">
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="ibrooni home"><img class="wordmark" src="assets/logo.svg?v=6" alt="ibrooni" width="158" height="42"></a>
+      <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false">Menu</button>
+      <nav id="nav" class="nav">
+        <a href="revit-plugins.html">Revit plugins</a>
+        <a href="birubox.html">BiruBox</a>
+        <a href="vertical-host-placer.html">Vertical Host</a>
+        <a href="family-loader.html">Family Loader</a>
+        <a href="biruscan.html">Biruscan</a>
+        <a href="view-reference-robot.html">Robot</a>
+        <a class="is-current" href="account.html" data-account-link>Sign in</a>
+        <button id="btnSignOut" class="btn btn-ghost hidden" type="button">Sign out</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="auth-shell">
+      <div class="wrap auth-wrap" id="authLayout">
+        <aside class="auth-aside">
+          <p class="kicker">Customer account</p>
+          <h1>Your Ibrooni workspace</h1>
+          <p class="lede">One login for licenses, Family Loader, View Reference Robot, and company purchases. Mail is confirmed before sign-in.</p>
+          <ul class="auth-points">
+            <li>
+              <strong>Confirm Mail ID first</strong>
+              <span>We send a Verify email link from info@ibrooni.com. Sign-in stays locked until you click it.</span>
+            </li>
+            <li>
+              <strong>Family Loader after verify</strong>
+              <span>A registered key is issued to this account once the Mail ID is confirmed.</span>
+            </li>
+            <li>
+              <strong>View Reference Robot founder offer</strong>
+              <span>Everyone may use Robot without a key until 31 January 2027. The first 100 verified accounts — new or existing — can click Claim offer for six months starting 1 February 2027.</span>
+            </li>
+            <li>
+              <strong>Personal and company licenses</strong>
+              <span>Keys issued to this Mail ID appear here. A Site License for your company domain (@yourfirm.com) appears for every verified account on that domain. Ask sales@ibrooni.com to issue one.</span>
+            </li>
+            <li>
+              <strong>Reset by email</strong>
+              <span>Forgot password sends a Reset password link to the same Mail ID.</span>
+            </li>
+          </ul>
+        </aside>
+
+        <div id="authPanel" class="auth-card">
+          <p class="kicker" id="authKicker">Account</p>
+          <h2 id="authTitle">Sign in</h2>
+          <p class="auth-lede" id="authLede">Enter your Mail ID and password. New accounts must confirm email before the first sign-in.</p>
+
+          <div class="tabs" id="authTabs" role="tablist" aria-label="Account forms">
+            <button type="button" id="tabSignin" class="on" role="tab" aria-selected="true">Sign in</button>
+            <button type="button" id="tabSignup" role="tab" aria-selected="false">Create account</button>
+          </div>
+
+          <p id="authError" class="banner error hidden" role="alert"></p>
+          <p id="authNotice" class="banner notice hidden" role="status"></p>
+
+          <form id="formSignin" class="auth-form" autocomplete="on">
+            <label class="field" for="signinEmail">Mail ID
+              <input type="email" id="signinEmail" name="email" required placeholder="you@email.com" autocomplete="username" autocapitalize="none" spellcheck="false" autofocus>
+            </label>
+            <label class="field" for="signinPassword">
+              <span class="field-top"><span>Password</span><button type="button" class="text-link" id="btnForgot">Forgot password?</button></span>
+              <span class="password-wrap">
+                <input type="password" id="signinPassword" name="password" required autocomplete="current-password">
+                <button type="button" class="pw-toggle" data-target="signinPassword" aria-label="Show password">Show</button>
+              </span>
+            </label>
+            <button type="submit" class="btn btn-primary btn-wide">Sign in</button>
+            <p class="auth-trust">Sign-in opens only after you click Verify email in the message from info@ibrooni.com.</p>
+            <p class="form-foot">Need an account? <button type="button" class="text-link" id="linkToSignup">Create account</button></p>
+          </form>
+
+          <form id="formSignup" class="auth-form hidden" autocomplete="on">
+            <label class="field" for="signupName">Full name
+              <input type="text" id="signupName" name="name" required minlength="2" autocomplete="name" placeholder="Your name">
+            </label>
+            <label class="field" for="signupEmail">Mail ID
+              <input type="email" id="signupEmail" name="email" required placeholder="you@email.com" autocomplete="email" autocapitalize="none" spellcheck="false">
+              <span class="field-hint">Use an inbox you can open. Family Loader is issued only after this address is confirmed.</span>
+            </label>
+            <label class="field" for="signupCompany">Company <span class="optional">optional</span>
+              <input type="text" id="signupCompany" name="organization" autocomplete="organization" placeholder="Studio or firm">
+            </label>
+            <label class="field" for="signupPassword">Password
+              <span class="password-wrap">
+                <input type="password" id="signupPassword" name="new-password" required minlength="8" autocomplete="new-password">
+                <button type="button" class="pw-toggle" data-target="signupPassword" aria-label="Show password">Show</button>
+              </span>
+              <span class="field-hint">At least 8 characters.</span>
+            </label>
+            <label class="field" for="signupConfirm">Confirm password
+              <span class="password-wrap">
+                <input type="password" id="signupConfirm" name="confirm-password" required minlength="8" autocomplete="new-password">
+                <button type="button" class="pw-toggle" data-target="signupConfirm" aria-label="Show password">Show</button>
+              </span>
+              <span class="field-hint" id="signupMatchHint"></span>
+            </label>
+            <button type="submit" class="btn btn-primary btn-wide">Create account</button>
+            <p class="auth-trust">We email from info@ibrooni.com. Creating an account confirms this Mail ID is yours.</p>
+            <p class="form-foot">Already registered? <button type="button" class="text-link" id="linkToSignin">Sign in</button></p>
+          </form>
+
+          <form id="formForgot" class="auth-form hidden">
+            <label class="field" for="forgotEmail">Mail ID
+              <input type="email" id="forgotEmail" name="email" required placeholder="you@email.com" autocomplete="email" autocapitalize="none" spellcheck="false">
+              <span class="field-hint">We send a Reset password link from info@ibrooni.com. Check spam if it is not in the inbox.</span>
+            </label>
+            <button type="submit" class="btn btn-primary btn-wide">Send reset link</button>
+            <p class="form-foot"><button type="button" class="text-link" id="btnBackSignin">Back to sign in</button></p>
+          </form>
+
+          <form id="formReset" class="auth-form hidden">
+            <input type="hidden" id="resetToken">
+            <label class="field" for="resetPassword">New password
+              <span class="password-wrap">
+                <input type="password" id="resetPassword" name="new-password" required minlength="8" autocomplete="new-password">
+                <button type="button" class="pw-toggle" data-target="resetPassword" aria-label="Show password">Show</button>
+              </span>
+              <span class="field-hint">At least 8 characters.</span>
+            </label>
+            <label class="field" for="resetConfirm">Confirm password
+              <span class="password-wrap">
+                <input type="password" id="resetConfirm" name="confirm-password" required minlength="8" autocomplete="new-password">
+                <button type="button" class="pw-toggle" data-target="resetConfirm" aria-label="Show password">Show</button>
+              </span>
+              <span class="field-hint" id="resetMatchHint"></span>
+            </label>
+            <button type="submit" class="btn btn-primary btn-wide">Save new password</button>
+          </form>
+
+          <div id="pendingPanel" class="pending-box hidden">
+            <div class="pending-mark" aria-hidden="true">
+              <svg viewBox="0 0 48 48" width="40" height="40" fill="none">
+                <rect x="6" y="12" width="36" height="24" rx="4" stroke="currentColor" stroke-width="2"/>
+                <path d="M8 14l16 12L40 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <p class="pending-copy">Open the Ibrooni message sent to <strong id="pendingEmail"></strong> and click <strong>Verify email</strong>.</p>
+            <p class="field-hint">The link expires in 24 hours. Check spam if you do not see it. Sign-in stays locked until that link is used.</p>
+            <button type="button" id="btnResend" class="btn btn-primary btn-wide">Resend verification email</button>
+            <p class="form-foot"><button type="button" class="text-link" id="btnPendingSignin">Back to sign in</button></p>
+          </div>
+        </div>
+      </div>
+
+      <div id="dashPanel" class="wrap dash-wrap hidden">
+        <div class="dash-head">
+          <div>
+            <p class="kicker">Signed in</p>
+            <h1 id="dashName">Account</h1>
+            <p id="dashMeta" class="lede"></p>
+          </div>
+          <span class="tag free" id="dashVerified">Mail ID confirmed</span>
+        </div>
+        <div id="robotOffer" class="card robot-offer">
+          <span class="tag free">Founder offer</span>
+          <h3>View Reference Robot</h3>
+          <p>Everyone may use Robot without a key until 31 January 2027. The first 100 verified accounts — new or existing — can claim a ROBOT key. The six months start on 1 February 2027.</p>
+          <p class="robot-remain"><strong id="robotRemainCount">—</strong> of <span id="robotRemainCap">100</span> founder licenses remaining</p>
+          <p id="robotOfferStatus" class="muted hidden" role="status"></p>
+          <div class="hero-actions">
+            <button type="button" class="btn btn-primary" id="btnClaimRobot">Claim offer</button>
+            <a class="btn btn-ghost" href="view-reference-robot.html">Product page</a>
+          </div>
+        </div>
+        <h2 class="dash-h2">Licenses <span id="purchaseCount" class="muted"></span></h2>
+        <div id="purchaseEmpty" class="card hidden">
+          <h3>No licenses yet</h3>
+          <p>Family Loader appears here after you confirm Mail ID. Claim a View Reference Robot founder license with the button above while any of the first 100 remain. BiruBox and Vertical Host Placer install without a key. A company site license for your domain (@yourfirm.com) appears here after sales issues it — email sales@ibrooni.com.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="family-loader.html">Family Loader</a>
+            <a class="btn btn-ghost" href="view-reference-robot.html">Robot</a>
+          </div>
+        </div>
+        <div id="purchaseList" class="purchase-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div>
+        <strong style="color:#fff">Ibrooni</strong>
+        <div>© 2026 Ibrooni. Revit add-ins for Windows.</div>
+      </div>
+      <div class="foot-links">
+        <a href="/">Home</a>
+        <a href="revit-plugins.html">Revit plugins</a>
+        <a href="birubox.html">BiruBox</a>
+        <a href="vertical-host-placer.html">Vertical Host</a>
+        <a href="family-loader.html">Family Loader</a>
+        <a href="biruscan.html">Biruscan</a>
+        <a href="view-reference-robot.html">Robot</a>
+        <a href="account.html" data-account-link>Account</a>
+        <a href="mailto:info@ibrooni.com">info@ibrooni.com</a>
+        <a href="mailto:sales@ibrooni.com">sales@ibrooni.com</a>
+      </div>
+    </div>
+  </footer>
+  <script src="assets/site.js"></script>
+  <script src="assets/account-nav.js"></script>
+  <script src="assets/account.js?v=12"></script>
+</body>
+</html>

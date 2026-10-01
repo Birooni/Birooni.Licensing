@@ -376,9 +376,37 @@ public class LicensingService : ILicensingService
         return $"TRIAL-{hex[..4]}-{hex[4..8]}-{hex[8..12]}";
     }
 
+    internal static string? NormalizeAllowedDomain(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        var domain = value.Trim().ToLowerInvariant();
+        if (domain.StartsWith("www."))
+        {
+            domain = domain[4..];
+        }
+
+        if (!domain.StartsWith('@'))
+        {
+            domain = "@" + domain;
+        }
+
+        return domain;
+    }
+
     private static string GenerateCommercialKey(string product)
     {
-        var prefix = product.ToUpperInvariant().Contains("BOX") ? "BIRU" : "BIROONI";
+        var p = product.Trim().ToUpperInvariant().Replace(" ", "");
+        var prefix =
+            p.Contains("FAMILY", StringComparison.Ordinal) ? "FAMILY" :
+            p.Contains("ROBOT", StringComparison.Ordinal) || p.Contains("VIEWREFERENCE", StringComparison.Ordinal) ? "ROBOT" :
+            p.Contains("SCAN", StringComparison.Ordinal) ? "SCAN" :
+            p.Contains("VERTICAL", StringComparison.Ordinal) || p.Contains("HOST", StringComparison.Ordinal) ? "VHP" :
+            p.Contains("BOX", StringComparison.Ordinal) ? "BIRU" :
+            "IBROONI";
         Span<byte> randomBytes = stackalloc byte[6];
         RandomNumberGenerator.Fill(randomBytes);
         var hex = Convert.ToHexString(randomBytes);
@@ -461,6 +489,13 @@ public class LicensingService : ILicensingService
 
     public async Task<LicenseResult> CreateCustomLicenseAsync(CreateCustomLicenseRequest request, CancellationToken cancellationToken = default)
     {
+        var allowedDomain = NormalizeAllowedDomain(request.AllowedDomain);
+        if (string.Equals(request.LicenseMode, "SiteLicense", StringComparison.OrdinalIgnoreCase)
+            && string.IsNullOrWhiteSpace(allowedDomain))
+        {
+            return LicenseResult.Fail("Site license requires an authorized domain such as @firm.com.");
+        }
+
         var key = string.IsNullOrWhiteSpace(request.CustomKey)
             ? GenerateCommercialKey(request.Product)
             : request.CustomKey.Trim().ToUpperInvariant();
@@ -485,7 +520,7 @@ public class LicensingService : ILicensingService
             Company = request.Company?.Trim(),
             LicenseType = request.LicenseType.Trim(),
             LicenseMode = request.LicenseMode.Trim(),
-            AllowedDomain = request.AllowedDomain?.Trim().ToLowerInvariant(),
+            AllowedDomain = allowedDomain,
             MaxActivations = request.MaxActivations > 0 ? request.MaxActivations : 2,
             ConcurrentSeats = request.ConcurrentSeats,
             IsActive = true,
