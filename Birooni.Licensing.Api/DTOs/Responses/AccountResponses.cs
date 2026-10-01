@@ -75,6 +75,8 @@ public class RobotOfferDto
     public string? LicenseKey { get; set; }
     public DateTimeOffset? ExpiresAt { get; set; }
     public DateTimeOffset FreeUntil { get; set; }
+    public DateTimeOffset FounderStarts { get; set; }
+    public DateTimeOffset FounderExpires { get; set; }
 }
 
 public class ClaimRobotOfferResponse

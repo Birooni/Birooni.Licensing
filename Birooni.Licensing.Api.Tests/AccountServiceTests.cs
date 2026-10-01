@@ -227,9 +227,9 @@ public class AccountServiceTests
         Assert.Equal("Individual", license.LicenseMode);
         Assert.Equal(2, license.MaxActivations);
         Assert.True(license.IsActive);
-        Assert.NotNull(license.ExpiresAt);
-        Assert.True(license.ExpiresAt > DateTimeOffset.UtcNow.AddMonths(5));
-        Assert.True(license.ExpiresAt < DateTimeOffset.UtcNow.AddMonths(7));
+        Assert.Equal(AccountService.ViewReferenceRobotFounderExpires, license.ExpiresAt);
+        Assert.Equal(AccountService.ViewReferenceRobotFounderExpires, claim.ExpiresAt);
+        Assert.Contains("1 February 2027", claim.Message);
         Assert.Equal(claim.LicenseKey, license.LicenseKey);
 
         var offerAfter = await service.GetRobotOfferAsync(signup.Account.Id);
@@ -240,8 +240,42 @@ public class AccountServiceTests
         var again = await service.ClaimRobotOfferAsync(signup.Account.Id);
         Assert.True(again.Success);
         Assert.Equal(license.LicenseKey, again.LicenseKey);
+        Assert.Equal(AccountService.ViewReferenceRobotFounderExpires, again.ExpiresAt);
         Assert.Equal(1, db.Licenses.Count(l => l.Product == "ViewReferenceRobot"));
         Assert.Contains("already", again.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task Claim_ExistingFounderExpiry_AlignsToFebruary2027Window()
+    {
+        var (db, service, mail) = Create();
+        var signup = await service.SignupAsync(new SignupRequest
+        {
+            FullName = "Ada Khan",
+            Email = "ada@studio.com",
+            Password = "secret123",
+            ConfirmPassword = "secret123"
+        });
+        await service.VerifyEmailAsync(mail.LastToken!);
+        db.Licenses.Add(new License
+        {
+            LicenseKey = "ROBOT-OLD-KEY1",
+            Product = "ViewReferenceRobot",
+            CustomerName = "Ada Khan",
+            CustomerEmail = "ada@studio.com",
+            LicenseType = "Founder",
+            LicenseMode = "Individual",
+            MaxActivations = 2,
+            IsActive = true,
+            ExpiresAt = DateTimeOffset.UtcNow.AddMonths(6)
+        });
+        await db.SaveChangesAsync();
+
+        var claim = await service.ClaimRobotOfferAsync(signup.Account!.Id);
+        Assert.True(claim.Success);
+        Assert.Equal("ROBOT-OLD-KEY1", claim.LicenseKey);
+        Assert.Equal(AccountService.ViewReferenceRobotFounderExpires, claim.ExpiresAt);
+        Assert.Equal(AccountService.ViewReferenceRobotFounderExpires, db.Licenses.Single(l => l.Product == "ViewReferenceRobot").ExpiresAt);
     }
 
     [Fact]

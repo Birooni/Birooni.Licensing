@@ -424,6 +424,8 @@ public class AccountService : IAccountService
     }
 
     public static readonly DateTimeOffset ViewReferenceRobotFreeUntil = new(2027, 1, 31, 23, 59, 59, TimeSpan.Zero);
+    public static readonly DateTimeOffset ViewReferenceRobotFounderStarts = new(2027, 2, 1, 0, 0, 0, TimeSpan.Zero);
+    public static readonly DateTimeOffset ViewReferenceRobotFounderExpires = ViewReferenceRobotFounderStarts.AddMonths(6);
 
     public async Task<RobotOfferDto> GetRobotOfferAsync(Guid? accountId, CancellationToken cancellationToken = default)
     {
@@ -433,7 +435,9 @@ public class AccountService : IAccountService
             Cap = ViewReferenceRobotFounderCap,
             Claimed = claimed,
             Remaining = remaining,
-            FreeUntil = ViewReferenceRobotFreeUntil
+            FreeUntil = ViewReferenceRobotFreeUntil,
+            FounderStarts = ViewReferenceRobotFounderStarts,
+            FounderExpires = ViewReferenceRobotFounderExpires
         };
 
         if (accountId is Guid id)
@@ -494,8 +498,8 @@ public class AccountService : IAccountService
             {
                 Success = true,
                 Message = already
-                    ? "This account already has a View Reference Robot founder license."
-                    : "Founder license claimed. It is valid for six months from today.",
+                    ? "This account already has a View Reference Robot founder license. The six months start on 1 February 2027."
+                    : "Founder license claimed. The six months start on 1 February 2027.",
                 LicenseKey = key,
                 ExpiresAt = license?.ExpiresAt,
                 Remaining = remaining,
@@ -512,7 +516,7 @@ public class AccountService : IAccountService
     /// <summary>
     /// Everyone may use View Reference Robot until 31 January 2027 without a key.
     /// The first 100 verified accounts may claim a six-month Founder license that
-    /// can continue past that date. Grants happen only through ClaimRobotOfferAsync.
+    /// starts on 1 February 2027. Grants happen only through ClaimRobotOfferAsync.
     /// </summary>
     public async Task<string?> EnsureViewReferenceRobotLicenseAsync(CustomerAccount account, CancellationToken cancellationToken = default)
     {
@@ -520,6 +524,8 @@ public class AccountService : IAccountService
         var existing = await FindViewReferenceRobotLicenseAsync(email, cancellationToken);
         if (existing != null)
         {
+            AlignFounderExpiry(existing);
+            await _db.SaveChangesAsync(cancellationToken);
             return existing.LicenseKey;
         }
 
@@ -541,12 +547,25 @@ public class AccountService : IAccountService
             LicenseMode = "Individual",
             MaxActivations = 2,
             IsActive = true,
-            ExpiresAt = DateTimeOffset.UtcNow.AddMonths(6),
+            ExpiresAt = ViewReferenceRobotFounderExpires,
             CreatedAt = DateTimeOffset.UtcNow
         };
         _db.Licenses.Add(license);
         await _db.SaveChangesAsync(cancellationToken);
         return license.LicenseKey;
+    }
+
+    private static void AlignFounderExpiry(License license)
+    {
+        if (!string.Equals(license.LicenseType, "Founder", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        if (license.ExpiresAt is null || license.ExpiresAt < ViewReferenceRobotFounderExpires)
+        {
+            license.ExpiresAt = ViewReferenceRobotFounderExpires;
+        }
     }
 
     private async Task<License?> FindViewReferenceRobotLicenseAsync(string email, CancellationToken cancellationToken)

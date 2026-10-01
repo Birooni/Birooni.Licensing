@@ -77,6 +77,12 @@ public static class DatabaseInitializer
                 UPDATE customer_accounts
                 SET email_verified = TRUE
                 WHERE email_verified = FALSE AND last_login_at IS NOT NULL;
+
+                UPDATE licenses
+                SET expires_at = TIMESTAMPTZ '2027-08-01 00:00:00+00'
+                WHERE lower(product) = 'viewreferencerobot'
+                  AND lower(license_type) = 'founder'
+                  AND (expires_at IS NULL OR expires_at < TIMESTAMPTZ '2027-08-01 00:00:00+00');
                 """;
 
             await db.Database.ExecuteSqlRawAsync(sql);
