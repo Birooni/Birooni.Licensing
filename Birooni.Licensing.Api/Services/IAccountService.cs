@@ -13,4 +13,6 @@ public interface IAccountService
     Task<AuthResponse> ResetPasswordAsync(ResetPasswordRequest request, CancellationToken cancellationToken = default);
     Task<AccountProfileDto?> GetProfileAsync(Guid accountId, CancellationToken cancellationToken = default);
     Task<List<PurchaseDto>> GetPurchasesAsync(Guid accountId, CancellationToken cancellationToken = default);
+    Task<RobotOfferDto> GetRobotOfferAsync(Guid? accountId, CancellationToken cancellationToken = default);
+    Task<ClaimRobotOfferResponse> ClaimRobotOfferAsync(Guid accountId, CancellationToken cancellationToken = default);
 }

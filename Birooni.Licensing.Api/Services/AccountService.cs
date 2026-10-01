@@ -10,6 +10,8 @@ namespace Birooni.Licensing.Api.Services;
 
 public class AccountService : IAccountService
 {
+    private static readonly SemaphoreSlim RobotClaimGate = new(1, 1);
+
     private readonly LicensingDbContext _db;
     private readonly IJwtTokenService _jwt;
     private readonly IEmailSender _email;
@@ -115,7 +117,6 @@ public class AccountService : IAccountService
 
         account.LastLoginAt = DateTimeOffset.UtcNow;
         var familyKey = await EnsureFamilyLoaderLicenseAsync(account, cancellationToken);
-        await EnsureViewReferenceRobotLicenseAsync(account, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
 
         return AuthResponse.Ok("Signed in.", _jwt.CreateToken(account), ToProfile(account), familyKey);
@@ -140,7 +141,6 @@ public class AccountService : IAccountService
         if (account.EmailVerified)
         {
             var existingKey = await EnsureFamilyLoaderLicenseAsync(account, cancellationToken);
-            await EnsureViewReferenceRobotLicenseAsync(account, cancellationToken);
             await _db.SaveChangesAsync(cancellationToken);
             return AuthResponse.Ok("Email is already verified. You can sign in.", _jwt.CreateToken(account), ToProfile(account), existingKey);
         }
@@ -156,7 +156,6 @@ public class AccountService : IAccountService
         account.LastLoginAt = DateTimeOffset.UtcNow;
 
         var familyKey = await EnsureFamilyLoaderLicenseAsync(account, cancellationToken);
-        await EnsureViewReferenceRobotLicenseAsync(account, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
 
         return AuthResponse.Ok(
@@ -424,31 +423,107 @@ public class AccountService : IAccountService
         return $"FAMILY-{hex[..4]}-{hex[4..8]}-{hex[8..12]}";
     }
 
+    public static readonly DateTimeOffset ViewReferenceRobotFreeUntil = new(2027, 1, 31, 23, 59, 59, TimeSpan.Zero);
+
+    public async Task<RobotOfferDto> GetRobotOfferAsync(Guid? accountId, CancellationToken cancellationToken = default)
+    {
+        var (claimed, remaining) = await RobotFounderStatsAsync(cancellationToken);
+        var dto = new RobotOfferDto
+        {
+            Cap = ViewReferenceRobotFounderCap,
+            Claimed = claimed,
+            Remaining = remaining,
+            FreeUntil = ViewReferenceRobotFreeUntil
+        };
+
+        if (accountId is Guid id)
+        {
+            var account = await _db.CustomerAccounts.FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+            if (account != null)
+            {
+                var existing = await FindViewReferenceRobotLicenseAsync(account.Email, cancellationToken);
+                if (existing != null)
+                {
+                    dto.ClaimedByYou = true;
+                    dto.LicenseKey = existing.LicenseKey;
+                    dto.ExpiresAt = existing.ExpiresAt;
+                }
+            }
+        }
+
+        return dto;
+    }
+
+    public async Task<ClaimRobotOfferResponse> ClaimRobotOfferAsync(Guid accountId, CancellationToken cancellationToken = default)
+    {
+        var account = await _db.CustomerAccounts.FirstOrDefaultAsync(a => a.Id == accountId, cancellationToken);
+        if (account == null)
+        {
+            return ClaimRobotOfferResponse.Fail("Account was not found.");
+        }
+
+        if (!account.EmailVerified)
+        {
+            var (claimedOpen, remainingOpen) = await RobotFounderStatsAsync(cancellationToken);
+            return ClaimRobotOfferResponse.Fail(
+                "Confirm your Mail ID before claiming this offer.",
+                remainingOpen,
+                claimedOpen,
+                ViewReferenceRobotFounderCap);
+        }
+
+        await RobotClaimGate.WaitAsync(cancellationToken);
+        try
+        {
+            var existing = await FindViewReferenceRobotLicenseAsync(account.Email, cancellationToken);
+            var already = existing != null;
+            var key = await EnsureViewReferenceRobotLicenseAsync(account, cancellationToken);
+            var (claimed, remaining) = await RobotFounderStatsAsync(cancellationToken);
+
+            if (key == null)
+            {
+                return ClaimRobotOfferResponse.Fail(
+                    "All 100 founder licenses have been claimed.",
+                    remaining,
+                    claimed,
+                    ViewReferenceRobotFounderCap);
+            }
+
+            var license = already ? existing : await FindViewReferenceRobotLicenseAsync(account.Email, cancellationToken);
+            return new ClaimRobotOfferResponse
+            {
+                Success = true,
+                Message = already
+                    ? "This account already has a View Reference Robot founder license."
+                    : "Founder license claimed. It is valid for six months from today.",
+                LicenseKey = key,
+                ExpiresAt = license?.ExpiresAt,
+                Remaining = remaining,
+                Claimed = claimed,
+                Cap = ViewReferenceRobotFounderCap
+            };
+        }
+        finally
+        {
+            RobotClaimGate.Release();
+        }
+    }
+
     /// <summary>
     /// Everyone may use View Reference Robot until 31 January 2027 without a key.
-    /// The first 100 verified accounts also receive a six-month Founder license that
-    /// can continue past that date.
+    /// The first 100 verified accounts may claim a six-month Founder license that
+    /// can continue past that date. Grants happen only through ClaimRobotOfferAsync.
     /// </summary>
     public async Task<string?> EnsureViewReferenceRobotLicenseAsync(CustomerAccount account, CancellationToken cancellationToken = default)
     {
         var email = account.Email;
-        var existing = await _db.Licenses
-            .Where(l => l.Product.ToLower() == ViewReferenceRobotProduct.ToLower() && l.CustomerEmail.ToLower() == email)
-            .OrderByDescending(l => l.IsActive)
-            .ThenByDescending(l => l.CreatedAt)
-            .FirstOrDefaultAsync(cancellationToken);
-
+        var existing = await FindViewReferenceRobotLicenseAsync(email, cancellationToken);
         if (existing != null)
         {
             return existing.LicenseKey;
         }
 
-        var grantedCount = await _db.Licenses
-            .Where(l => l.Product.ToLower() == ViewReferenceRobotProduct.ToLower())
-            .Select(l => l.CustomerEmail.ToLower())
-            .Distinct()
-            .CountAsync(cancellationToken);
-
+        var grantedCount = await CountViewReferenceRobotEmailsAsync(cancellationToken);
         if (grantedCount >= ViewReferenceRobotFounderCap)
         {
             return null;
@@ -472,6 +547,31 @@ public class AccountService : IAccountService
         _db.Licenses.Add(license);
         await _db.SaveChangesAsync(cancellationToken);
         return license.LicenseKey;
+    }
+
+    private async Task<License?> FindViewReferenceRobotLicenseAsync(string email, CancellationToken cancellationToken)
+    {
+        return await _db.Licenses
+            .Where(l => l.Product.ToLower() == ViewReferenceRobotProduct.ToLower() && l.CustomerEmail.ToLower() == email)
+            .OrderByDescending(l => l.IsActive)
+            .ThenByDescending(l => l.CreatedAt)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    private async Task<int> CountViewReferenceRobotEmailsAsync(CancellationToken cancellationToken)
+    {
+        return await _db.Licenses
+            .Where(l => l.Product.ToLower() == ViewReferenceRobotProduct.ToLower())
+            .Select(l => l.CustomerEmail.ToLower())
+            .Distinct()
+            .CountAsync(cancellationToken);
+    }
+
+    private async Task<(int Claimed, int Remaining)> RobotFounderStatsAsync(CancellationToken cancellationToken)
+    {
+        var claimed = await CountViewReferenceRobotEmailsAsync(cancellationToken);
+        var remaining = Math.Max(0, ViewReferenceRobotFounderCap - claimed);
+        return (claimed, remaining);
     }
 
     private static string GenerateViewReferenceRobotKey()

@@ -164,7 +164,7 @@ public class AccountServiceTests
     }
 
     [Fact]
-    public async Task Verify_GrantsSixMonthViewReferenceRobotLicenseToFirst100()
+    public async Task VerifyAndSignin_DoNotGrantViewReferenceRobotLicense()
     {
         var (db, service, mail) = Create();
         await service.SignupAsync(new SignupRequest
@@ -174,10 +174,55 @@ public class AccountServiceTests
             Password = "secret123",
             ConfirmPassword = "secret123"
         });
+        var verified = await service.VerifyEmailAsync(mail.LastToken!);
+        Assert.True(verified.Success);
+        Assert.Empty(db.Licenses.Where(l => l.Product == "ViewReferenceRobot"));
+
+        var signin = await service.SigninAsync(new SigninRequest
+        {
+            Email = "ada@studio.com",
+            Password = "secret123"
+        });
+        Assert.True(signin.Success);
+        Assert.Empty(db.Licenses.Where(l => l.Product == "ViewReferenceRobot"));
+    }
+
+    [Fact]
+    public async Task GetRobotOffer_ReportsRemainingWithoutAnAccount()
+    {
+        var (_, service, _) = Create();
+        var offer = await service.GetRobotOfferAsync(null);
+        Assert.Equal(100, offer.Cap);
+        Assert.Equal(0, offer.Claimed);
+        Assert.Equal(100, offer.Remaining);
+        Assert.False(offer.ClaimedByYou);
+        Assert.Null(offer.LicenseKey);
+    }
+
+    [Fact]
+    public async Task Claim_GrantsSixMonthViewReferenceRobotLicenseToFirst100()
+    {
+        var (db, service, mail) = Create();
+        var signup = await service.SignupAsync(new SignupRequest
+        {
+            FullName = "Ada Khan",
+            Email = "ada@studio.com",
+            Password = "secret123",
+            ConfirmPassword = "secret123"
+        });
         await service.VerifyEmailAsync(mail.LastToken!);
 
+        var offerBefore = await service.GetRobotOfferAsync(signup.Account!.Id);
+        Assert.Equal(100, offerBefore.Remaining);
+        Assert.False(offerBefore.ClaimedByYou);
+
+        var claim = await service.ClaimRobotOfferAsync(signup.Account.Id);
+        Assert.True(claim.Success);
+        Assert.StartsWith("ROBOT-", claim.LicenseKey);
+        Assert.Equal(99, claim.Remaining);
+        Assert.Equal(1, claim.Claimed);
+
         var license = Assert.Single(db.Licenses.Where(l => l.Product == "ViewReferenceRobot"));
-        Assert.StartsWith("ROBOT-", license.LicenseKey);
         Assert.Equal("Founder", license.LicenseType);
         Assert.Equal("Individual", license.LicenseMode);
         Assert.Equal(2, license.MaxActivations);
@@ -185,19 +230,22 @@ public class AccountServiceTests
         Assert.NotNull(license.ExpiresAt);
         Assert.True(license.ExpiresAt > DateTimeOffset.UtcNow.AddMonths(5));
         Assert.True(license.ExpiresAt < DateTimeOffset.UtcNow.AddMonths(7));
+        Assert.Equal(claim.LicenseKey, license.LicenseKey);
 
-        var again = await service.SigninAsync(new SigninRequest
-        {
-            Email = "ada@studio.com",
-            Password = "secret123"
-        });
+        var offerAfter = await service.GetRobotOfferAsync(signup.Account.Id);
+        Assert.True(offerAfter.ClaimedByYou);
+        Assert.Equal(license.LicenseKey, offerAfter.LicenseKey);
+        Assert.Equal(99, offerAfter.Remaining);
+
+        var again = await service.ClaimRobotOfferAsync(signup.Account.Id);
         Assert.True(again.Success);
+        Assert.Equal(license.LicenseKey, again.LicenseKey);
         Assert.Equal(1, db.Licenses.Count(l => l.Product == "ViewReferenceRobot"));
-        Assert.Equal(license.LicenseKey, db.Licenses.Single(l => l.Product == "ViewReferenceRobot").LicenseKey);
+        Assert.Contains("already", again.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
-    public async Task Verify_DoesNotGrantViewReferenceRobotAfterFirst100()
+    public async Task Claim_DoesNotGrantViewReferenceRobotAfterFirst100()
     {
         var (db, service, mail) = Create();
         for (var i = 0; i < 100; i++)
@@ -217,7 +265,7 @@ public class AccountServiceTests
         }
         await db.SaveChangesAsync();
 
-        await service.SignupAsync(new SignupRequest
+        var signup = await service.SignupAsync(new SignupRequest
         {
             FullName = "Late User",
             Email = "late@studio.com",
@@ -226,10 +274,34 @@ public class AccountServiceTests
         });
         await service.VerifyEmailAsync(mail.LastToken!);
 
+        var claim = await service.ClaimRobotOfferAsync(signup.Account!.Id);
+        Assert.False(claim.Success);
+        Assert.Equal(0, claim.Remaining);
+        Assert.Equal(100, claim.Claimed);
+        Assert.Contains("All 100", claim.Message);
+
         Assert.DoesNotContain(db.Licenses, l =>
             l.Product == "ViewReferenceRobot" &&
             l.CustomerEmail == "late@studio.com");
         Assert.Equal(100, db.Licenses.Count(l => l.Product == "ViewReferenceRobot"));
+    }
+
+    [Fact]
+    public async Task Claim_UnverifiedAccount_Fails()
+    {
+        var (db, service, _) = Create();
+        var signup = await service.SignupAsync(new SignupRequest
+        {
+            FullName = "Ada Khan",
+            Email = "ada@studio.com",
+            Password = "secret123",
+            ConfirmPassword = "secret123"
+        });
+
+        var claim = await service.ClaimRobotOfferAsync(signup.Account!.Id);
+        Assert.False(claim.Success);
+        Assert.Contains("Confirm", claim.Message);
+        Assert.Empty(db.Licenses.Where(l => l.Product == "ViewReferenceRobot"));
     }
 
     [Fact]

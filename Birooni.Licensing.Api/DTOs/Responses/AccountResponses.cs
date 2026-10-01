@@ -65,3 +65,35 @@ public class PurchaseDto
     public DateTimeOffset CreatedAt { get; set; }
     public List<PurchaseActivationDto> Activations { get; set; } = new();
 }
+
+public class RobotOfferDto
+{
+    public int Cap { get; set; }
+    public int Claimed { get; set; }
+    public int Remaining { get; set; }
+    public bool ClaimedByYou { get; set; }
+    public string? LicenseKey { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
+    public DateTimeOffset FreeUntil { get; set; }
+}
+
+public class ClaimRobotOfferResponse
+{
+    public bool Success { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public string? LicenseKey { get; set; }
+    public DateTimeOffset? ExpiresAt { get; set; }
+    public int Remaining { get; set; }
+    public int Claimed { get; set; }
+    public int Cap { get; set; }
+
+    public static ClaimRobotOfferResponse Fail(string message, int remaining = 0, int claimed = 0, int cap = 100) =>
+        new()
+        {
+            Success = false,
+            Message = message,
+            Remaining = remaining,
+            Claimed = claimed,
+            Cap = cap
+        };
+}

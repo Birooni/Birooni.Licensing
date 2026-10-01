@@ -177,6 +177,48 @@ public class AccountController : ControllerBase
         return Ok(purchases);
     }
 
+    [HttpGet("robot-offer")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(RobotOfferDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> RobotOffer(CancellationToken cancellationToken)
+    {
+        var offer = await _accounts.GetRobotOfferAsync(GetAccountId(), cancellationToken);
+        return Ok(offer);
+    }
+
+    [HttpPost("claim-robot-offer")]
+    [Authorize]
+    [ProducesResponseType(typeof(ClaimRobotOfferResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ClaimRobotOfferResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ClaimRobotOfferResponse), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ClaimRobotOfferResponse), StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> ClaimRobotOffer(CancellationToken cancellationToken)
+    {
+        var accountId = GetAccountId();
+        if (accountId == null)
+        {
+            return Unauthorized(new { error = "Invalid session." });
+        }
+
+        var result = await _accounts.ClaimRobotOfferAsync(accountId.Value, cancellationToken);
+        if (result.Success)
+        {
+            return Ok(result);
+        }
+
+        if (result.Message.Contains("Confirm your Mail ID", StringComparison.OrdinalIgnoreCase))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, result);
+        }
+
+        if (result.Message.Contains("All 100", StringComparison.OrdinalIgnoreCase))
+        {
+            return Conflict(result);
+        }
+
+        return BadRequest(result);
+    }
+
     private Guid? GetAccountId()
     {
         var sub = User.FindFirstValue(JwtRegisteredClaimNames.Sub)
