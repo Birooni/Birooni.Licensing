@@ -186,6 +186,15 @@ public class AccountController : ControllerBase
         return Ok(offer);
     }
 
+    [HttpGet("family-loader-stats")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(FamilyLoaderStatsDto), StatusCodes.Status200OK)]
+    public async Task<IActionResult> FamilyLoaderStats(CancellationToken cancellationToken)
+    {
+        var stats = await _accounts.GetFamilyLoaderStatsAsync(cancellationToken);
+        return Ok(stats);
+    }
+
     [HttpPost("claim-robot-offer")]
     [Authorize]
     [ProducesResponseType(typeof(ClaimRobotOfferResponse), StatusCodes.Status200OK)]

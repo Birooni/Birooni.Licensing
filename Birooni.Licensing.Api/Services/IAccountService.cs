@@ -15,4 +15,5 @@ public interface IAccountService
     Task<List<PurchaseDto>> GetPurchasesAsync(Guid accountId, CancellationToken cancellationToken = default);
     Task<RobotOfferDto> GetRobotOfferAsync(Guid? accountId, CancellationToken cancellationToken = default);
     Task<ClaimRobotOfferResponse> ClaimRobotOfferAsync(Guid accountId, CancellationToken cancellationToken = default);
+    Task<FamilyLoaderStatsDto> GetFamilyLoaderStatsAsync(CancellationToken cancellationToken = default);
 }

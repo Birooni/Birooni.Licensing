@@ -437,7 +437,8 @@ public class AccountService : IAccountService
             Remaining = remaining,
             FreeUntil = ViewReferenceRobotFreeUntil,
             FounderStarts = ViewReferenceRobotFounderStarts,
-            FounderExpires = ViewReferenceRobotFounderExpires
+            FounderExpires = ViewReferenceRobotFounderExpires,
+            FamilyLoaderGranted = await CountFamilyLoaderEmailsAsync(cancellationToken)
         };
 
         if (accountId is Guid id)
@@ -456,6 +457,14 @@ public class AccountService : IAccountService
         }
 
         return dto;
+    }
+
+    public async Task<FamilyLoaderStatsDto> GetFamilyLoaderStatsAsync(CancellationToken cancellationToken = default)
+    {
+        return new FamilyLoaderStatsDto
+        {
+            Granted = await CountFamilyLoaderEmailsAsync(cancellationToken)
+        };
     }
 
     public async Task<ClaimRobotOfferResponse> ClaimRobotOfferAsync(Guid accountId, CancellationToken cancellationToken = default)
@@ -581,6 +590,15 @@ public class AccountService : IAccountService
     {
         return await _db.Licenses
             .Where(l => l.Product.ToLower() == ViewReferenceRobotProduct.ToLower())
+            .Select(l => l.CustomerEmail.ToLower())
+            .Distinct()
+            .CountAsync(cancellationToken);
+    }
+
+    private async Task<int> CountFamilyLoaderEmailsAsync(CancellationToken cancellationToken)
+    {
+        return await _db.Licenses
+            .Where(l => l.Product.ToLower() == FamilyLoaderProduct.ToLower())
             .Select(l => l.CustomerEmail.ToLower())
             .Distinct()
             .CountAsync(cancellationToken);

@@ -77,6 +77,12 @@ public class RobotOfferDto
     public DateTimeOffset FreeUntil { get; set; }
     public DateTimeOffset FounderStarts { get; set; }
     public DateTimeOffset FounderExpires { get; set; }
+    public int FamilyLoaderGranted { get; set; }
+}
+
+public class FamilyLoaderStatsDto
+{
+    public int Granted { get; set; }
 }
 
 public class ClaimRobotOfferResponse

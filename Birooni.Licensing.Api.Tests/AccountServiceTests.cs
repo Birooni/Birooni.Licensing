@@ -195,8 +195,28 @@ public class AccountServiceTests
         Assert.Equal(100, offer.Cap);
         Assert.Equal(0, offer.Claimed);
         Assert.Equal(100, offer.Remaining);
+        Assert.Equal(0, offer.FamilyLoaderGranted);
         Assert.False(offer.ClaimedByYou);
         Assert.Null(offer.LicenseKey);
+    }
+
+    [Fact]
+    public async Task Verify_CountsFamilyLoaderGrants()
+    {
+        var (_, service, mail) = Create();
+        await service.SignupAsync(new SignupRequest
+        {
+            FullName = "Ada Khan",
+            Email = "ada@studio.com",
+            Password = "secret123",
+            ConfirmPassword = "secret123"
+        });
+        await service.VerifyEmailAsync(mail.LastToken!);
+
+        var stats = await service.GetFamilyLoaderStatsAsync();
+        Assert.Equal(1, stats.Granted);
+        var offer = await service.GetRobotOfferAsync(null);
+        Assert.Equal(1, offer.FamilyLoaderGranted);
     }
 
     [Fact]
