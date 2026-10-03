@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>Biruscan</Name>
+    <Assembly>Biruscan\Biruscan.Loader.dll</Assembly>
+    <AddInId>B8F7A2C3-D4E5-4F6A-8B9C-1D2E3F4A5B6C</AddInId>
+    <FullClassName>Biruscan.Loader.AppLoader</FullClassName>
+    <VendorId>BIRUSCAN</VendorId>
+    <VendorDescription>Biruscan — Point Cloud Plugin for Revit (RCP/RCS)</VendorDescription>
+  </AddIn>
+</RevitAddIns>

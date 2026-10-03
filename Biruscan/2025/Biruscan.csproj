@@ -1,0 +1,84 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <!-- Revit add-in is Windows-only; CA1416 platform-compatibility warnings are noise. -->
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="RevitAPI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2025\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>C:\Program Files\Autodesk\Revit 2025\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIIFC">
+      <HintPath>C:\Program Files\Autodesk\Revit 2025\RevitAPIIFC.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Biruscan.AI\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="Biruscan.AI\Biruscan.AI.csproj" />
+    <ProjectReference Include="..\..\Birooni.Client\Birooni.Client.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.29.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Biruscan.AI\Weights\BiruscanMepWeights.onnx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>BiruscanMepWeights.onnx</Link>
+      <TargetPath>BiruscanMepWeights.onnx</TargetPath>
+    </None>
+  </ItemGroup>
+
+  <!--
+    SDK-style projects do NOT run a bare "AfterBuild" target reliably.
+    Use AfterTargets="Build" and always overwrite so Revit gets the new DLL.
+  -->
+  <Target Name="EnsurePretrainedDat" BeforeTargets="DeployToRevitAddins">
+    <Copy
+      SourceFiles="$(ProjectDir)bin\Debug\BiruscanMepWeights.dat"
+      DestinationFolder="$(TargetDir)"
+      SkipUnchangedFiles="true"
+      Condition="Exists('$(ProjectDir)bin\Debug\BiruscanMepWeights.dat')" />
+  </Target>
+
+  <Target Name="DeployToRevitAddins" AfterTargets="Build">
+    <PropertyGroup>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+      <_BiruscanAddinDir>$(AppData)\Autodesk\Revit\Addins\2025\Biruscan\</_BiruscanAddinDir>
+      <_BiruscanAddinsRoot>$(AppData)\Autodesk\Revit\Addins\2025\</_BiruscanAddinsRoot>
+    </PropertyGroup>
+    <MakeDir Directories="$(_BiruscanAddinDir)" />
+    <ItemGroup>
+      <!-- Runtime add-in only: no PDBs, no optional ONNX native stack (~16 MB). -->
+      <_DeployFiles Include="$(TargetDir)Biruscan.dll;$(TargetDir)Biruscan.AI.dll" />
+      <_DeployDat Include="$(TargetDir)BiruscanMepWeights.dat;$(TargetDir)BiruscanMepWeights.base.dat" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_DeployFiles)" DestinationFolder="$(_BiruscanAddinDir)" SkipUnchangedFiles="false" OverwriteReadOnlyFiles="true" ContinueOnError="true" />
+    <Copy SourceFiles="@(_DeployDat)" DestinationFolder="$(_BiruscanAddinDir)" SkipUnchangedFiles="false" OverwriteReadOnlyFiles="true" ContinueOnError="true" />
+    <Copy SourceFiles="$(ProjectDir)Biruscan.addin" DestinationFolder="$(_BiruscanAddinsRoot)" SkipUnchangedFiles="false" OverwriteReadOnlyFiles="true" ContinueOnError="true" />
+    <Message Importance="high" Text="Biruscan deployed to $(_BiruscanAddinDir)$(TargetFileName)" />
+  </Target>
+
+</Project>
+

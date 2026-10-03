@@ -1,0 +1,79 @@
+<Window x:Class="Biruscan.UI.Views.MepConverterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MEP Network Converter" Height="580" Width="460"
+        WindowStartupLocation="CenterOwner"
+        Background="#1E1E1E" Foreground="White"
+        FontFamily="Segoe UI" FontSize="13"
+        ResizeMode="NoResize" WindowStyle="None"
+        AllowsTransparency="True" BorderThickness="1" BorderBrush="#333333">
+
+    <Border CornerRadius="8" Background="#1E1E1E" BorderThickness="1" BorderBrush="#3E3E42">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,15">
+                <TextBlock Text="MEP NETWORK CONVERTER" FontSize="18" FontWeight="Bold" Foreground="#00BCD4"/>
+                <TextBlock Text="Convert connected runs and fittings between Ducts, Pipes, and Conduits" FontSize="11" Foreground="#AAAAAA" Margin="0,2,0,0"/>
+            </StackPanel>
+
+            <!-- Body -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- Mode Selection -->
+                    <TextBlock Text="Conversion Mode" FontWeight="SemiBold" Foreground="#CCCCCC" Margin="0,0,0,6"/>
+                    <ComboBox x:Name="cmbConversionMode" Height="32" Margin="0,0,0,14" SelectionChanged="CmbConversionMode_SelectionChanged">
+                        <ComboBoxItem Content="Round Duct to Pipe" IsSelected="True" Tag="RoundDuctToPipe"/>
+                        <ComboBoxItem Content="Pipe to Conduit" Tag="PipeToConduit"/>
+                        <ComboBoxItem Content="Conduit to Pipe" Tag="ConduitToPipe"/>
+                        <ComboBoxItem Content="Pipe to Round Duct" Tag="PipeToRoundDuct"/>
+                    </ComboBox>
+
+                    <!-- Scope Selection -->
+                    <TextBlock Text="Conversion Scope" FontWeight="SemiBold" Foreground="#CCCCCC" Margin="0,0,0,6"/>
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,14">
+                        <StackPanel>
+                            <RadioButton x:Name="rbSelected" Content="Convert Selected Run / Elements" GroupName="ScopeGroup" IsChecked="True" Foreground="White" Margin="0,0,0,6"/>
+                            <RadioButton x:Name="rbPick" Content="Pick Run in View and Convert (Interactive)" GroupName="ScopeGroup" Foreground="White" Margin="0,0,0,6"/>
+                            <RadioButton x:Name="rbView" Content="Convert All Matching Elements in Active View" GroupName="ScopeGroup" Foreground="White"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Target Configuration -->
+                    <TextBlock Text="Target Family Type" FontWeight="SemiBold" Foreground="#CCCCCC" Margin="0,0,0,6"/>
+                    <ComboBox x:Name="cmbTargetType" Height="32" Margin="0,0,0,14" DisplayMemberPath="Name"/>
+
+                    <StackPanel x:Name="pnlSystemType">
+                        <TextBlock Text="Target System Type" FontWeight="SemiBold" Foreground="#CCCCCC" Margin="0,0,0,6"/>
+                        <ComboBox x:Name="cmbTargetSystem" Height="32" Margin="0,0,0,14" DisplayMemberPath="Name"/>
+                    </StackPanel>
+
+                    <!-- Options Group -->
+                    <TextBlock Text="Options" FontWeight="SemiBold" Foreground="#CCCCCC" Margin="0,0,0,6"/>
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+                        <StackPanel>
+                            <CheckBox x:Name="chkFittings" Content="Rebuild and connect fittings (Elbows, Tees, Crosses)" IsChecked="True" Foreground="White" Margin="0,0,0,6"/>
+                            <CheckBox x:Name="chkNetwork" Content="Auto-crawl connected network (full branch tree)" IsChecked="True" Foreground="White" Margin="0,0,0,6"/>
+                            <CheckBox x:Name="chkDelete" Content="Delete original elements after conversion" IsChecked="True" Foreground="White" Margin="0,0,0,6"/>
+                            <CheckBox x:Name="chkParams" Content="Preserve Mark and Comments parameters" IsChecked="True" Foreground="White"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Status Info -->
+                    <TextBlock x:Name="txtSelectionStatus" Text="Ready to convert." FontSize="11" Foreground="#00BCD4" Margin="0,4,0,0"/>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Footer -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+                <Button Content="CANCEL" Width="90" Height="32" Margin="0,0,10,0" Background="Transparent" Foreground="White" BorderThickness="1" BorderBrush="#3E3E42" Click="CancelButton_Click"/>
+                <Button x:Name="btnConvert" Content="CONVERT" Width="120" Height="32" Background="#00BCD4" Foreground="Black" FontWeight="Bold" BorderThickness="0" Click="ConvertButton_Click"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

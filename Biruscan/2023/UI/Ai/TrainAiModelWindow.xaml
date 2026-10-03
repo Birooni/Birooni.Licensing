@@ -1,0 +1,506 @@
+<Window x:Class="Biruscan.UI.Ai.TrainAiModelWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Train AI &amp; Active Learning" Height="820" Width="720"
+        WindowStartupLocation="CenterOwner"
+        Background="#1E1E1E" Foreground="White"
+        FontFamily="Segoe UI" FontSize="13"
+        ResizeMode="NoResize" WindowStyle="None"
+        AllowsTransparency="True" BorderThickness="1" BorderBrush="#333333">
+
+    <Window.Resources>
+        <!-- TabItem Style -->
+        <Style TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="TabBorder" Background="#252526" BorderBrush="#3E3E42" BorderThickness="1,1,1,0"
+                                CornerRadius="6,6,0,0" Margin="0,0,6,0" Padding="14,8">
+                            <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="TabBorder" Property="Background" Value="#1E1E1E"/>
+                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#007ACC"/>
+                                <Setter Property="Foreground" Value="#007ACC"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter Property="Foreground" Value="#AAAAAA"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="TabBorder" Property="Background" Value="#2D2D30"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Custom ScrollBar Style -->
+        <Style TargetType="ScrollViewer">
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+        </Style>
+    </Window.Resources>
+
+    <Border CornerRadius="8" Background="#1E1E1E" BorderThickness="1" BorderBrush="#3E3E42">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header with Close Button -->
+            <Grid Grid.Row="0" Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="TRAIN AI &amp; ACTIVE LEARNING" FontSize="18" FontWeight="Bold" Foreground="#007ACC"/>
+                    <TextBlock Text="Multi-Method Supervised Training: Manual Dataset Capture, Fitter Operations Learning, and User Modeling Watcher."
+                               FontSize="11" Foreground="#888888" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                </StackPanel>
+                <Button Grid.Column="1" Content="✕" Click="CancelButton_Click" Width="30" Height="30"
+                        Background="Transparent" Foreground="#888888" BorderThickness="0" FontSize="14"
+                        Cursor="Hand" VerticalAlignment="Top"/>
+            </Grid>
+
+            <!-- Three Dedicated Tabs -->
+            <TabControl x:Name="TrainAiTabControl" Grid.Row="1" Background="Transparent" BorderThickness="0">
+                
+                <!-- ========================================================= -->
+                <!-- TAB 1: MANUAL CAPTURE & DATASET                           -->
+                <!-- ========================================================= -->
+                <TabItem Header="🎯 Manual Capture">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,8,0,0">
+                        <StackPanel Margin="4,0,10,0">
+                            
+                            <!-- Target Service -->
+                            <TextBlock Text="Service Category" Margin="0,0,0,4" Foreground="#AAAAAA"/>
+                            <ComboBox x:Name="ServiceComboBox" Height="30" Margin="0,0,0,10">
+                                <ComboBoxItem Content="Piping" IsSelected="True"/>
+                                <ComboBoxItem Content="Duct"/>
+                                <ComboBoxItem Content="Conduit"/>
+                                <ComboBoxItem Content="Cable Tray"/>
+                            </ComboBox>
+
+                            <!-- Automatic Element Capture Information Banner -->
+                            <Border Background="#252526" BorderBrush="#007ACC" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="ℹ️" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Top"/>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="Automatic Revit Ground-Truth Extraction" FontWeight="SemiBold" Foreground="#007ACC" FontSize="12"/>
+                                        <TextBlock Text="Primary Types, System Classifications, Reference Levels, Nominal Dimensions, and Insulation wrap are automatically extracted directly from the visible/selected elements in the active Revit model."
+                                                   FontSize="11" Foreground="#CCCCCC" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <TextBlock Text="Training Methods to Trigger" Margin="0,0,0,6" Foreground="#AAAAAA" FontWeight="SemiBold"/>
+                            <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <CheckBox x:Name="HybridCheckBox" Content="Hybrid Engine (PointNet++ SIMD → Geometric RANSAC)"
+                                              IsChecked="True" Foreground="White" Margin="0,2,0,4"/>
+                                    <CheckBox x:Name="PureDlCheckBox" Content="Pure Deep Learning (In-Process Neural Weights + End-to-End Set Prediction)"
+                                              IsChecked="True" Foreground="White" Margin="0,4,0,2"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Local Dataset Status Panel -->
+                            <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1"
+                                    CornerRadius="4" Padding="10" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock x:Name="StatusHeaderText" Text="Local Dataset &amp; Model Status"
+                                               Foreground="#007ACC" FontWeight="Bold" Margin="0,0,0,4"/>
+                                    <TextBlock x:Name="SamplesCountText" Text="Captured Samples: ?" Foreground="#DDDDDD" Margin="0,2,0,2"/>
+                                    <TextBlock x:Name="HybridStatusText" Text="Hybrid model: not trained" Foreground="#DDDDDD" Margin="0,2,0,2"/>
+                                    <TextBlock x:Name="PureDlStatusText" Text="Pure DL model: not trained" Foreground="#DDDDDD" Margin="0,2,0,2"/>
+                                    <TextBlock x:Name="InProcStatusText" Text="In-Process SIMD Weights: Ready (500MB tensor dataset)" Foreground="#888888" FontSize="11" Margin="0,2,0,2"/>
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock Text="Core skills (as-built + fittings)" Margin="0,0,0,6" Foreground="#AAAAAA" FontWeight="SemiBold"/>
+                            <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1"
+                                    CornerRadius="4" Padding="10" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock x:Name="CoreSkillsStatusText" Text="Core skills: not taught yet"
+                                               Foreground="#FFCC66" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                                    <TextBlock Text="Pipe shell · sloped run · riser · elbow · tee · cross · reducer · union · duct/tray · wall clutter · insulation"
+                                               FontSize="11" Foreground="#888888" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                                    <Button x:Name="TeachCoreSkillsButton" Content="Teach all core skills now"
+                                            Click="TeachCoreSkillsButton_Click" Height="32"
+                                            Background="#007ACC" Foreground="White" BorderThickness="0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <CheckBox x:Name="TriggerTrainingCheckBox"
+                                      Content="Trigger background training immediately after sample capture"
+                                      IsChecked="True" Foreground="White" Margin="0,0,0,12"/>
+
+                            <!-- Export / Import Dataset -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <Button x:Name="ExportButton" Content="Export Dataset…" Click="ExportButton_Click"
+                                        Width="150" Height="30" Margin="0,0,10,0"
+                                        Background="#2D2D30" Foreground="White" BorderThickness="1" BorderBrush="#3E3E42"/>
+                                <Button x:Name="ImportButton" Content="Import Dataset…" Click="ImportButton_Click"
+                                        Width="150" Height="30"
+                                        Background="#2D2D30" Foreground="White" BorderThickness="1" BorderBrush="#3E3E42"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ========================================================= -->
+                <!-- TAB 2: AUTO-TRAINING (FITTER & MEP TOOLS)                 -->
+                <!-- ========================================================= -->
+                <TabItem Header="⚡ Auto-Training (Fitter &amp; MEP)">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,8,0,0">
+                        <StackPanel Margin="4,0,10,0">
+                            
+                            <!-- Master Switch Card -->
+                            <Border Background="#252526" BorderBrush="#007ACC" BorderThickness="1"
+                                    CornerRadius="6" Padding="10" Margin="0,0,0,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Continuous Active Learning (Fitter / MEP)" FontWeight="Bold" FontSize="13" Foreground="White"/>
+                                        <TextBlock Text="Automatically observe Fitter and MEP operations. Learn from accepted elements, user manual updates/corrections, and deletions."
+                                                   FontSize="11" Foreground="#AAAAAA" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                    <CheckBox x:Name="AutoTrainMasterCheckBox" Grid.Column="1" Content="ENABLE"
+                                              IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"
+                                              VerticalAlignment="Center" Margin="10,0,0,0"
+                                              Click="AutoTrainMasterCheckBox_Click"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Tool Observers & Learning Modes -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Left: Observed Tools -->
+                                <Border Grid.Column="0" Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="10">
+                                    <StackPanel>
+                                        <TextBlock Text="Observed Tools" FontWeight="SemiBold" Foreground="#007ACC" Margin="0,0,0,4"/>
+                                        <CheckBox x:Name="ObserveFitterCheckBox" Content="Fitter Tools (Pipe, Duct, Tray, Wall, Steel)"
+                                                  IsChecked="True" Foreground="White" Margin="0,2" Click="AutoTrainSetting_Changed"/>
+                                        <CheckBox x:Name="ObserveMepOpsCheckBox" Content="MEP Operations (Elbow, Tee, Union, etc.)"
+                                                  IsChecked="True" Foreground="White" Margin="0,2" Click="AutoTrainSetting_Changed"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Right: Learning Modes -->
+                                <Border Grid.Column="2" Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="10">
+                                    <StackPanel>
+                                        <TextBlock Text="Learning Rules" FontWeight="SemiBold" Foreground="#007ACC" Margin="0,0,0,4"/>
+                                        <CheckBox x:Name="LearnAcceptedCheckBox" Content="Positive Learning (Kept Fits)"
+                                                  IsChecked="True" Foreground="White" Margin="0,2" Click="AutoTrainSetting_Changed"/>
+                                        <CheckBox x:Name="LearnCorrectionsCheckBox" Content="Mistake &amp; Correction Learning"
+                                                  IsChecked="True" Foreground="#FFB74D" FontWeight="SemiBold" Margin="0,2" Click="AutoTrainSetting_Changed"/>
+                                        <CheckBox x:Name="LearnRejectionsCheckBox" Content="Negative Learning (Deletions)"
+                                                  IsChecked="True" Foreground="White" Margin="0,2" Click="AutoTrainSetting_Changed"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- Auto-Retrain Policy -->
+                            <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8,6" Margin="0,0,0,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Auto-retrain threshold:" VerticalAlignment="Center" Foreground="#AAAAAA" Margin="0,0,8,0"/>
+                                    <ComboBox x:Name="ThresholdComboBox" Grid.Column="1" Width="95" Height="26" SelectionChanged="ThresholdComboBox_SelectionChanged">
+                                        <ComboBoxItem Content="5 events"/>
+                                        <ComboBoxItem Content="10 events" IsSelected="True"/>
+                                        <ComboBoxItem Content="20 events"/>
+                                        <ComboBoxItem Content="50 events"/>
+                                    </ComboBox>
+                                    <CheckBox x:Name="AutoSaveWeightsCheckBox" Grid.Column="3" Content="Auto-save weights"
+                                              IsChecked="True" Foreground="White" VerticalAlignment="Center" Click="AutoTrainSetting_Changed"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Live Session Telemetry Metrics Grid -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0" Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock Text="Accepted Fits" FontSize="11" Foreground="#AAAAAA" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="AcceptedCountText" Text="0" FontSize="18" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="2" Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock Text="Mistakes Learned" FontSize="11" Foreground="#AAAAAA" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="CorrectionsCountText" Text="0" FontSize="18" FontWeight="Bold" Foreground="#FF9800" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="4" Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock Text="Rejections" FontSize="11" Foreground="#AAAAAA" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="RejectionsCountText" Text="0" FontSize="18" FontWeight="Bold" Foreground="#E57373" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- Live Session Status Sub-Bar -->
+                            <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8,5" Margin="0,0,0,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                        <Ellipse x:Name="StatusLed" Width="8" Height="8" Fill="#4CAF50" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="MonitoringStatusText" Text="Status: Monitoring Active" FontSize="11" Foreground="#4CAF50" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="PendingBufferText" Grid.Column="1" Text="Buffer: 0 samples pending" FontSize="11" Foreground="#AAAAAA" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="LastRetrainText" Grid.Column="2" Text="Last Retrain: Never" FontSize="11" Foreground="#888888" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Action Buttons -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <Button x:Name="RetrainBufferButton" Content="⚡ Retrain Model Now" Click="RetrainBufferButton_Click"
+                                        Width="180" Height="30" Margin="0,0,8,0"
+                                        Background="#007ACC" Foreground="White" BorderThickness="0" FontWeight="Bold"/>
+                                <Button x:Name="ClearBufferButton" Content="Clear Buffer" Click="ClearBufferButton_Click"
+                                        Width="100" Height="30" Margin="0,0,8,0"
+                                        Background="#2D2D30" Foreground="White" BorderThickness="1" BorderBrush="#3E3E42"/>
+                                <Button x:Name="ExportAutoDatasetButton" Content="Export Dataset…" Click="ExportAutoDatasetButton_Click"
+                                        Width="130" Height="30"
+                                        Background="#2D2D30" Foreground="White" BorderThickness="1" BorderBrush="#3E3E42"/>
+                            </StackPanel>
+
+                            <!-- Activity Log Console -->
+                            <Border Background="#141414" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Height="100">
+                                <ScrollViewer x:Name="LogScrollViewer" VerticalScrollBarVisibility="Auto">
+                                    <TextBox x:Name="ActivityLogTextBox" Background="Transparent" Foreground="#CCCCCC"
+                                             BorderThickness="0" FontFamily="Consolas" FontSize="10"
+                                             IsReadOnly="True" TextWrapping="Wrap" Margin="6" AcceptsReturn="True"/>
+                                </ScrollViewer>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ========================================================= -->
+                <!-- TAB 3: USER MODELING WATCHER (LEARN FROM MANUAL MODELING) -->
+                <!-- ========================================================= -->
+                <TabItem Header="👁️ User Modeling Watcher">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,8,0,0">
+                        <StackPanel Margin="4,0,10,0">
+                            
+                            <!-- Master Switch Card -->
+                            <Border Background="#252526" BorderBrush="#4CAF50" BorderThickness="1"
+                                    CornerRadius="6" Padding="10" Margin="0,0,0,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Live Manual Modeling Watcher (Imitation Learning)" FontWeight="Bold" FontSize="13" Foreground="White"/>
+                                        <TextBlock Text="Once activated, AI silently watches you drawing and modeling natively in Revit, extracts local point clouds around your elements, and learns your manual modeling habits."
+                                                   FontSize="11" Foreground="#AAAAAA" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                    <CheckBox x:Name="WatcherMasterCheckBox" Grid.Column="1" Content="WATCH"
+                                              IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"
+                                              VerticalAlignment="Center" Margin="10,0,0,0"
+                                              Click="WatcherMasterCheckBox_Click"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Observation Categories & Rules -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Left: Watched Categories -->
+                                <Border Grid.Column="0" Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="10">
+                                    <StackPanel>
+                                        <TextBlock Text="Observed Revit Categories" FontWeight="SemiBold" Foreground="#4CAF50" Margin="0,0,0,4"/>
+                                        <CheckBox x:Name="WatchPipesCheckBox" Content="Pipes &amp; Plumbing Runs"
+                                                  IsChecked="True" Foreground="White" Margin="0,2" Click="WatcherSetting_Changed"/>
+                                        <CheckBox x:Name="WatchDuctsCheckBox" Content="Ducts &amp; HVAC Runs"
+                                                  IsChecked="True" Foreground="White" Margin="0,2" Click="WatcherSetting_Changed"/>
+                                        <CheckBox x:Name="WatchConduitsCheckBox" Content="Conduits &amp; Cable Trays"
+                                                  IsChecked="True" Foreground="White" Margin="0,2" Click="WatcherSetting_Changed"/>
+                                        <CheckBox x:Name="WatchFittingsCheckBox" Content="Fittings, Valves &amp; Flanges"
+                                                  IsChecked="True" Foreground="White" Margin="0,2" Click="WatcherSetting_Changed"/>
+                                        <CheckBox x:Name="WatchStructuresCheckBox" Content="Walls &amp; Structural Beams"
+                                                  IsChecked="True" Foreground="White" Margin="0,2" Click="WatcherSetting_Changed"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Right: Imitation Parameters -->
+                                <Border Grid.Column="2" Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="10">
+                                    <StackPanel>
+                                        <TextBlock Text="Imitation Learning Rules" FontWeight="SemiBold" Foreground="#4CAF50" Margin="0,0,0,4"/>
+                                        <TextBlock Text="• Auto-extracts point cloud patch (1.5 ft / 450mm radius around element)." FontSize="10" Foreground="#AAAAAA" Margin="0,2"/>
+                                        <TextBlock Text="• Learns correlation between scan shape and user sizing." FontSize="10" Foreground="#AAAAAA" Margin="0,2"/>
+                                        <TextBlock Text="• Learns centerline snapping and elevation placement." FontSize="10" Foreground="#AAAAAA" Margin="0,2"/>
+                                        
+                                        <Grid Margin="0,6,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="Auto-retrain threshold:" VerticalAlignment="Center" FontSize="11" Foreground="#AAAAAA" Margin="0,0,6,0"/>
+                                            <ComboBox x:Name="WatcherThresholdComboBox" Grid.Column="1" Height="24" SelectionChanged="WatcherThresholdComboBox_SelectionChanged">
+                                                <ComboBoxItem Content="5 elements"/>
+                                                <ComboBoxItem Content="10 elements" IsSelected="True"/>
+                                                <ComboBoxItem Content="20 elements"/>
+                                                <ComboBoxItem Content="50 elements"/>
+                                            </ComboBox>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- Live Telemetry Metrics Grid -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Card 1: Total Observed -->
+                                <Border Grid.Column="0" Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock Text="Manual Elements" FontSize="10" Foreground="#AAAAAA" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="WatcherTotalObservedText" Text="0" FontSize="18" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="total observed" FontSize="9" Foreground="#666666" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Card 2: Pipes -->
+                                <Border Grid.Column="2" Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock Text="Pipes" FontSize="10" Foreground="#AAAAAA" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="WatcherPipesText" Text="0" FontSize="18" FontWeight="Bold" Foreground="#2196F3" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="plumbing runs" FontSize="9" Foreground="#666666" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Card 3: Ducts -->
+                                <Border Grid.Column="4" Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock Text="Ducts" FontSize="10" Foreground="#AAAAAA" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="WatcherDuctsText" Text="0" FontSize="18" FontWeight="Bold" Foreground="#FF9800" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="HVAC runs" FontSize="9" Foreground="#666666" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Card 4: Electrical & Structures -->
+                                <Border Grid.Column="6" Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock Text="Fittings / Misc" FontSize="10" Foreground="#AAAAAA" HorizontalAlignment="Center"/>
+                                        <TextBlock x:Name="WatcherFittingsText" Text="0" FontSize="18" FontWeight="Bold" Foreground="#AB47BC" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="fittings &amp; walls" FontSize="9" Foreground="#666666" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- Live Session Status Sub-Bar -->
+                            <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8,5" Margin="0,0,0,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                        <Ellipse x:Name="WatcherStatusLed" Width="8" Height="8" Fill="#4CAF50" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="WatcherStatusText" Text="Status: Watching Active" FontSize="11" Foreground="#4CAF50" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <TextBlock x:Name="WatcherPendingText" Grid.Column="1" Text="Buffer: 0 samples pending" FontSize="11" Foreground="#AAAAAA" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="WatcherLastRetrainText" Grid.Column="2" Text="Last Retrain: Ready" FontSize="11" Foreground="#888888" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Action Buttons -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <Button x:Name="WatcherRetrainNowButton" Content="⚡ Retrain on Manual Modeling Now" Click="WatcherRetrainNowButton_Click"
+                                        Width="240" Height="30" Margin="0,0,8,0"
+                                        Background="#4CAF50" Foreground="White" BorderThickness="0" FontWeight="Bold"/>
+                                <Button x:Name="WatcherClearBufferButton" Content="Clear Buffer" Click="WatcherClearBufferButton_Click"
+                                        Width="100" Height="30" Margin="0,0,8,0"
+                                        Background="#2D2D30" Foreground="White" BorderThickness="1" BorderBrush="#3E3E42"/>
+                                <Button x:Name="WatcherExportDatasetButton" Content="Export Manual Dataset…" Click="WatcherExportDatasetButton_Click"
+                                        Width="160" Height="30"
+                                        Background="#2D2D30" Foreground="White" BorderThickness="1" BorderBrush="#3E3E42"/>
+                            </StackPanel>
+
+                            <!-- Activity Log Console -->
+                            <Border Background="#141414" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Height="100">
+                                <ScrollViewer x:Name="WatcherLogScrollViewer" VerticalScrollBarVisibility="Auto">
+                                    <TextBox x:Name="WatcherLogTextBox" Background="Transparent" Foreground="#CCCCCC"
+                                             BorderThickness="0" FontFamily="Consolas" FontSize="10"
+                                             IsReadOnly="True" TextWrapping="Wrap" Margin="6" AcceptsReturn="True"/>
+                                </ScrollViewer>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+            </TabControl>
+
+            <!-- Dialog Action Footer -->
+            <Border Grid.Row="2" BorderBrush="#333333" BorderThickness="0,1,0,0" Padding="0,12,0,0" Margin="0,6,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" x:Name="FooterInfoText"
+                               Text="Biruscan AI · Dual-Engine SIMD PointNet++ &amp; Imitation Learning"
+                               FontSize="11" Foreground="#666666" VerticalAlignment="Center"/>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="CANCEL" Click="CancelButton_Click" Width="85" Height="32" Margin="0,0,10,0"
+                                Background="Transparent" Foreground="White" BorderThickness="1" BorderBrush="#3E3E42"/>
+                        <Button x:Name="CaptureButton" Content="CAPTURE SAMPLE" Click="CaptureButton_Click" Width="160" Height="32"
+                                Background="#007ACC" Foreground="White" BorderThickness="0" FontWeight="Bold"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

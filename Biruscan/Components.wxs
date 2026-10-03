@@ -1,0 +1,671 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <SetDirectory Id="ADDINROOTFOLDER" Action="SetRootPerMachine" Value="[CommonAppDataFolder]Autodesk" Condition="INSTALL_SCOPE_SELECTION=&quot;2&quot;" />
+    <SetDirectory Id="ADDINROOTFOLDER" Action="SetRootPerUser" Value="[AppDataFolder]Autodesk" Condition="INSTALL_SCOPE_SELECTION=&quot;1&quot;" />
+
+    <StandardDirectory Id="TARGETDIR">
+      <Directory Id="ADDINROOTFOLDER" Name="Autodesk">
+        <Directory Id="REVITFOLDER" Name="Revit">
+          <Directory Id="ADDINSFOLDER" Name="Addins">            <Directory Id="DIR_REVIT_2020" Name="2020">
+              <Component Id="Comp_1" Guid="29a5b4d1-23df-4f9d-9e9f-27cc26976be9" Condition="REVIT_2020 = &quot;1&quot;">
+                <File Source="SourceDir\2020\Biruscan.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Biruscan">
+                <Component Id="Comp_2" Guid="b3e42a06-43c4-4cec-beb2-9c38ef878705" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\Birooni.Client.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_3" Guid="c6e2ab78-21ca-4596-9bd4-076d58ad2200" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\Biruscan.AI.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_4" Guid="d01e69a3-52ef-4af9-a478-34002d4cb71b" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\Biruscan.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_5" Guid="49a019be-3db1-461b-87cc-3b399b7a2e09" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\Biruscan.Loader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_6" Guid="acb4522c-63ad-460c-90b2-8ced05aa5a70" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\BiruscanMepWeights.base.dat" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_7" Guid="45e8b0a1-39e7-4366-afe5-3b18a06293a7" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\BiruscanMepWeights.dat" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_8" Guid="27f433be-8c7e-417e-8365-8959b2d071ef" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\BiruscanMepWeights.onnx" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_9" Guid="acb53d10-bc4d-40d6-968f-b0b733aea05d" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_10" Guid="b2198fa9-5097-4744-8141-92f092297be7" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\Microsoft.ML.OnnxRuntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_11" Guid="2cc06a0d-c338-49f3-99c3-0b1b15b73886" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\onnxruntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_12" Guid="32db8fcb-32e9-4adb-a034-e51b3aa3e291" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\onnxruntime_providers_shared.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_13" Guid="43c6a495-19f1-4e99-a175-9ea439b9d9f3" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\System.Buffers.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_14" Guid="287e72d3-01d2-4688-b702-01839b36923b" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\System.Memory.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_15" Guid="f65cceee-c21c-4689-913b-1695a7ed82a5" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\System.Net.Http.Json.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_16" Guid="0bb66f38-b705-44ae-9d3e-44d64407cfbd" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\System.Numerics.Vectors.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_17" Guid="47ebc799-a9c8-405a-9522-a9dad1e0eb52" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_18" Guid="0c1a7633-8a46-4236-a210-9acf1c2ee7a0" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\System.Text.Encodings.Web.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_19" Guid="4dac1df2-0092-4cf3-8bb9-c29215d2b283" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\System.Text.Json.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_20" Guid="f022ccdc-6155-4a45-9481-333e69c271a8" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\System.Threading.Tasks.Extensions.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_21" Guid="144f41ec-c5cf-45aa-bd48-c0c71c0e8586" Condition="REVIT_2020 = &quot;1&quot;">
+                  <File Source="SourceDir\2020\Biruscan\System.ValueTuple.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+            <Directory Id="DIR_REVIT_2021" Name="2021">
+              <Component Id="Comp_22" Guid="7926cffa-5459-479e-a952-5da144c292a2" Condition="REVIT_2021 = &quot;1&quot;">
+                <File Source="SourceDir\2021\Biruscan.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Biruscan">
+                <Component Id="Comp_23" Guid="5bfc4479-da65-401c-8761-e091123b85e1" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\Birooni.Client.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_24" Guid="e1caf27c-3669-4284-93d0-426fdb2fffe4" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\Biruscan.AI.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_25" Guid="fb614232-ffc4-4673-9a17-022083b10e5e" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\Biruscan.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_26" Guid="93ce9a85-d551-4e51-a599-9a92ed4aa6ec" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\Biruscan.Loader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_27" Guid="1b17cf99-c527-442b-87dc-d530ec236640" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\BiruscanMepWeights.base.dat" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_28" Guid="e9203e79-73cd-41b4-b7ff-6fe3913e218c" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\BiruscanMepWeights.dat" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_29" Guid="6ec6bc61-9ca9-4460-8a7d-8bf77531b564" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\BiruscanMepWeights.onnx" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_30" Guid="dc8cf5a7-bae1-493e-9ab7-aca920014fda" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_31" Guid="bd689e7d-8ea3-473a-af3a-a0a5714f2569" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\Microsoft.ML.OnnxRuntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_32" Guid="a2bf75be-0812-486f-bd26-a6f5ef1bccd9" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\onnxruntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_33" Guid="e6d5e491-808c-4d57-b8f5-c51f781558b4" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\onnxruntime_providers_shared.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_34" Guid="456c061f-330b-48d8-9b99-65a08f0facfe" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\System.Buffers.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_35" Guid="ecdc8a45-0f44-49c4-a7c5-1f09909146d8" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\System.Memory.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_36" Guid="46bbde00-8760-4208-be39-b17643b4b0e4" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\System.Net.Http.Json.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_37" Guid="2e9ea00d-961e-4001-a9e3-b912423749f4" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\System.Numerics.Vectors.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_38" Guid="a5aa9cc5-dd35-4de7-bbfe-48c11fc26c5f" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_39" Guid="13fda0af-2c4e-4aae-88df-0bf382077ae1" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\System.Text.Encodings.Web.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_40" Guid="16bc69b1-1310-4814-a40b-4fdd93b532f0" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\System.Text.Json.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_41" Guid="8606ae3e-00d4-4396-833b-f5f5b2dc0d0d" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\System.Threading.Tasks.Extensions.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_42" Guid="b96b3e2d-bbfd-4349-8996-583d2e87bb6c" Condition="REVIT_2021 = &quot;1&quot;">
+                  <File Source="SourceDir\2021\Biruscan\System.ValueTuple.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+            <Directory Id="DIR_REVIT_2022" Name="2022">
+              <Component Id="Comp_43" Guid="aa788cb1-9933-4bb4-8dbf-98703bd596c3" Condition="REVIT_2022 = &quot;1&quot;">
+                <File Source="SourceDir\2022\Biruscan.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Biruscan">
+                <Component Id="Comp_44" Guid="022fa810-851a-4110-af02-305ec87e5acd" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\Birooni.Client.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_45" Guid="c3b77873-df84-4579-baba-2c20a9156ab5" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\Biruscan.AI.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_46" Guid="ddf72ea9-27a1-4bb7-a4dc-24ba40239354" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\Biruscan.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_47" Guid="b5ad2f8e-3bf6-45d6-80dd-4fb82c70bc28" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\Biruscan.Loader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_48" Guid="97ed4e93-d5d8-44e2-81e1-0ed1cbcbb3ad" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\BiruscanMepWeights.base.dat" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_49" Guid="c7376e3d-9a46-4a83-87fb-a3725d46f907" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\BiruscanMepWeights.dat" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_50" Guid="1f82abb4-1c9b-4be1-97c1-9d73a244998d" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\BiruscanMepWeights.onnx" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_51" Guid="fab6b150-baf7-4853-9642-7096772bab14" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_52" Guid="5aaad06d-cede-4d60-8374-a8c4c26a4275" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\Microsoft.ML.OnnxRuntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_53" Guid="d753c1b4-f0d4-4b8b-ad95-5c64bb77fdd3" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\onnxruntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_54" Guid="9a7dde18-52e8-4a2a-9335-09d1820420f2" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\onnxruntime_providers_shared.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_55" Guid="3ad2f74b-2e52-4e2b-b0d0-81542b29edf4" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\System.Buffers.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_56" Guid="d60ff947-292f-4049-bcab-a0ace70e8bfd" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\System.Memory.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_57" Guid="86f30dd6-6656-4bdc-bb0b-d67f0a992f4f" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\System.Net.Http.Json.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_58" Guid="fbf79334-194a-4e71-833c-c0a5af8d8ce7" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\System.Numerics.Vectors.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_59" Guid="d6c64991-9341-427a-87f0-64ce49e9664c" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_60" Guid="1b832ae5-f990-4bb2-9701-e9ac303701cb" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\System.Text.Encodings.Web.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_61" Guid="1fba9677-40ef-43c7-bbdc-1affa64ab1b9" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\System.Text.Json.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_62" Guid="1f391c1c-beed-4498-a9c7-d7b7860351e4" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\System.Threading.Tasks.Extensions.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_63" Guid="849ad3c2-816f-43b1-ad94-c7311ed39ca8" Condition="REVIT_2022 = &quot;1&quot;">
+                  <File Source="SourceDir\2022\Biruscan\System.ValueTuple.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+            <Directory Id="DIR_REVIT_2023" Name="2023">
+              <Component Id="Comp_64" Guid="41cc55d8-29fc-490a-9752-8fc821626df2" Condition="REVIT_2023 = &quot;1&quot;">
+                <File Source="SourceDir\2023\Biruscan.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Biruscan">
+                <Component Id="Comp_65" Guid="3ae4f402-7d2d-4b0a-be34-13384afb7a52" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\Birooni.Client.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_66" Guid="2f2a76be-11a9-4eb9-b4cc-f76f1ca04e77" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\Biruscan.AI.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_67" Guid="10b0f723-06b1-4630-947c-ac5ec6d31c08" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\Biruscan.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_68" Guid="c753a2b1-3c0c-4180-b3bf-01118a98ff29" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\Biruscan.Loader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_69" Guid="56f79945-dccc-4d0d-b3bc-832c6c192671" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\BiruscanMepWeights.base.dat" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_70" Guid="57184893-ae83-49c1-ac3f-9fa8be39cc84" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\BiruscanMepWeights.dat" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_71" Guid="2b58985c-13cd-4d30-9ac6-ee57f694dca4" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\BiruscanMepWeights.onnx" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_72" Guid="5652836e-1478-4da4-895b-82a804d92d3c" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_73" Guid="352fea4d-612d-4d2d-b49b-31d60581065d" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\Microsoft.ML.OnnxRuntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_74" Guid="fdb1890b-f39e-4375-9e40-8ad1d745e6d4" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\onnxruntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_75" Guid="25b07804-c983-4839-9a94-0f04a8360df4" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\onnxruntime_providers_shared.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_76" Guid="5af0d993-c2e9-47ed-a0c7-153342238b7f" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\System.Buffers.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_77" Guid="99522020-fa6d-4d63-a64d-ee72b506aab5" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\System.Memory.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_78" Guid="f7236cca-315d-4cb7-99f8-fd696dc28452" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\System.Net.Http.Json.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_79" Guid="15140d9a-2028-475a-a6cf-7773df0721fc" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\System.Numerics.Vectors.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_80" Guid="17e6aec2-57da-458a-b634-2f9343ccff4e" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_81" Guid="7e22d1cb-9bbd-438c-87dd-b027fbcd62d2" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\System.Text.Encodings.Web.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_82" Guid="4bfdf57c-a523-4ccb-a2f8-b7e9d0be6165" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\System.Text.Json.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_83" Guid="7ce4dcd2-a947-4940-9566-a6e44bcdd55b" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\System.Threading.Tasks.Extensions.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_84" Guid="5fe07d8b-ce15-4264-8ba6-e48d37b17d41" Condition="REVIT_2023 = &quot;1&quot;">
+                  <File Source="SourceDir\2023\Biruscan\System.ValueTuple.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+            <Directory Id="DIR_REVIT_2024" Name="2024">
+              <Component Id="Comp_85" Guid="d6c2d825-c6c8-49fb-baaf-d8d14cdd8002" Condition="REVIT_2024 = &quot;1&quot;">
+                <File Source="SourceDir\2024\Biruscan.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Biruscan">
+                <Component Id="Comp_86" Guid="5a627547-60c4-47b0-97f2-5be6826bca49" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\Birooni.Client.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_87" Guid="383e69fb-d9ee-49f2-9f2d-52958ccf4bc7" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\Biruscan.AI.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_88" Guid="5093c712-1bc3-453d-b901-26d52e27c1da" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\Biruscan.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_89" Guid="3afd5f08-bc2a-480e-bd13-2ab683ae3ec0" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\Biruscan.Loader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_90" Guid="53407305-3909-48e7-847c-14d2a4b96a37" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\BiruscanMepWeights.base.dat" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_91" Guid="d3a5fb59-08c5-46b5-bc14-9dd5a887bbec" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\BiruscanMepWeights.dat" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_92" Guid="856dcb04-0934-4833-860e-b02bc7778f3e" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\BiruscanMepWeights.onnx" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_93" Guid="2b454cfb-e514-493b-987e-926ba094e3bf" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_94" Guid="abaf0ab3-d893-4372-b2ac-dcd75fad34ea" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\Microsoft.ML.OnnxRuntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_95" Guid="57ae5cb9-2a2c-4c55-935b-244349127166" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\onnxruntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_96" Guid="006c22f2-2bc9-42f1-8ec8-b2228f829b08" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\onnxruntime_providers_shared.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_97" Guid="2f0cda83-3965-4ba2-8a5e-41c59e4d334a" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\System.Buffers.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_98" Guid="a07736b4-dc76-4519-b62a-f5104c354e86" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\System.Memory.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_99" Guid="d49c2dc6-cd93-45c3-9916-0ecc9ce0d0ba" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\System.Net.Http.Json.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_100" Guid="91efe37a-5b83-484e-a970-3da44dd003a0" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\System.Numerics.Vectors.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_101" Guid="1f907adc-c0a9-4bf7-ae81-2bbd896f6011" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_102" Guid="d2a71d38-3753-4344-86e9-63d10caf3210" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\System.Text.Encodings.Web.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_103" Guid="dcc91e5c-5628-49c1-b1cf-33b06251cdd0" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\System.Text.Json.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_104" Guid="a8308633-daf6-45e2-838d-eea10103b546" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\System.Threading.Tasks.Extensions.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_105" Guid="c67ed366-8d7d-4140-bf69-cd05fb719f90" Condition="REVIT_2024 = &quot;1&quot;">
+                  <File Source="SourceDir\2024\Biruscan\System.ValueTuple.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+            <Directory Id="DIR_REVIT_2025" Name="2025">
+              <Component Id="Comp_106" Guid="fd32525c-ef3b-4fc2-8ff9-e54b79c4eb7e" Condition="REVIT_2025 = &quot;1&quot;">
+                <File Source="SourceDir\2025\Biruscan.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Biruscan">
+                <Component Id="Comp_107" Guid="0aa003bb-f092-4429-991c-eab1d33a2805" Condition="REVIT_2025 = &quot;1&quot;">
+                  <File Source="SourceDir\2025\Biruscan\Birooni.Client.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_108" Guid="3eb762ce-b797-4af7-a0b4-46c1ddf33bf8" Condition="REVIT_2025 = &quot;1&quot;">
+                  <File Source="SourceDir\2025\Biruscan\Biruscan.AI.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_109" Guid="7ed21f86-4413-49f3-8e0a-519a7c4b3b45" Condition="REVIT_2025 = &quot;1&quot;">
+                  <File Source="SourceDir\2025\Biruscan\Biruscan.deps.json" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_110" Guid="0e59bed0-ef21-461a-a80f-eca29fa39f8d" Condition="REVIT_2025 = &quot;1&quot;">
+                  <File Source="SourceDir\2025\Biruscan\Biruscan.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_111" Guid="e46921df-ebd1-4a0e-8d5d-ec80d898e025" Condition="REVIT_2025 = &quot;1&quot;">
+                  <File Source="SourceDir\2025\Biruscan\Biruscan.Loader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_112" Guid="5ddc46e1-c7d5-4e52-8e20-7ce1aa644306" Condition="REVIT_2025 = &quot;1&quot;">
+                  <File Source="SourceDir\2025\Biruscan\BiruscanMepWeights.dat" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_113" Guid="9fcff08e-6bfe-478c-9874-11e1804f73fe" Condition="REVIT_2025 = &quot;1&quot;">
+                  <File Source="SourceDir\2025\Biruscan\BiruscanMepWeights.onnx" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_114" Guid="6520ef3c-b5d1-4eda-82f8-68c0053b3372" Condition="REVIT_2025 = &quot;1&quot;">
+                  <File Source="SourceDir\2025\Biruscan\Microsoft.ML.OnnxRuntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_115" Guid="14084334-54fd-4a4f-b774-3da39d2e65d9" Condition="REVIT_2025 = &quot;1&quot;">
+                  <File Source="SourceDir\2025\Biruscan\onnxruntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_116" Guid="e7e15578-43cf-4df7-ae1f-7ce34ce4b4a8" Condition="REVIT_2025 = &quot;1&quot;">
+                  <File Source="SourceDir\2025\Biruscan\onnxruntime_providers_shared.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_117" Guid="f572e886-ac2d-43b3-afc2-86f5f4cc3355" Condition="REVIT_2025 = &quot;1&quot;">
+                  <File Source="SourceDir\2025\Biruscan\System.Management.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_118" Guid="1e1d9586-6c50-401d-aa76-5afedf0018bb" Condition="REVIT_2025 = &quot;1&quot;">
+                  <File Source="SourceDir\2025\Biruscan\System.Numerics.Tensors.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+            <Directory Id="DIR_REVIT_2026" Name="2026">
+              <Component Id="Comp_119" Guid="de8d2869-348d-4635-aabc-27bccf5fe55b" Condition="REVIT_2026 = &quot;1&quot;">
+                <File Source="SourceDir\2026\Biruscan.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Biruscan">
+                <Component Id="Comp_120" Guid="ba807fc9-905b-4626-8c89-d1fb5593f6c9" Condition="REVIT_2026 = &quot;1&quot;">
+                  <File Source="SourceDir\2026\Biruscan\Birooni.Client.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_121" Guid="fbd4c288-91d4-4a94-88cf-ec684715646e" Condition="REVIT_2026 = &quot;1&quot;">
+                  <File Source="SourceDir\2026\Biruscan\Biruscan.AI.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_122" Guid="92000357-9df3-41f3-be20-78c56c586ad3" Condition="REVIT_2026 = &quot;1&quot;">
+                  <File Source="SourceDir\2026\Biruscan\Biruscan.deps.json" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_123" Guid="65f539c2-3c31-4315-ba1e-1c1cb9f23e31" Condition="REVIT_2026 = &quot;1&quot;">
+                  <File Source="SourceDir\2026\Biruscan\Biruscan.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_124" Guid="22eede58-b713-42b1-8ef4-a622f3b53e1d" Condition="REVIT_2026 = &quot;1&quot;">
+                  <File Source="SourceDir\2026\Biruscan\Biruscan.Loader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_125" Guid="973d20da-8284-40eb-846e-8dc9cf59769e" Condition="REVIT_2026 = &quot;1&quot;">
+                  <File Source="SourceDir\2026\Biruscan\BiruscanMepWeights.dat" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_126" Guid="2e698888-6e80-4006-886e-a46102c83f58" Condition="REVIT_2026 = &quot;1&quot;">
+                  <File Source="SourceDir\2026\Biruscan\BiruscanMepWeights.onnx" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_127" Guid="0eb06d6b-7a08-4405-ad8c-0e4f79abe818" Condition="REVIT_2026 = &quot;1&quot;">
+                  <File Source="SourceDir\2026\Biruscan\Microsoft.ML.OnnxRuntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_128" Guid="c132e389-691a-450b-80f2-8c0df71aed53" Condition="REVIT_2026 = &quot;1&quot;">
+                  <File Source="SourceDir\2026\Biruscan\onnxruntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_129" Guid="77bd432c-fe61-4681-9253-baef8052e7fd" Condition="REVIT_2026 = &quot;1&quot;">
+                  <File Source="SourceDir\2026\Biruscan\onnxruntime_providers_shared.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_130" Guid="78e6f2c1-be9f-483b-8b21-fada4c83ba72" Condition="REVIT_2026 = &quot;1&quot;">
+                  <File Source="SourceDir\2026\Biruscan\System.Management.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_131" Guid="f9c4c311-146a-4b51-ab3f-698b9660b951" Condition="REVIT_2026 = &quot;1&quot;">
+                  <File Source="SourceDir\2026\Biruscan\System.Numerics.Tensors.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+            <Directory Id="DIR_REVIT_2027" Name="2027">
+              <Component Id="Comp_132" Guid="d2055eb1-f28c-4a22-902a-cfd696e56371" Condition="REVIT_2027 = &quot;1&quot;">
+                <File Source="SourceDir\2027\Biruscan.addin" KeyPath="yes" />
+              </Component>
+              <Directory Name="Biruscan">
+                <Component Id="Comp_133" Guid="7918666a-d88d-4411-9a97-584e627de96f" Condition="REVIT_2027 = &quot;1&quot;">
+                  <File Source="SourceDir\2027\Biruscan\Birooni.Client.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_134" Guid="d2c94517-5bf8-48f2-98e1-6a2c2a0d4e58" Condition="REVIT_2027 = &quot;1&quot;">
+                  <File Source="SourceDir\2027\Biruscan\Biruscan.AI.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_135" Guid="56ab99f2-3163-4c27-9fba-76f9ed952b7f" Condition="REVIT_2027 = &quot;1&quot;">
+                  <File Source="SourceDir\2027\Biruscan\Biruscan.deps.json" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_136" Guid="6464cb2f-1737-42c1-abb9-1a9bb5108614" Condition="REVIT_2027 = &quot;1&quot;">
+                  <File Source="SourceDir\2027\Biruscan\Biruscan.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_137" Guid="016d0508-77f2-476a-8f91-42f1a8130041" Condition="REVIT_2027 = &quot;1&quot;">
+                  <File Source="SourceDir\2027\Biruscan\Biruscan.Loader.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_138" Guid="25c1ae5d-4216-473e-89c7-241a5624befc" Condition="REVIT_2027 = &quot;1&quot;">
+                  <File Source="SourceDir\2027\Biruscan\BiruscanMepWeights.dat" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_139" Guid="f5c7945c-7453-4d82-92f9-c25a73b153e2" Condition="REVIT_2027 = &quot;1&quot;">
+                  <File Source="SourceDir\2027\Biruscan\BiruscanMepWeights.onnx" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_140" Guid="75907211-6c5c-40d6-b668-fed2258c67c5" Condition="REVIT_2027 = &quot;1&quot;">
+                  <File Source="SourceDir\2027\Biruscan\Microsoft.ML.OnnxRuntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_141" Guid="2c6e0d66-1a19-4740-9968-a8e249d17b8e" Condition="REVIT_2027 = &quot;1&quot;">
+                  <File Source="SourceDir\2027\Biruscan\onnxruntime.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_142" Guid="fd50f947-a4cc-4f9b-aadc-455d50c71428" Condition="REVIT_2027 = &quot;1&quot;">
+                  <File Source="SourceDir\2027\Biruscan\onnxruntime_providers_shared.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_143" Guid="3b6a29d2-5433-4a1e-872a-2de02a1d330d" Condition="REVIT_2027 = &quot;1&quot;">
+                  <File Source="SourceDir\2027\Biruscan\System.Management.dll" KeyPath="yes" />
+                </Component>
+                <Component Id="Comp_144" Guid="021dad63-eaf5-4639-b9a9-ff83b4993fae" Condition="REVIT_2027 = &quot;1&quot;">
+                  <File Source="SourceDir\2027\Biruscan\System.Numerics.Tensors.dll" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
+          </Directory>
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+
+    <ComponentGroup Id="Group_2020">
+      <ComponentRef Id="Comp_1" />
+      <ComponentRef Id="Comp_2" />
+      <ComponentRef Id="Comp_3" />
+      <ComponentRef Id="Comp_4" />
+      <ComponentRef Id="Comp_5" />
+      <ComponentRef Id="Comp_6" />
+      <ComponentRef Id="Comp_7" />
+      <ComponentRef Id="Comp_8" />
+      <ComponentRef Id="Comp_9" />
+      <ComponentRef Id="Comp_10" />
+      <ComponentRef Id="Comp_11" />
+      <ComponentRef Id="Comp_12" />
+      <ComponentRef Id="Comp_13" />
+      <ComponentRef Id="Comp_14" />
+      <ComponentRef Id="Comp_15" />
+      <ComponentRef Id="Comp_16" />
+      <ComponentRef Id="Comp_17" />
+      <ComponentRef Id="Comp_18" />
+      <ComponentRef Id="Comp_19" />
+      <ComponentRef Id="Comp_20" />
+      <ComponentRef Id="Comp_21" />
+    </ComponentGroup>
+    <ComponentGroup Id="Group_2021">
+      <ComponentRef Id="Comp_22" />
+      <ComponentRef Id="Comp_23" />
+      <ComponentRef Id="Comp_24" />
+      <ComponentRef Id="Comp_25" />
+      <ComponentRef Id="Comp_26" />
+      <ComponentRef Id="Comp_27" />
+      <ComponentRef Id="Comp_28" />
+      <ComponentRef Id="Comp_29" />
+      <ComponentRef Id="Comp_30" />
+      <ComponentRef Id="Comp_31" />
+      <ComponentRef Id="Comp_32" />
+      <ComponentRef Id="Comp_33" />
+      <ComponentRef Id="Comp_34" />
+      <ComponentRef Id="Comp_35" />
+      <ComponentRef Id="Comp_36" />
+      <ComponentRef Id="Comp_37" />
+      <ComponentRef Id="Comp_38" />
+      <ComponentRef Id="Comp_39" />
+      <ComponentRef Id="Comp_40" />
+      <ComponentRef Id="Comp_41" />
+      <ComponentRef Id="Comp_42" />
+    </ComponentGroup>
+    <ComponentGroup Id="Group_2022">
+      <ComponentRef Id="Comp_43" />
+      <ComponentRef Id="Comp_44" />
+      <ComponentRef Id="Comp_45" />
+      <ComponentRef Id="Comp_46" />
+      <ComponentRef Id="Comp_47" />
+      <ComponentRef Id="Comp_48" />
+      <ComponentRef Id="Comp_49" />
+      <ComponentRef Id="Comp_50" />
+      <ComponentRef Id="Comp_51" />
+      <ComponentRef Id="Comp_52" />
+      <ComponentRef Id="Comp_53" />
+      <ComponentRef Id="Comp_54" />
+      <ComponentRef Id="Comp_55" />
+      <ComponentRef Id="Comp_56" />
+      <ComponentRef Id="Comp_57" />
+      <ComponentRef Id="Comp_58" />
+      <ComponentRef Id="Comp_59" />
+      <ComponentRef Id="Comp_60" />
+      <ComponentRef Id="Comp_61" />
+      <ComponentRef Id="Comp_62" />
+      <ComponentRef Id="Comp_63" />
+    </ComponentGroup>
+    <ComponentGroup Id="Group_2023">
+      <ComponentRef Id="Comp_64" />
+      <ComponentRef Id="Comp_65" />
+      <ComponentRef Id="Comp_66" />
+      <ComponentRef Id="Comp_67" />
+      <ComponentRef Id="Comp_68" />
+      <ComponentRef Id="Comp_69" />
+      <ComponentRef Id="Comp_70" />
+      <ComponentRef Id="Comp_71" />
+      <ComponentRef Id="Comp_72" />
+      <ComponentRef Id="Comp_73" />
+      <ComponentRef Id="Comp_74" />
+      <ComponentRef Id="Comp_75" />
+      <ComponentRef Id="Comp_76" />
+      <ComponentRef Id="Comp_77" />
+      <ComponentRef Id="Comp_78" />
+      <ComponentRef Id="Comp_79" />
+      <ComponentRef Id="Comp_80" />
+      <ComponentRef Id="Comp_81" />
+      <ComponentRef Id="Comp_82" />
+      <ComponentRef Id="Comp_83" />
+      <ComponentRef Id="Comp_84" />
+    </ComponentGroup>
+    <ComponentGroup Id="Group_2024">
+      <ComponentRef Id="Comp_85" />
+      <ComponentRef Id="Comp_86" />
+      <ComponentRef Id="Comp_87" />
+      <ComponentRef Id="Comp_88" />
+      <ComponentRef Id="Comp_89" />
+      <ComponentRef Id="Comp_90" />
+      <ComponentRef Id="Comp_91" />
+      <ComponentRef Id="Comp_92" />
+      <ComponentRef Id="Comp_93" />
+      <ComponentRef Id="Comp_94" />
+      <ComponentRef Id="Comp_95" />
+      <ComponentRef Id="Comp_96" />
+      <ComponentRef Id="Comp_97" />
+      <ComponentRef Id="Comp_98" />
+      <ComponentRef Id="Comp_99" />
+      <ComponentRef Id="Comp_100" />
+      <ComponentRef Id="Comp_101" />
+      <ComponentRef Id="Comp_102" />
+      <ComponentRef Id="Comp_103" />
+      <ComponentRef Id="Comp_104" />
+      <ComponentRef Id="Comp_105" />
+    </ComponentGroup>
+    <ComponentGroup Id="Group_2025">
+      <ComponentRef Id="Comp_106" />
+      <ComponentRef Id="Comp_107" />
+      <ComponentRef Id="Comp_108" />
+      <ComponentRef Id="Comp_109" />
+      <ComponentRef Id="Comp_110" />
+      <ComponentRef Id="Comp_111" />
+      <ComponentRef Id="Comp_112" />
+      <ComponentRef Id="Comp_113" />
+      <ComponentRef Id="Comp_114" />
+      <ComponentRef Id="Comp_115" />
+      <ComponentRef Id="Comp_116" />
+      <ComponentRef Id="Comp_117" />
+      <ComponentRef Id="Comp_118" />
+    </ComponentGroup>
+    <ComponentGroup Id="Group_2026">
+      <ComponentRef Id="Comp_119" />
+      <ComponentRef Id="Comp_120" />
+      <ComponentRef Id="Comp_121" />
+      <ComponentRef Id="Comp_122" />
+      <ComponentRef Id="Comp_123" />
+      <ComponentRef Id="Comp_124" />
+      <ComponentRef Id="Comp_125" />
+      <ComponentRef Id="Comp_126" />
+      <ComponentRef Id="Comp_127" />
+      <ComponentRef Id="Comp_128" />
+      <ComponentRef Id="Comp_129" />
+      <ComponentRef Id="Comp_130" />
+      <ComponentRef Id="Comp_131" />
+    </ComponentGroup>
+    <ComponentGroup Id="Group_2027">
+      <ComponentRef Id="Comp_132" />
+      <ComponentRef Id="Comp_133" />
+      <ComponentRef Id="Comp_134" />
+      <ComponentRef Id="Comp_135" />
+      <ComponentRef Id="Comp_136" />
+      <ComponentRef Id="Comp_137" />
+      <ComponentRef Id="Comp_138" />
+      <ComponentRef Id="Comp_139" />
+      <ComponentRef Id="Comp_140" />
+      <ComponentRef Id="Comp_141" />
+      <ComponentRef Id="Comp_142" />
+      <ComponentRef Id="Comp_143" />
+      <ComponentRef Id="Comp_144" />
+    </ComponentGroup>
+
+
+  </Fragment>
+
+  <Fragment>
+    <FeatureGroup Id="AllFeatures">
+    <Feature Id="Feature_2020" Title="Revit 2020" Level="1">
+      <ComponentGroupRef Id="Group_2020" />
+    </Feature>
+    <Feature Id="Feature_2021" Title="Revit 2021" Level="1">
+      <ComponentGroupRef Id="Group_2021" />
+    </Feature>
+    <Feature Id="Feature_2022" Title="Revit 2022" Level="1">
+      <ComponentGroupRef Id="Group_2022" />
+    </Feature>
+    <Feature Id="Feature_2023" Title="Revit 2023" Level="1">
+      <ComponentGroupRef Id="Group_2023" />
+    </Feature>
+    <Feature Id="Feature_2024" Title="Revit 2024" Level="1">
+      <ComponentGroupRef Id="Group_2024" />
+    </Feature>
+    <Feature Id="Feature_2025" Title="Revit 2025" Level="1">
+      <ComponentGroupRef Id="Group_2025" />
+    </Feature>
+    <Feature Id="Feature_2026" Title="Revit 2026" Level="1">
+      <ComponentGroupRef Id="Group_2026" />
+    </Feature>
+    <Feature Id="Feature_2027" Title="Revit 2027" Level="1">
+      <ComponentGroupRef Id="Group_2027" />
+    </Feature>
+
+    </FeatureGroup>
+  </Fragment>
+</Wix>

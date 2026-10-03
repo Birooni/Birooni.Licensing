@@ -1,0 +1,172 @@
+<Window x:Class="Biruscan.UI.Ai.AiGenerateMepWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Generate MEP" Width="460"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        Background="#1E1E1E" Foreground="White"
+        FontFamily="Segoe UI" FontSize="13"
+        ResizeMode="NoResize" WindowStyle="None"
+        AllowsTransparency="True" BorderThickness="1" BorderBrush="#333333">
+
+    <Window.Resources>
+        <!-- TabItem Style -->
+        <Style TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="TabBorder" Background="#252526" BorderBrush="#3E3E42" BorderThickness="1,1,1,0"
+                                CornerRadius="6,6,0,0" Margin="0,0,4,0" Padding="12,7">
+                            <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="TabBorder" Property="Background" Value="#1E1E1E"/>
+                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#007ACC"/>
+                                <Setter Property="Foreground" Value="#007ACC"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter Property="Foreground" Value="#AAAAAA"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="TabBorder" Property="Background" Value="#2D2D30"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border CornerRadius="8" Background="#1E1E1E" BorderThickness="1" BorderBrush="#3E3E42">
+        <Grid Margin="22">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header with Close Button -->
+            <Grid Grid.Row="0" Margin="0,0,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock x:Name="HeaderText" Text="GENERATE MEP" FontSize="18" FontWeight="Bold" Foreground="#007ACC"/>
+                    <TextBlock x:Name="SubtitleText" Text="Clip is optional. Without a cut, Edgewise finds pipes across the whole point cloud."
+                               FontSize="11" Foreground="#888888" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                </StackPanel>
+                <Button Grid.Column="1" Content="✕" Click="CancelButton_Click" Width="30" Height="30"
+                        Background="Transparent" Foreground="#888888" BorderThickness="0" FontSize="14"
+                        Cursor="Hand" VerticalAlignment="Top"/>
+            </Grid>
+
+            <!-- Three Tabs for Standard, Trained, and Combined Modes (Only for AI Tools) -->
+            <TabControl x:Name="PipelineTabControl" Grid.Row="1" Background="Transparent" BorderThickness="0"
+                        Margin="0,0,0,12" SelectionChanged="PipelineTabControl_SelectionChanged">
+                
+                <!-- TAB 1: STANDARD AI GENERATE -->
+                <TabItem Header="⚡ Standard AI">
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="0,6,6,6" Padding="12" Margin="0,6,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Standard In-Process Neural Extraction" FontWeight="SemiBold" FontSize="12" Foreground="#007ACC"/>
+                            <TextBlock Text="PointNet++ extract. Clip optional — without a cut, Edgewise tiles the whole cloud and finds pipes."
+                                       FontSize="11" Foreground="#AAAAAA" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </TabItem>
+
+                <!-- TAB 2: GENERATE AI TRAINED -->
+                <TabItem Header="🧠 Trained Model">
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="0,6,6,6" Padding="12" Margin="0,6,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Custom Fine-Tuned Active Learning Model" FontWeight="SemiBold" FontSize="12" Foreground="#FF9800"/>
+                            <TextBlock Text="Fine-tuned weights. Clip optional. Train AI on modeled pipes (Edgewise surface rings) then generate."
+                                       FontSize="11" Foreground="#AAAAAA" TextWrapping="Wrap" Margin="0,2,0,8"/>
+
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton x:Name="HybridRadio" Content="Hybrid (PointNet++ → RANSAC)"
+                                             GroupName="TrainedMethod" IsChecked="True"
+                                             Foreground="White" Margin="0,0,12,0"/>
+                                <RadioButton x:Name="PureDlRadio" Content="Pure DL (Set Prediction)"
+                                             GroupName="TrainedMethod"
+                                             Foreground="White"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </TabItem>
+
+                <!-- TAB 3: COMBINED DUAL-PIPELINE AI -->
+                <TabItem Header="🚀 Combined AI">
+                    <Border Background="#252526" BorderBrush="#007ACC" BorderThickness="1" CornerRadius="0,6,6,6" Padding="12" Margin="0,6,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Dual-Engine Ensemble &amp; Trained Model Fusion" FontWeight="SemiBold" FontSize="12" Foreground="#007ACC"/>
+                            <TextBlock Text="Standard + trained fusion. Clip optional — Edgewise scans the whole cloud when no region is cut."
+                                       FontSize="11" Foreground="#AAAAAA" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </TabItem>
+            </TabControl>
+
+            <!-- Single Column Parameters (Service, Primary Type, System Type, Level, Checkboxes) -->
+            <StackPanel Grid.Row="2">
+                <!-- 1. Service -->
+                <TextBlock Text="Service" Margin="0,0,0,4" Foreground="#AAAAAA"/>
+                <ComboBox x:Name="ServiceComboBox" Height="30" Margin="0,0,0,10" SelectionChanged="ServiceComboBox_SelectionChanged">
+                    <ComboBoxItem Content="Piping" IsSelected="True"/>
+                    <ComboBoxItem Content="Duct"/>
+                    <ComboBoxItem Content="Conduit"/>
+                    <ComboBoxItem Content="Cable Tray"/>
+                </ComboBox>
+
+                <!-- 2. Primary Type -->
+                <TextBlock Text="Primary Type" Margin="0,0,0,4" Foreground="#AAAAAA"/>
+                <ComboBox x:Name="PrimaryTypeComboBox" Height="30" Margin="0,0,0,10" DisplayMemberPath="Name"/>
+
+                <!-- 3. System Type (Piping & Duct) -->
+                <StackPanel x:Name="SystemTypePanel">
+                    <TextBlock Text="System Type" Margin="0,0,0,4" Foreground="#AAAAAA"/>
+                    <ComboBox x:Name="SystemTypeComboBox" Height="30" Margin="0,0,0,10" DisplayMemberPath="Name"/>
+                </StackPanel>
+
+                <!-- 4. Reference Level -->
+                <TextBlock Text="Reference Level" Margin="0,0,0,4" Foreground="#AAAAAA"/>
+                <ComboBox x:Name="LevelComboBox" Height="30" Margin="0,0,0,12" DisplayMemberPath="Name"/>
+
+                <!-- 5. Options Checkboxes -->
+                <StackPanel Margin="0,2,0,6">
+                    <CheckBox x:Name="InsulationCheckBox" Content="Insulation Present"
+                              IsChecked="False" Foreground="White" Margin="0,0,0,8"
+                              ToolTip="Tick if the point cloud scanned surface includes insulation wrap."/>
+                    <CheckBox x:Name="GenerateWithoutFittingsCheckBox" Content="Generate Without Fittings"
+                              IsChecked="False" Foreground="White" Margin="0,0,0,4"
+                              ToolTip="If checked, only straight pipes/ducts are generated without auto-elbows or tees."/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Dialog Action Footer -->
+            <Border Grid.Row="3" BorderBrush="#333333" BorderThickness="0,1,0,0" Padding="0,14,0,0" Margin="0,10,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock x:Name="ModeIndicatorText" Grid.Column="0"
+                               Text="Mode: Parametric Geometric Fitting"
+                               FontSize="11" Foreground="#4CAF50" VerticalAlignment="Center"/>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="CANCEL" Click="CancelButton_Click" Width="80" Height="32" Margin="0,0,10,0"
+                                Background="Transparent" Foreground="White" BorderThickness="1" BorderBrush="#3E3E42"/>
+                        <Button x:Name="GenerateButton" Content="GENERATE MEP" Click="GenerateButton_Click" Width="140" Height="32"
+                                Background="#007ACC" Foreground="White" BorderThickness="0" FontWeight="Bold"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

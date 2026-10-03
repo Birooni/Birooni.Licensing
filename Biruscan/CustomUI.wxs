@@ -1,0 +1,131 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <Property Id="REVIT_2020" Value="1" Secure="yes" />
+    <Property Id="REVIT_2021" Value="1" Secure="yes" />
+    <Property Id="REVIT_2022" Value="1" Secure="yes" />
+    <Property Id="REVIT_2023" Value="1" Secure="yes" />
+    <Property Id="REVIT_2024" Value="1" Secure="yes" />
+    <Property Id="REVIT_2025" Value="1" Secure="yes" />
+    <Property Id="REVIT_2026" Value="1" Secure="yes" />
+    <Property Id="REVIT_2027" Value="1" Secure="yes" />
+
+    <!-- Scope checkboxes: 1 = single user, 2 = entire system. Mutually exclusive. -->
+    <Property Id="SCOPE_USER" Value="1" Secure="yes" />
+    <Property Id="SCOPE_MACHINE" Secure="yes" />
+    <Property Id="INSTALL_SCOPE_SELECTION" Value="1" Secure="yes" />
+
+    <UI Id="WixUI_Custom">
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+      <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+      <Property Id="WixUI_Mode" Value="Custom" />
+
+      <DialogRef Id="BrowseDlg" />
+      <DialogRef Id="DiskCostDlg" />
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <DialogRef Id="PrepareDlg" />
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ResumeDlg" />
+      <DialogRef Id="UserExit" />
+      <DialogRef Id="MaintenanceWelcomeDlg" />
+      <DialogRef Id="MaintenanceTypeDlg" />
+
+      <Dialog Id="MyScopeDlg" Width="370" Height="270" Title="Installation Scope">
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
+          <Publish Property="INSTALL_SCOPE_SELECTION" Value="2" Condition="SCOPE_MACHINE=&quot;1&quot;" />
+          <Publish Property="INSTALL_SCOPE_SELECTION" Value="1" Condition="NOT SCOPE_MACHINE=&quot;1&quot;" />
+          <Publish Event="DoAction" Value="SetRootPerMachine" Condition="SCOPE_MACHINE=&quot;1&quot;" />
+          <Publish Event="DoAction" Value="SetRootPerUser" Condition="NOT SCOPE_MACHINE=&quot;1&quot;" />
+          <Publish Event="NewDialog" Value="RevitVersionsDlg" />
+        </Control>
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)">
+          <Publish Event="NewDialog" Value="LicenseAgreementDlg" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="{\WixUI_Font_Title}Installation Scope" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="320" Height="15" Transparent="yes" NoPrefix="yes" Text="Choose who this copy of Biruscan is installed for." />
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+
+        <Control Id="ScopeHint" Type="Text" X="25" Y="70" Width="320" Height="30" Transparent="yes" NoPrefix="yes" Text="Check one option. Entire system writes to ProgramData so every Windows account on this PC loads Biruscan in Revit." />
+
+        <Control Id="chkSingleUser" Type="CheckBox" X="25" Y="110" Width="320" Height="18" Property="SCOPE_USER" CheckBoxValue="1" Text="Single user (only for me)">
+          <Publish Property="SCOPE_MACHINE" Value="{}" />
+          <Publish Property="INSTALL_SCOPE_SELECTION" Value="1" />
+        </Control>
+        <Control Id="chkEntireSystem" Type="CheckBox" X="25" Y="135" Width="320" Height="18" Property="SCOPE_MACHINE" CheckBoxValue="1" Text="Entire system (all users on this computer)">
+          <Publish Property="SCOPE_USER" Value="{}" />
+          <Publish Property="INSTALL_SCOPE_SELECTION" Value="2" />
+        </Control>
+      </Dialog>
+
+      <Dialog Id="RevitVersionsDlg" Width="370" Height="270" Title="Select Revit Versions">
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
+          <Publish Event="SpawnDialog" Value="NoVersionDlg" Condition="NOT REVIT_2020 AND NOT REVIT_2021 AND NOT REVIT_2022 AND NOT REVIT_2023 AND NOT REVIT_2024 AND NOT REVIT_2025 AND NOT REVIT_2026 AND NOT REVIT_2027" />
+          <Publish Event="NewDialog" Value="VerifyReadyDlg" Condition="REVIT_2020 OR REVIT_2021 OR REVIT_2022 OR REVIT_2023 OR REVIT_2024 OR REVIT_2025 OR REVIT_2026 OR REVIT_2027" />
+        </Control>
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)">
+          <Publish Event="NewDialog" Value="MyScopeDlg" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="{\WixUI_Font_Title}Required Revit versions" />
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="320" Height="15" Transparent="yes" NoPrefix="yes" Text="Check every Autodesk Revit year that should load Biruscan." />
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+
+        <Control Id="LegacyHint" Type="Text" X="25" Y="54" Width="320" Height="12" Transparent="yes" NoPrefix="yes" Text="2020-2024 use the 2023 build. 2025-2027 use the 2025 build." />
+
+        <Control Id="chk2020" Type="CheckBox" X="25" Y="72" Width="150" Height="14" Property="REVIT_2020" CheckBoxValue="1" Text="Revit 2020" />
+        <Control Id="chk2021" Type="CheckBox" X="180" Y="72" Width="150" Height="14" Property="REVIT_2021" CheckBoxValue="1" Text="Revit 2021" />
+        <Control Id="chk2022" Type="CheckBox" X="25" Y="92" Width="150" Height="14" Property="REVIT_2022" CheckBoxValue="1" Text="Revit 2022" />
+        <Control Id="chk2023" Type="CheckBox" X="180" Y="92" Width="150" Height="14" Property="REVIT_2023" CheckBoxValue="1" Text="Revit 2023" />
+        <Control Id="chk2024" Type="CheckBox" X="25" Y="112" Width="150" Height="14" Property="REVIT_2024" CheckBoxValue="1" Text="Revit 2024" />
+        <Control Id="chk2025" Type="CheckBox" X="180" Y="112" Width="150" Height="14" Property="REVIT_2025" CheckBoxValue="1" Text="Revit 2025" />
+        <Control Id="chk2026" Type="CheckBox" X="25" Y="132" Width="150" Height="14" Property="REVIT_2026" CheckBoxValue="1" Text="Revit 2026" />
+        <Control Id="chk2027" Type="CheckBox" X="180" Y="132" Width="150" Height="14" Property="REVIT_2027" CheckBoxValue="1" Text="Revit 2027" />
+      </Dialog>
+
+      <Dialog Id="NoVersionDlg" Width="260" Height="85" Title="Biruscan">
+        <Control Id="Text" Type="Text" X="15" Y="15" Width="230" Height="30" Text="Select at least one Revit version." />
+        <Control Id="Ok" Type="PushButton" X="100" Y="55" Width="56" Height="17" Default="yes" Cancel="yes" Text="OK">
+          <Publish Event="EndDialog" Value="Return" />
+        </Control>
+      </Dialog>
+
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg" Condition="NOT Installed" />
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Condition="Installed AND PATCH" />
+
+      <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" />
+      <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="MyScopeDlg" Condition="LicenseAccepted = &quot;1&quot;" />
+
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="RevitVersionsDlg" Condition="NOT Installed" />
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Condition="Installed AND NOT PATCH AND NOT WIX_UPGRADE_DETECTED" />
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Condition="Installed AND PATCH" />
+
+      <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg" />
+      <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg" />
+      <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg" />
+      <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg" />
+    </UI>
+
+    <UIRef Id="WixUI_Common" />
+
+    <InstallUISequence>
+      <Show Dialog="WelcomeDlg" Before="ProgressDlg" Condition="NOT Installed OR WIX_UPGRADE_DETECTED" />
+      <Show Dialog="MaintenanceWelcomeDlg" Before="ProgressDlg" Condition="Installed AND NOT RESUME AND NOT Preselected AND NOT WIX_UPGRADE_DETECTED" />
+      <Show Dialog="ResumeDlg" Before="ProgressDlg" Condition="Installed AND (RESUME OR Preselected)" />
+    </InstallUISequence>
+  </Fragment>
+</Wix>

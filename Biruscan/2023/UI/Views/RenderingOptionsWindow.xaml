@@ -1,0 +1,96 @@
+<Window x:Class="Biruscan.UI.Views.RenderingOptionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Rendering Options — Biruscan"
+        Width="520" Height="520"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Point Cloud Rendering Options"
+                   FontWeight="Bold" FontSize="15" Margin="0,0,0,15"/>
+
+        <!-- Color Mode Selection -->
+        <GroupBox Grid.Row="1" Header="Color Mode" Margin="0,0,0,12" Padding="10">
+            <StackPanel>
+                <RadioButton Name="rbTrueColor" Content="True Color — Display in original scan colors" IsChecked="True" Margin="0,0,0,6"/>
+                <RadioButton Name="rbIntensity" Content="Intensity — Grayscale or custom color gradient" Margin="0,0,0,6"/>
+                <RadioButton Name="rbElevation" Content="Elevation — Color by Z value (height)" Margin="0,0,0,6"/>
+                <RadioButton Name="rbNormals" Content="Normals — Color by surface normal direction" Margin="0,0,0,2"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Intensity Gradient Settings (visible when Intensity is checked) -->
+        <GroupBox Grid.Row="2" Name="grpIntensitySettings" Header="Intensity Color Ramp" Margin="0,0,0,12" Padding="10">
+            <StackPanel>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Preset Ramp:" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    <ComboBox Grid.Column="1" Name="cmbIntensityPreset" SelectedIndex="0" SelectionChanged="CmbIntensityPreset_SelectionChanged">
+                        <ComboBoxItem Content="Green → Yellow (Default)"/>
+                        <ComboBoxItem Content="Yellow → Red (Warm)"/>
+                        <ComboBoxItem Content="Green → Red (Full Spectrum)"/>
+                        <ComboBoxItem Content="Grayscale (Black → White)"/>
+                        <ComboBoxItem Content="Custom 2-Color Gradient..."/>
+                    </ComboBox>
+                </Grid>
+
+                <!-- Gradient Visual Preview -->
+                <TextBlock Text="Gradient Preview:" Margin="0,0,0,4" Foreground="Gray" FontSize="11"/>
+                <Border BorderBrush="#CCCCCC" BorderThickness="1" CornerRadius="3" Height="24" Margin="0,0,0,10">
+                    <Rectangle Name="rectGradientPreview" RadiusX="2" RadiusY="2"/>
+                </Border>
+
+                <!-- Min & Max Color Custom Pickers -->
+                <Grid Margin="0,0,0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Min Color (0% Intensity) -->
+                    <Border Grid.Column="0" BorderBrush="#E0E0E0" BorderThickness="1" Padding="6" CornerRadius="3">
+                        <StackPanel>
+                            <TextBlock Text="Min Intensity (0%):" FontSize="11" Foreground="#555555" Margin="0,0,0,4"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Border Name="borderMinColor" Width="24" Height="24" BorderBrush="#999" BorderThickness="1" CornerRadius="2" Margin="0,0,8,0"/>
+                                <Button Name="btnPickMinColor" Content="Change..." Width="70" Height="24" Click="BtnPickMinColor_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Max Color (100% Intensity) -->
+                    <Border Grid.Column="2" BorderBrush="#E0E0E0" BorderThickness="1" Padding="6" CornerRadius="3">
+                        <StackPanel>
+                            <TextBlock Text="Max Intensity (100%):" FontSize="11" Foreground="#555555" Margin="0,0,0,4"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Border Name="borderMaxColor" Width="24" Height="24" BorderBrush="#999" BorderThickness="1" CornerRadius="2" Margin="0,0,8,0"/>
+                                <Button Name="btnPickMaxColor" Content="Change..." Width="70" Height="24" Click="BtnPickMaxColor_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+
+        <TextBlock Grid.Row="3" TextWrapping="Wrap" Foreground="Gray" FontSize="11" VerticalAlignment="Top"
+                   Text="Note: Intensity color gradients are applied directly to the active 3D/2D view overrides. Intensity data must be present in the loaded RCP/RCS point cloud file."/>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Name="btnApply" Content="Apply" Width="85" Height="30" Margin="0,0,8,0" IsDefault="True" Click="BtnApply_Click"/>
+            <Button Name="btnCancel" Content="Cancel" Width="85" Height="30" IsCancel="True" Click="BtnCancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

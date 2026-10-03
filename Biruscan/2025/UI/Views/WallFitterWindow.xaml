@@ -1,0 +1,104 @@
+<Window x:Class="Biruscan.UI.Views.WallFitterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Wall Fitter — Scan-to-BIM"
+        Width="520" Height="580"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,12">
+            <TextBlock Text="Wall Fitter — Scan-to-BIM" FontWeight="Bold" FontSize="16" Foreground="#1E88E5"/>
+            <TextBlock Text="Fit parametric Revit walls automatically or interactively from point cloud data."
+                       FontSize="12" Foreground="#666666" Margin="0,3,0,0"/>
+        </StackPanel>
+
+        <!-- Fitting Mode Selection -->
+        <GroupBox Grid.Row="1" Header="Wall Fitting Mode" Margin="0,0,0,12" Padding="10">
+            <StackPanel>
+                <RadioButton Name="rbAuto" IsChecked="True" Margin="0,0,0,8" Checked="OnModeChanged">
+                    <StackPanel>
+                        <TextBlock Text="⚡ Automatic Wall Generation (1-Click Scan-to-BIM)" FontWeight="SemiBold" FontSize="13"/>
+                        <TextBlock Text="Automatically detects wall planes, measures thicknesses, rectifies 90° corners, and places all walls in one pass."
+                                   FontSize="11" Foreground="#666666" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </RadioButton>
+
+                <RadioButton Name="rbThreePoint" Margin="0,0,0,8" Checked="OnModeChanged">
+                    <StackPanel>
+                        <TextBlock Text="🎯 3-Point Mode (Face + Auto-Thickness Fit)" FontWeight="SemiBold" FontSize="13"/>
+                        <TextBlock Text="Pick 2 points on a wall face + 1 point on the opposite face to auto-detect thickness and fit."
+                                   FontSize="11" Foreground="#666666" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </RadioButton>
+
+                <RadioButton Name="rbTwoPoint" Checked="OnModeChanged">
+                    <StackPanel>
+                        <TextBlock Text="✏️ 2-Point Mode (Direct Pick)" FontWeight="SemiBold" FontSize="13"/>
+                        <TextBlock Text="Pick start and end points directly on the point cloud to draw a single wall."
+                                   FontSize="11" Foreground="#666666" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </RadioButton>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Parameters Group -->
+        <GroupBox Grid.Row="2" Header="Wall Parameters &amp; Constraints" Margin="0,0,0,12" Padding="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Base Level -->
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Base Level:" VerticalAlignment="Center" Margin="0,0,0,8" FontWeight="SemiBold"/>
+                <ComboBox Grid.Row="0" Grid.Column="1" Name="cmbLevels" Margin="0,0,0,8"/>
+
+                <!-- Wall Height -->
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Wall Height (ft):" VerticalAlignment="Center" Margin="0,0,0,8" FontWeight="SemiBold"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Name="txtWallHeight" Text="10.0" Margin="0,0,0,8" Padding="3"/>
+
+                <!-- Min Length (Auto Mode) -->
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Min Wall Length (ft):" VerticalAlignment="Center" Margin="0,0,0,8" FontWeight="SemiBold"/>
+                <TextBox Grid.Row="2" Grid.Column="1" Name="txtMinLength" Text="2.0" Margin="0,0,0,8" Padding="3"/>
+
+                <!-- Wall Type Override / Auto -->
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Wall Type:" VerticalAlignment="Center" Margin="0,0,0,8" FontWeight="SemiBold"/>
+                <ComboBox Grid.Row="3" Grid.Column="1" Name="cmbWallTypes" Margin="0,0,0,8"/>
+
+                <!-- Ortho-Snap -->
+                <CheckBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Name="chkOrthoSnap" IsChecked="True"
+                          Content="Auto-snap orthogonal angles (90° / 45° corner alignment)" Margin="0,4,0,0"/>
+            </Grid>
+        </GroupBox>
+
+        <!-- Informational Note -->
+        <Border Grid.Row="3" Background="#F5F5F5" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4" Padding="8" VerticalAlignment="Top">
+            <TextBlock Name="txtInfoNote" TextWrapping="Wrap" FontSize="11" Foreground="#555555"
+                       Text="Auto Mode automatically searches for planar point clusters, pairs opposite wall faces for thickness, and places native Revit Wall elements."/>
+        </Border>
+
+        <!-- Dialog Buttons -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Name="btnAction" Content="Generate Walls" Width="120" Height="32" Margin="0,0,8,0"
+                    Background="#1976D2" Foreground="White" FontWeight="SemiBold" IsDefault="True" Click="BtnAction_Click"/>
+            <Button Name="btnCancel" Content="Cancel" Width="85" Height="32" IsCancel="True" Click="BtnCancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
