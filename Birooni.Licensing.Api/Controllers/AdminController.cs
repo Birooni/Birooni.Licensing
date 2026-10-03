@@ -125,15 +125,16 @@ public class AdminController : ControllerBase
     }
 
     /// <summary>
-    /// Lists activated machines across all licenses.
+    /// Lists activated machines across all licenses, optionally filtered by product.
     /// </summary>
     [HttpGet("devices")]
     [ProducesResponseType(typeof(List<AdminDeviceDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDevices(
         [FromQuery] string? search,
+        [FromQuery] string? product,
         CancellationToken cancellationToken)
     {
-        var devices = await _licensingService.GetAdminDevicesAsync(search, cancellationToken);
+        var devices = await _licensingService.GetAdminDevicesAsync(search, product, cancellationToken);
         return Ok(devices);
     }
 

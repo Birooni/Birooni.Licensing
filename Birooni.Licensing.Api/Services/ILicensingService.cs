@@ -22,7 +22,7 @@ public interface ILicensingService
 
     Task<bool> RevokeLicenseAsync(Guid licenseId, string? reason = null, CancellationToken cancellationToken = default);
 
-    Task<List<AdminDeviceDto>> GetAdminDevicesAsync(string? search = null, CancellationToken cancellationToken = default);
+    Task<List<AdminDeviceDto>> GetAdminDevicesAsync(string? search = null, string? product = null, CancellationToken cancellationToken = default);
 
     Task<bool> ReleaseDeviceAsync(Guid activationId, CancellationToken cancellationToken = default);
 }

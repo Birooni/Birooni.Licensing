@@ -24,6 +24,7 @@ public class AdminDeviceDto
     public Guid Id { get; set; }
     public Guid LicenseId { get; set; }
     public string LicenseKey { get; set; } = string.Empty;
+    public string Product { get; set; } = string.Empty;
     public string CustomerName { get; set; } = string.Empty;
     public string CustomerEmail { get; set; } = string.Empty;
     public string? Company { get; set; }

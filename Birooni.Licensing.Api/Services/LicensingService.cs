@@ -565,7 +565,7 @@ public class LicensingService : ILicensingService
         return true;
     }
 
-    public async Task<List<AdminDeviceDto>> GetAdminDevicesAsync(string? search = null, CancellationToken cancellationToken = default)
+    public async Task<List<AdminDeviceDto>> GetAdminDevicesAsync(string? search = null, string? product = null, CancellationToken cancellationToken = default)
     {
         var query = _context.Activations.Include(a => a.License).AsQueryable();
 
@@ -575,16 +575,26 @@ public class LicensingService : ILicensingService
             query = query.Where(a => a.DeviceId.ToLower().Contains(s) ||
                                      (a.DeviceName != null && a.DeviceName.ToLower().Contains(s)) ||
                                      (a.License != null && a.License.LicenseKey.ToLower().Contains(s)) ||
-                                     (a.License != null && a.License.CustomerEmail.ToLower().Contains(s)));
+                                     (a.License != null && a.License.CustomerEmail.ToLower().Contains(s)) ||
+                                     (a.License != null && a.License.Product.ToLower().Contains(s)) ||
+                                     (a.License != null && a.License.CustomerName.ToLower().Contains(s)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(product))
+        {
+            var aliases = ProductAliases(product);
+            query = query.Where(a => a.License != null && aliases.Contains(a.License.Product.ToLower()));
         }
 
         return await query
-            .OrderByDescending(a => a.LastValidatedAt)
+            .OrderBy(a => a.License != null ? a.License.Product : string.Empty)
+            .ThenByDescending(a => a.LastValidatedAt)
             .Select(a => new AdminDeviceDto
             {
                 Id = a.Id,
                 LicenseId = a.LicenseId,
                 LicenseKey = a.License != null ? a.License.LicenseKey : string.Empty,
+                Product = a.License != null ? a.License.Product : string.Empty,
                 CustomerName = a.License != null ? a.License.CustomerName : string.Empty,
                 CustomerEmail = a.License != null ? a.License.CustomerEmail : string.Empty,
                 Company = a.License != null ? a.License.Company : null,
@@ -596,6 +606,17 @@ public class LicensingService : ILicensingService
                 LastValidatedAt = a.LastValidatedAt
             })
             .ToListAsync(cancellationToken);
+    }
+
+    internal static List<string> ProductAliases(string product)
+    {
+        var p = product.Trim().ToLowerInvariant();
+        if (p is "robot" or "viewreferencerobot")
+        {
+            return ["robot", "viewreferencerobot"];
+        }
+
+        return [p];
     }
 
     public async Task<bool> ReleaseDeviceAsync(Guid activationId, CancellationToken cancellationToken = default)

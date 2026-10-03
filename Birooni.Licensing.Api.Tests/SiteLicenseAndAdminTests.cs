@@ -216,4 +216,54 @@ public class SiteLicenseAndAdminTests
         Assert.False(updatedLic!.IsActive);
         Assert.False(updatedAct!.IsActive);
     }
+
+    [Fact]
+    public async Task Admin_GetDevices_ReturnsProductAndFiltersProductWise()
+    {
+        var (db, service) = CreateTestContext();
+
+        var family = await service.CreateCustomLicenseAsync(new CreateCustomLicenseRequest
+        {
+            Product = "FamilyLoader",
+            CustomerName = "Ameen",
+            CustomerEmail = "ameen@ibrooni.com",
+            MaxActivations = 2
+        });
+        var scan = await service.CreateCustomLicenseAsync(new CreateCustomLicenseRequest
+        {
+            Product = "Biruscan",
+            CustomerName = "Ameen",
+            CustomerEmail = "ameen@ibrooni.com",
+            MaxActivations = 2
+        });
+        var robot = await service.CreateCustomLicenseAsync(new CreateCustomLicenseRequest
+        {
+            Product = "Robot",
+            CustomerName = "Ameen",
+            CustomerEmail = "ameen@ibrooni.com",
+            MaxActivations = 2
+        });
+
+        await service.ActivateAsync(new ActivateLicenseRequest { LicenseKey = family.LicenseKey!, DeviceId = "PC-FAMILY", DeviceName = "Office-1" }, null);
+        await service.ActivateAsync(new ActivateLicenseRequest { LicenseKey = scan.LicenseKey!, DeviceId = "PC-SCAN", DeviceName = "Office-2" }, null);
+        await service.ActivateAsync(new ActivateLicenseRequest { LicenseKey = robot.LicenseKey!, DeviceId = "PC-ROBOT", DeviceName = "Office-3" }, null);
+
+        var all = await service.GetAdminDevicesAsync();
+        Assert.Equal(3, all.Count);
+        Assert.Contains(all, d => d.Product == "FamilyLoader" && d.DeviceId == "PC-FAMILY");
+        Assert.Contains(all, d => d.Product == "Biruscan" && d.DeviceId == "PC-SCAN");
+
+        var onlyScan = await service.GetAdminDevicesAsync(product: "Biruscan");
+        Assert.Single(onlyScan);
+        Assert.Equal("PC-SCAN", onlyScan[0].DeviceId);
+        Assert.Equal("Biruscan", onlyScan[0].Product);
+
+        var robotAlias = await service.GetAdminDevicesAsync(product: "ViewReferenceRobot");
+        Assert.Single(robotAlias);
+        Assert.Equal("PC-ROBOT", robotAlias[0].DeviceId);
+
+        var searchByProduct = await service.GetAdminDevicesAsync(search: "family");
+        Assert.Single(searchByProduct);
+        Assert.Equal("FamilyLoader", searchByProduct[0].Product);
+    }
 }
