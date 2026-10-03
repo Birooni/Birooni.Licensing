@@ -62,6 +62,37 @@ public class UpdateServiceTests
     }
 
     [Fact]
+    public async Task CheckForUpdate_RecordsPluginInstallHeartbeat_AndDoesNotDuplicate()
+    {
+        using var db = CreateInMemoryDbContext();
+        var service = new UpdateService(db, NullLogger<UpdateService>.Instance);
+
+        await service.CheckForUpdateAsync("Biruscan", "1.0.6", "2025", ipAddress: "203.0.113.10");
+        await service.CheckForUpdateAsync("Biruscan", "1.0.6", "2025", ipAddress: "203.0.113.10");
+        await service.CheckForUpdateAsync("Biruscan", "1.0.6", "2024", ipAddress: "203.0.113.11");
+
+        var installs = db.PluginInstalls.Where(p => p.Product == "Biruscan").ToList();
+        Assert.Equal(2, installs.Count);
+        Assert.All(installs, p => Assert.True(p.IsActive));
+        Assert.Contains(installs, p => p.PluginVersion == "1.0.6" && p.IpAddress == "203.0.113.10");
+    }
+
+    [Fact]
+    public async Task CheckForUpdate_PromotesIpHeartbeatToDeviceId()
+    {
+        using var db = CreateInMemoryDbContext();
+        var service = new UpdateService(db, NullLogger<UpdateService>.Instance);
+
+        await service.CheckForUpdateAsync("Biruscan", "1.0.6", "2025", ipAddress: "198.51.100.9");
+        await service.CheckForUpdateAsync("Biruscan", "1.0.6", "2025", deviceId: "HW-OFFICE-1", deviceName: "DESIGN-PC", ipAddress: "198.51.100.9");
+
+        var installs = db.PluginInstalls.Where(p => p.Product == "Biruscan").ToList();
+        Assert.Single(installs);
+        Assert.Equal("HW-OFFICE-1", installs[0].DeviceId);
+        Assert.Equal("DESIGN-PC", installs[0].DeviceName);
+    }
+
+    [Fact]
     public async Task CheckForUpdate_RespectsRevitVersionFilter()
     {
         using var db = CreateInMemoryDbContext();

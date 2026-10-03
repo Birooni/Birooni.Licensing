@@ -30,6 +30,8 @@ public class UpdatesController : ControllerBase
         [FromQuery] string product,
         [FromQuery] string version,
         [FromQuery] string? revitVersion,
+        [FromQuery] string? deviceId,
+        [FromQuery] string? deviceName,
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(product) || string.IsNullOrWhiteSpace(version))
@@ -37,8 +39,29 @@ public class UpdatesController : ControllerBase
             return BadRequest(new { error = "Parameters 'product' and 'version' are required." });
         }
 
-        var result = await _updateService.CheckForUpdateAsync(product, version, revitVersion, cancellationToken);
+        var result = await _updateService.CheckForUpdateAsync(
+            product,
+            version,
+            revitVersion,
+            deviceId,
+            deviceName,
+            GetClientIpAddress(),
+            cancellationToken);
         return Ok(result);
+    }
+
+    private string? GetClientIpAddress()
+    {
+        if (Request.Headers.TryGetValue("X-Forwarded-For", out var forwardedFor))
+        {
+            var ip = forwardedFor.FirstOrDefault()?.Split(',').FirstOrDefault()?.Trim();
+            if (!string.IsNullOrEmpty(ip))
+            {
+                return ip;
+            }
+        }
+
+        return HttpContext.Connection.RemoteIpAddress?.ToString();
     }
 
     /// <summary>

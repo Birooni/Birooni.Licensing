@@ -266,4 +266,26 @@ public class SiteLicenseAndAdminTests
         Assert.Single(searchByProduct);
         Assert.Equal("FamilyLoader", searchByProduct[0].Product);
     }
+
+    [Fact]
+    public async Task Admin_GetDevices_IncludesBiruscanInstallHeartbeats()
+    {
+        var (db, service) = CreateTestContext();
+        var updates = new UpdateService(db, NullLogger<UpdateService>.Instance);
+
+        await updates.CheckForUpdateAsync("Biruscan", "1.0.6", "2025", deviceId: "HW-SCAN-1", deviceName: "Office-Scan", ipAddress: "192.0.2.10");
+        await updates.CheckForUpdateAsync("Biruscan", "1.0.6", "2024", deviceId: "HW-SCAN-2", deviceName: "Laptop-Scan", ipAddress: "192.0.2.11");
+
+        var all = await service.GetAdminDevicesAsync();
+        var scan = await service.GetAdminDevicesAsync(product: "Biruscan");
+
+        Assert.Equal(2, scan.Count);
+        Assert.All(scan, d => Assert.Equal("Biruscan", d.Product));
+        Assert.All(scan, d => Assert.Equal("install", d.Source));
+        Assert.Contains(scan, d => d.DeviceName == "Office-Scan");
+        Assert.Equal(2, all.Count(d => d.Product == "Biruscan"));
+
+        var stats = await service.GetAdminStatsAsync();
+        Assert.Equal(2, stats.ActiveDevices);
+    }
 }

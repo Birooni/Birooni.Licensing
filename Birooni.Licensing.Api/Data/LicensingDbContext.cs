@@ -15,6 +15,7 @@ public class LicensingDbContext : DbContext
     public DbSet<ProductRelease> ProductReleases => Set<ProductRelease>();
     public DbSet<FloatingSession> FloatingSessions => Set<FloatingSession>();
     public DbSet<CustomerAccount> CustomerAccounts => Set<CustomerAccount>();
+    public DbSet<PluginInstall> PluginInstalls => Set<PluginInstall>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -161,6 +162,26 @@ public class LicensingDbContext : DbContext
             entity.HasIndex(e => e.Email).IsUnique();
             entity.HasIndex(e => e.VerificationTokenHash);
             entity.HasIndex(e => e.PasswordResetTokenHash);
+        });
+
+        modelBuilder.Entity<PluginInstall>(entity =>
+        {
+            entity.ToTable("plugin_installs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.InstallKey).HasColumnName("install_key").IsRequired().HasMaxLength(300);
+            entity.Property(e => e.Product).HasColumnName("product").IsRequired().HasMaxLength(100);
+            entity.Property(e => e.DeviceId).HasColumnName("device_id").HasMaxLength(200);
+            entity.Property(e => e.DeviceName).HasColumnName("device_name").HasMaxLength(200);
+            entity.Property(e => e.PluginVersion).HasColumnName("plugin_version").HasMaxLength(50);
+            entity.Property(e => e.RevitVersion).HasColumnName("revit_version").HasMaxLength(50);
+            entity.Property(e => e.IpAddress).HasColumnName("ip_address").HasMaxLength(100);
+            entity.Property(e => e.IsActive).HasColumnName("is_active").HasDefaultValue(true);
+            entity.Property(e => e.FirstSeen).HasColumnName("first_seen");
+            entity.Property(e => e.LastSeen).HasColumnName("last_seen");
+            entity.HasIndex(e => e.InstallKey).IsUnique();
+            entity.HasIndex(e => e.Product);
+            entity.HasIndex(e => e.LastSeen);
         });
     }
 }

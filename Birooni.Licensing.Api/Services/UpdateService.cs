@@ -21,10 +21,22 @@ public class UpdateService : IUpdateService
         string product,
         string currentVersion,
         string? revitVersion = null,
+        string? deviceId = null,
+        string? deviceName = null,
+        string? ipAddress = null,
         CancellationToken cancellationToken = default)
     {
         var prod = product.Trim();
         var cleanRev = string.IsNullOrWhiteSpace(revitVersion) ? "All" : revitVersion.Trim();
+
+        try
+        {
+            await RecordInstallHeartbeatAsync(prod, currentVersion, cleanRev, deviceId, deviceName, ipAddress, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to record plugin install heartbeat for {Product}", prod);
+        }
 
         // Fetch candidates for this product matching the Revit version or "All"
         var candidates = await _db.ProductReleases
@@ -132,6 +144,82 @@ public class UpdateService : IUpdateService
         }
 
         return await query.OrderByDescending(r => r.ReleasedAt).ToListAsync(cancellationToken);
+    }
+
+    internal static string BuildInstallKey(string product, string? deviceId, string? ipAddress)
+    {
+        var prod = product.Trim().ToLowerInvariant();
+        if (!string.IsNullOrWhiteSpace(deviceId))
+        {
+            return prod + "|dev:" + deviceId.Trim();
+        }
+
+        var ip = string.IsNullOrWhiteSpace(ipAddress) ? "unknown" : ipAddress.Trim();
+        return prod + "|ip:" + ip;
+    }
+
+    private async Task RecordInstallHeartbeatAsync(
+        string product,
+        string currentVersion,
+        string revitVersion,
+        string? deviceId,
+        string? deviceName,
+        string? ipAddress,
+        CancellationToken cancellationToken)
+    {
+        var key = BuildInstallKey(product, deviceId, ipAddress);
+        var now = DateTimeOffset.UtcNow;
+        var row = await _db.PluginInstalls.FirstOrDefaultAsync(p => p.InstallKey == key, cancellationToken);
+
+        if (row == null && !string.IsNullOrWhiteSpace(deviceId) && !string.IsNullOrWhiteSpace(ipAddress))
+        {
+            var ipKey = BuildInstallKey(product, null, ipAddress);
+            var ipRow = await _db.PluginInstalls.FirstOrDefaultAsync(p => p.InstallKey == ipKey, cancellationToken);
+            if (ipRow != null)
+            {
+                ipRow.InstallKey = key;
+                ipRow.DeviceId = deviceId.Trim();
+                row = ipRow;
+            }
+        }
+
+        if (row == null)
+        {
+            row = new PluginInstall
+            {
+                Id = Guid.NewGuid(),
+                InstallKey = key,
+                Product = product.Trim(),
+                FirstSeen = now
+            };
+            _db.PluginInstalls.Add(row);
+        }
+
+        row.Product = product.Trim();
+        if (!string.IsNullOrWhiteSpace(deviceId))
+        {
+            row.DeviceId = deviceId.Trim();
+        }
+        if (!string.IsNullOrWhiteSpace(deviceName))
+        {
+            row.DeviceName = deviceName.Trim();
+        }
+        if (!string.IsNullOrWhiteSpace(currentVersion))
+        {
+            row.PluginVersion = currentVersion.Trim().TrimStart('v', 'V');
+        }
+        if (!string.IsNullOrWhiteSpace(revitVersion) && !string.Equals(revitVersion, "All", StringComparison.OrdinalIgnoreCase))
+        {
+            row.RevitVersion = revitVersion.Trim();
+        }
+        if (!string.IsNullOrWhiteSpace(ipAddress))
+        {
+            row.IpAddress = ipAddress.Trim();
+        }
+        row.IsActive = true;
+        row.LastSeen = now;
+
+        await _db.SaveChangesAsync(cancellationToken);
     }
 
     private static Version? ParseVersion(string versionStr)

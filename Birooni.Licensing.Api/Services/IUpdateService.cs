@@ -6,7 +6,14 @@ namespace Birooni.Licensing.Api.Services;
 
 public interface IUpdateService
 {
-    Task<UpdateCheckResponse> CheckForUpdateAsync(string product, string currentVersion, string? revitVersion = null, CancellationToken cancellationToken = default);
+    Task<UpdateCheckResponse> CheckForUpdateAsync(
+        string product,
+        string currentVersion,
+        string? revitVersion = null,
+        string? deviceId = null,
+        string? deviceName = null,
+        string? ipAddress = null,
+        CancellationToken cancellationToken = default);
     Task<ProductRelease> CreateReleaseAsync(CreateReleaseRequest request, CancellationToken cancellationToken = default);
     Task<List<ProductRelease>> GetReleasesAsync(string? product = null, CancellationToken cancellationToken = default);
 }

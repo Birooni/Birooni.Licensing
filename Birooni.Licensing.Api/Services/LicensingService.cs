@@ -419,7 +419,26 @@ public class LicensingService : ILicensingService
         var activeLicenses = await _context.Licenses.CountAsync(l => l.IsActive, cancellationToken);
         var trialLicenses = await _context.Licenses.CountAsync(l => l.LicenseType == "Trial", cancellationToken);
         var totalActivations = await _context.Activations.CountAsync(cancellationToken);
-        var activeDevices = await _context.Activations.CountAsync(a => a.IsActive, cancellationToken);
+        var activeSeats = await _context.Activations.CountAsync(a => a.IsActive, cancellationToken);
+        var licensedPairs = await _context.Activations
+            .Include(a => a.License)
+            .Where(a => a.IsActive)
+            .Select(a => (((a.License != null ? a.License.Product : "") + "|" + a.DeviceId).ToLower()))
+            .ToListAsync(cancellationToken);
+        var licensedPairSet = licensedPairs.ToHashSet();
+        var heartbeatDevices = await _context.PluginInstalls
+            .Where(p => p.IsActive)
+            .ToListAsync(cancellationToken);
+        var extraInstalls = heartbeatDevices.Count(p =>
+        {
+            if (string.IsNullOrWhiteSpace(p.DeviceId))
+            {
+                return true;
+            }
+
+            return !licensedPairSet.Contains((p.Product + "|" + p.DeviceId).Trim().ToLower());
+        });
+        var activeDevices = activeSeats + extraInstalls;
         var totalReleases = await _context.ProductReleases.CountAsync(cancellationToken);
         var last24Hours = DateTimeOffset.UtcNow.AddHours(-24);
         var validationsLast24 = await _context.ValidationLogs.CountAsync(v => v.CreatedAt >= last24Hours, cancellationToken);
@@ -586,7 +605,7 @@ public class LicensingService : ILicensingService
             query = query.Where(a => a.License != null && aliases.Contains(a.License.Product.ToLower()));
         }
 
-        return await query
+        var activations = await query
             .OrderBy(a => a.License != null ? a.License.Product : string.Empty)
             .ThenByDescending(a => a.LastValidatedAt)
             .Select(a => new AdminDeviceDto
@@ -603,9 +622,73 @@ public class LicensingService : ILicensingService
                 PluginVersion = a.PluginVersion,
                 IsActive = a.IsActive,
                 ActivatedAt = a.ActivatedAt,
-                LastValidatedAt = a.LastValidatedAt
+                LastValidatedAt = a.LastValidatedAt,
+                Source = "activation"
             })
             .ToListAsync(cancellationToken);
+
+        var installQuery = _context.PluginInstalls.AsQueryable();
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var s = search.Trim().ToLower();
+            installQuery = installQuery.Where(p =>
+                p.Product.ToLower().Contains(s) ||
+                p.DeviceId.ToLower().Contains(s) ||
+                p.DeviceName.ToLower().Contains(s) ||
+                (p.IpAddress != null && p.IpAddress.ToLower().Contains(s)) ||
+                p.PluginVersion.ToLower().Contains(s));
+        }
+
+        if (!string.IsNullOrWhiteSpace(product))
+        {
+            var aliases = ProductAliases(product);
+            installQuery = installQuery.Where(p => aliases.Contains(p.Product.ToLower()));
+        }
+
+        var installs = await installQuery.ToListAsync(cancellationToken);
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var a in activations)
+        {
+            if (!string.IsNullOrWhiteSpace(a.DeviceId))
+            {
+                seen.Add(a.Product.Trim().ToLowerInvariant() + "|" + a.DeviceId.Trim().ToLowerInvariant());
+            }
+        }
+
+        foreach (var p in installs)
+        {
+            var productCode = string.IsNullOrWhiteSpace(p.Product) ? "Unknown" : p.Product.Trim();
+            if (!string.IsNullOrWhiteSpace(p.DeviceId) &&
+                seen.Contains(productCode.ToLowerInvariant() + "|" + p.DeviceId.Trim().ToLowerInvariant()))
+            {
+                continue;
+            }
+
+            activations.Add(new AdminDeviceDto
+            {
+                Id = p.Id,
+                LicenseId = Guid.Empty,
+                LicenseKey = string.Empty,
+                Product = productCode,
+                CustomerName = string.Empty,
+                CustomerEmail = string.Empty,
+                Company = null,
+                DeviceId = string.IsNullOrWhiteSpace(p.DeviceId) ? (p.IpAddress ?? p.InstallKey) : p.DeviceId,
+                DeviceName = string.IsNullOrWhiteSpace(p.DeviceName)
+                    ? (string.IsNullOrWhiteSpace(p.RevitVersion) ? "Installed PC" : "Revit " + p.RevitVersion)
+                    : p.DeviceName,
+                PluginVersion = string.IsNullOrWhiteSpace(p.PluginVersion) ? p.RevitVersion : p.PluginVersion,
+                IsActive = p.IsActive,
+                ActivatedAt = p.FirstSeen,
+                LastValidatedAt = p.LastSeen,
+                Source = "install"
+            });
+        }
+
+        return activations
+            .OrderBy(a => a.Product)
+            .ThenByDescending(a => a.LastValidatedAt)
+            .ToList();
     }
 
     internal static List<string> ProductAliases(string product)
@@ -622,13 +705,21 @@ public class LicensingService : ILicensingService
     public async Task<bool> ReleaseDeviceAsync(Guid activationId, CancellationToken cancellationToken = default)
     {
         var activation = await _context.Activations.FirstOrDefaultAsync(a => a.Id == activationId, cancellationToken);
-        if (activation == null) return false;
+        if (activation != null)
+        {
+            activation.IsActive = false;
+            await LogValidationAsync(activation.LicenseId, activation.DeviceId, "AdminReleased", null, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Device {DeviceId} seat released by admin.", activation.DeviceId);
+            return true;
+        }
 
-        activation.IsActive = false;
-        await LogValidationAsync(activation.LicenseId, activation.DeviceId, "AdminReleased", null, cancellationToken);
+        var install = await _context.PluginInstalls.FirstOrDefaultAsync(p => p.Id == activationId, cancellationToken);
+        if (install == null) return false;
+
+        install.IsActive = false;
         await _context.SaveChangesAsync(cancellationToken);
-
-        _logger.LogInformation("Device {DeviceId} seat released by admin.", activation.DeviceId);
+        _logger.LogInformation("Plugin install {Product} {DeviceId} marked inactive by admin.", install.Product, install.DeviceId);
         return true;
     }
 }

@@ -2,6 +2,7 @@
 <!-- site-license-products-2026-10-01 -->
 <!-- admin-lock-2026-10-03 -->
 <!-- admin-devices-by-product-2026-10-03 -->
+<!-- admin-install-heartbeats-2026-10-03 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -210,7 +211,7 @@
       <section id="tabDevices" class="space-y-4 hidden">
         <div>
           <h2 class="text-sm font-semibold text-white">Installed devices by product</h2>
-          <p class="text-xs text-slate-400 mt-1">Click a product to see the workstations that have it installed.</p>
+          <p class="text-xs text-slate-400 mt-1">Click a product to see the workstations that have it installed. Free products such as Biruscan count each PC that opens the add-in in Revit.</p>
         </div>
         <div id="deviceProductCards" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           <div class="bg-slate-800/60 border border-slate-700/60 p-3 rounded-xl text-slate-500 text-xs">Loading products...</div>
@@ -841,7 +842,7 @@
             <td class="py-3 px-4 font-sans text-slate-200">${productLabel(dev.product)}</td>
             <td class="py-3 px-4 font-sans text-slate-200 font-medium">${dev.deviceName || 'PC'}</td>
             <td class="py-3 px-4 font-mono text-slate-300 select-all">${dev.deviceId}</td>
-            <td class="py-3 px-4 font-mono text-slate-400 select-all">${dev.licenseKey}</td>
+            <td class="py-3 px-4 font-mono text-slate-400">${dev.source === 'install' || !dev.licenseKey ? '<span class="font-sans text-teal-300">Installed</span>' : `<span class="select-all">${dev.licenseKey}</span>`}</td>
             <td class="py-3 px-4 font-sans">
               <div class="text-slate-200">${dev.customerName || '—'}</div>
               <div class="text-[11px] text-slate-400">${dev.customerEmail || ''}${dev.company ? ' · ' + dev.company : ''}</div>
@@ -849,7 +850,7 @@
             <td class="py-3 px-4 font-sans text-slate-400">${dev.pluginVersion || '—'}</td>
             <td class="py-3 px-4 font-sans text-slate-400 text-[11px]">${(dev.lastValidatedAt || '').substring(0, 16).replace('T', ' ')}</td>
             <td class="py-3 px-4 text-right font-sans">
-              ${dev.isActive ? `<button onclick="releaseSeat('${dev.id}', '${(dev.deviceName || dev.deviceId).replace(/'/g, "\\'")}')" class="text-amber-400 hover:text-amber-300 hover:underline text-xs">Release Seat</button>` : '<span class="text-slate-500 text-xs">Released</span>'}
+              ${dev.source === 'install' ? '<span class="text-slate-500 text-xs font-sans">Install ping</span>' : (dev.isActive ? `<button onclick="releaseSeat('${dev.id}', '${(dev.deviceName || dev.deviceId).replace(/'/g, "\\'")}')" class="text-amber-400 hover:text-amber-300 hover:underline text-xs">Release Seat</button>` : '<span class="text-slate-500 text-xs">Released</span>')}
             </td>
           </tr>
         `).join("");

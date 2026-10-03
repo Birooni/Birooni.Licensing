@@ -83,6 +83,22 @@ public static class DatabaseInitializer
                 WHERE lower(product) = 'viewreferencerobot'
                   AND lower(license_type) = 'founder'
                   AND (expires_at IS NULL OR expires_at < TIMESTAMPTZ '2027-08-01 00:00:00+00');
+
+                CREATE TABLE IF NOT EXISTS plugin_installs (
+                    id UUID PRIMARY KEY,
+                    install_key VARCHAR(300) NOT NULL UNIQUE,
+                    product VARCHAR(100) NOT NULL,
+                    device_id VARCHAR(200) NOT NULL DEFAULT '',
+                    device_name VARCHAR(200) NOT NULL DEFAULT '',
+                    plugin_version VARCHAR(50) NOT NULL DEFAULT '',
+                    revit_version VARCHAR(50) NOT NULL DEFAULT '',
+                    ip_address VARCHAR(100),
+                    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+                    first_seen TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                    last_seen TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                );
+                CREATE INDEX IF NOT EXISTS idx_plugin_installs_product ON plugin_installs(product);
+                CREATE INDEX IF NOT EXISTS idx_plugin_installs_last_seen ON plugin_installs(last_seen);
                 """;
 
             await db.Database.ExecuteSqlRawAsync(sql);

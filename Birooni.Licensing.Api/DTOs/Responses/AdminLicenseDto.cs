@@ -34,4 +34,5 @@ public class AdminDeviceDto
     public bool IsActive { get; set; }
     public DateTimeOffset ActivatedAt { get; set; }
     public DateTimeOffset LastValidatedAt { get; set; }
+    public string Source { get; set; } = "activation";
 }
