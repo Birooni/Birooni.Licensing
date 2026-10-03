@@ -28,3 +28,5 @@ services:
         value: Ibrooni <beth.t@example.com>
       - key: PUBLIC_WEB_URL
         value: https://ibrooni.com
+      - key: ADMIN_API_KEY
+        sync: false

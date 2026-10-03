@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -13,8 +15,13 @@ public class AdminApiKeyAttribute : Attribute, IAsyncActionFilter
         var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
         var expectedKey = configuration["Admin:ApiKey"]
             ?? configuration["ADMIN_API_KEY"]
-            ?? Environment.GetEnvironmentVariable("ADMIN_API_KEY")
-            ?? "birooni-admin-secret-2026";
+            ?? Environment.GetEnvironmentVariable("ADMIN_API_KEY");
+
+        if (string.IsNullOrWhiteSpace(expectedKey))
+        {
+            context.Result = new UnauthorizedObjectResult(new { error = "Admin authentication is not configured." });
+            return;
+        }
 
         if (!context.HttpContext.Request.Headers.TryGetValue(ApiKeyHeaderName, out var extractedKey))
         {
@@ -22,12 +29,21 @@ public class AdminApiKeyAttribute : Attribute, IAsyncActionFilter
             return;
         }
 
-        if (!string.Equals(expectedKey, extractedKey.ToString().Trim()))
+        if (!KeyEquals(expectedKey, extractedKey.ToString().Trim()))
         {
             context.Result = new UnauthorizedObjectResult(new { error = "Invalid admin authentication key." });
             return;
         }
 
         await next();
+    }
+
+    private static bool KeyEquals(string expected, string provided)
+    {
+        var a = Encoding.UTF8.GetBytes(expected);
+        var b = Encoding.UTF8.GetBytes(provided);
+        if (a.Length != b.Length)
+            return false;
+        return CryptographicOperations.FixedTimeEquals(a, b);
     }
 }
