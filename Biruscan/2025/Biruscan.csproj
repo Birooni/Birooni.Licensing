@@ -71,7 +71,7 @@
     <MakeDir Directories="$(_BiruscanAddinDir)" />
     <ItemGroup>
       <!-- Runtime add-in only: no PDBs, no optional ONNX native stack (~16 MB). -->
-      <_DeployFiles Include="$(TargetDir)Biruscan.dll;$(TargetDir)Biruscan.AI.dll" />
+      <_DeployFiles Include="$(TargetDir)Biruscan.dll;$(TargetDir)Biruscan.AI.dll;$(TargetDir)Birooni.Client.dll" />
       <_DeployDat Include="$(TargetDir)BiruscanMepWeights.dat;$(TargetDir)BiruscanMepWeights.base.dat" />
     </ItemGroup>
     <Copy SourceFiles="@(_DeployFiles)" DestinationFolder="$(_BiruscanAddinDir)" SkipUnchangedFiles="false" OverwriteReadOnlyFiles="true" ContinueOnError="true" />

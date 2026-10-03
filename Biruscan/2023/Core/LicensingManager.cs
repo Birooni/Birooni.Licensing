@@ -29,7 +29,7 @@ HQIDAQAB
 
         private static BirooniLicenseClient? _client;
         public static BirooniLicenseClient Client =>
-            _client ??= new BirooniLicenseClient(ApiBaseUrl, PublicKeyPem, "1.0.7", productName: ProductCode);
+            _client ??= new BirooniLicenseClient(ApiBaseUrl, PublicKeyPem, "1.0.8", productName: ProductCode);
 
         private static Birooni.Client.Updates.UpdateChecker? _updateChecker;
         public static Birooni.Client.Updates.UpdateChecker UpdateChecker =>
@@ -61,7 +61,7 @@ HQIDAQAB
                         }
                     }
 
-                    var currentVersion = typeof(LicensingManager).Assembly.GetName().Version?.ToString(3) ?? "1.0.7";
+                    var currentVersion = typeof(LicensingManager).Assembly.GetName().Version?.ToString(3) ?? "1.0.8";
                     var revitYear = GuessRevitYear();
                     var fallback = UseNet48Payload()
                         ? "https://ibrooni.com/downloads/Biruscan-latest-net48.json"
@@ -99,7 +99,15 @@ HQIDAQAB
 
         public static bool EnsureLicense()
         {
+            // Keep ActivateLicenseAsync out of this method. Revit loads one
+            // Birooni.Client for the process (often Family Loader / BiruBox).
+            // JIT of a missing activate overload would fail every command.
             if (IsFreePeriod) return true;
+            return EnsurePaidLicense();
+        }
+
+        private static bool EnsurePaidLicense()
+        {
             if (CurrentStatus != null && CurrentStatus.IsGranted) return true;
 
             try
@@ -123,7 +131,7 @@ HQIDAQAB
 
             try
             {
-                var activated = Client.ActivateLicenseAsync(key.Trim(), userEmail: mailId).ConfigureAwait(false).GetAwaiter().GetResult();
+                var activated = ActivateOnThisPc(key.Trim(), mailId);
                 CurrentStatus = activated;
                 if (activated != null && activated.IsGranted) return true;
                 TaskDialog.Show("Biruscan", activated?.Message ?? "That license key could not be activated.");
@@ -134,6 +142,12 @@ HQIDAQAB
             }
 
             return false;
+        }
+
+        private static LicenseValidationResult? ActivateOnThisPc(string key, string mailId)
+        {
+            return Client.ActivateLicenseAsync(key, Environment.MachineName, mailId)
+                .ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         private static bool PromptLicense(out string key, out string mailId)

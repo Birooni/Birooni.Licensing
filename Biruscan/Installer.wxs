@@ -1,5 +1,5 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
-  <Package Name="Biruscan" Manufacturer="Birooni Tools" Version="1.0.7.0" UpgradeCode="c4e8d1a2-7b93-4f16-9e50-2a6c8d4b1f70" Scope="perUser">
+  <Package Name="Biruscan" Manufacturer="Birooni Tools" Version="1.0.8.0" UpgradeCode="c4e8d1a2-7b93-4f16-9e50-2a6c8d4b1f70" Scope="perUser">
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <MediaTemplate EmbedCab="yes" />
     <UIRef Id="WixUI_Custom" />

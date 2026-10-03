@@ -75,7 +75,7 @@
     <MakeDir Directories="$(_BiruscanAddinDir)" />
     <ItemGroup>
       <!-- Revit 2023 is .NET Framework 4.8 — ship System.Text.Json and its deps. No PDBs/ONNX. -->
-      <_DeployFiles Include="$(TargetDir)Biruscan.dll;$(TargetDir)Biruscan.AI.dll" />
+      <_DeployFiles Include="$(TargetDir)Biruscan.dll;$(TargetDir)Biruscan.AI.dll;$(TargetDir)Birooni.Client.dll" />
       <_DeployFiles Include="$(TargetDir)System.Text.Json.dll;$(TargetDir)System.Memory.dll;$(TargetDir)System.Buffers.dll;$(TargetDir)System.Numerics.Vectors.dll;$(TargetDir)System.Runtime.CompilerServices.Unsafe.dll;$(TargetDir)System.Threading.Tasks.Extensions.dll;$(TargetDir)System.ValueTuple.dll;$(TargetDir)System.Text.Encodings.Web.dll;$(TargetDir)Microsoft.Bcl.AsyncInterfaces.dll;$(TargetDir)System.IO.Pipelines.dll" />
       <_DeployDat Include="$(TargetDir)BiruscanMepWeights.dat;$(TargetDir)BiruscanMepWeights.base.dat" />
     </ItemGroup>
