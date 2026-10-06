@@ -407,6 +407,7 @@ public class LicensingService : ILicensingService
             p.Contains("CLASH", StringComparison.Ordinal) || p.Contains("AVOIDMEP", StringComparison.Ordinal) ? "CLASH" :
             p.Contains("VERTICAL", StringComparison.Ordinal) || p.Contains("HOST", StringComparison.Ordinal) ? "VHP" :
             p.Contains("BOX", StringComparison.Ordinal) ? "BIRU" :
+            p.Contains("PROJECTSETUP", StringComparison.Ordinal) || p.Contains("SETUP", StringComparison.Ordinal) ? "SETUP" :
             "IBROONI";
         Span<byte> randomBytes = stackalloc byte[6];
         RandomNumberGenerator.Fill(randomBytes);
@@ -703,6 +704,11 @@ public class LicensingService : ILicensingService
         if (p is "avoidmepclash" or "clash" or "avoidclash")
         {
             return ["avoidmepclash", "clash", "avoidclash"];
+        }
+
+        if (p is "projectsetuptools" or "projectsetup" or "setup")
+        {
+            return ["projectsetuptools", "projectsetup", "setup"];
         }
 
         return [p];
