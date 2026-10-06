@@ -17,11 +17,12 @@ public class AuthResponse
     public string? Token { get; set; }
     public AccountProfileDto? Account { get; set; }
     public string? FamilyLoaderKey { get; set; }
+    public string? AvoidMepClashKey { get; set; }
     public bool RequiresVerification { get; set; }
     public bool EmailSent { get; set; } = true;
     public string? VerificationLink { get; set; }
 
-    public static AuthResponse Ok(string message, string? token, AccountProfileDto? account, string? familyLoaderKey = null, bool requiresVerification = false, bool emailSent = true, string? verificationLink = null) =>
+    public static AuthResponse Ok(string message, string? token, AccountProfileDto? account, string? familyLoaderKey = null, bool requiresVerification = false, bool emailSent = true, string? verificationLink = null, string? avoidMepClashKey = null) =>
         new()
         {
             Success = true,
@@ -29,6 +30,7 @@ public class AuthResponse
             Token = token,
             Account = account,
             FamilyLoaderKey = familyLoaderKey,
+            AvoidMepClashKey = avoidMepClashKey,
             RequiresVerification = requiresVerification,
             EmailSent = emailSent,
             VerificationLink = verificationLink

@@ -117,9 +117,10 @@ public class AccountService : IAccountService
 
         account.LastLoginAt = DateTimeOffset.UtcNow;
         var familyKey = await EnsureFamilyLoaderLicenseAsync(account, cancellationToken);
+        var clashKey = await EnsureAvoidMepClashLicenseAsync(account, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
 
-        return AuthResponse.Ok("Signed in.", _jwt.CreateToken(account), ToProfile(account), familyKey);
+        return AuthResponse.Ok("Signed in.", _jwt.CreateToken(account), ToProfile(account), familyKey, avoidMepClashKey: clashKey);
     }
 
     public async Task<AuthResponse> VerifyEmailAsync(string token, CancellationToken cancellationToken = default)
@@ -141,8 +142,9 @@ public class AccountService : IAccountService
         if (account.EmailVerified)
         {
             var existingKey = await EnsureFamilyLoaderLicenseAsync(account, cancellationToken);
+            var existingClash = await EnsureAvoidMepClashLicenseAsync(account, cancellationToken);
             await _db.SaveChangesAsync(cancellationToken);
-            return AuthResponse.Ok("Email is already verified. You can sign in.", _jwt.CreateToken(account), ToProfile(account), existingKey);
+            return AuthResponse.Ok("Email is already verified. You can sign in.", _jwt.CreateToken(account), ToProfile(account), existingKey, avoidMepClashKey: existingClash);
         }
 
         if (account.VerificationExpiresAt is null || account.VerificationExpiresAt < DateTimeOffset.UtcNow)
@@ -156,13 +158,15 @@ public class AccountService : IAccountService
         account.LastLoginAt = DateTimeOffset.UtcNow;
 
         var familyKey = await EnsureFamilyLoaderLicenseAsync(account, cancellationToken);
+        var clashKey = await EnsureAvoidMepClashLicenseAsync(account, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
 
         return AuthResponse.Ok(
-            "Email verified. Family Loader is now on this account.",
+            "Email verified. Family Loader and Avoid MEP Clash keys are on this account.",
             _jwt.CreateToken(account),
             ToProfile(account),
-            familyKey);
+            familyKey,
+            avoidMepClashKey: clashKey);
     }
 
     public async Task<AuthResponse> ResendVerificationAsync(string email, CancellationToken cancellationToken = default)
@@ -357,6 +361,7 @@ public class AccountService : IAccountService
     }
 
     public const string FamilyLoaderProduct = "FamilyLoader";
+    public const string AvoidMepClashProduct = "AvoidMepClash";
     public const string ViewReferenceRobotProduct = "ViewReferenceRobot";
     public const int ViewReferenceRobotFounderCap = 100;
 
@@ -416,6 +421,64 @@ public class AccountService : IAccountService
         RandomNumberGenerator.Fill(randomBytes);
         var hex = Convert.ToHexString(randomBytes);
         return $"FAMILY-{hex[..4]}-{hex[4..8]}-{hex[8..12]}";
+    }
+
+    /// <summary>
+    /// Registered Ibrooni accounts receive a perpetual Avoid MEP Clash license after the 30-day trial.
+    /// Existing trials on the same email are upgraded; commercial keys are left in place.
+    /// </summary>
+    public async Task<string> EnsureAvoidMepClashLicenseAsync(CustomerAccount account, CancellationToken cancellationToken = default)
+    {
+        var email = account.Email;
+        var existing = await _db.Licenses
+            .Where(l => l.Product.ToLower() == AvoidMepClashProduct.ToLower() && l.CustomerEmail.ToLower() == email)
+            .OrderByDescending(l => l.IsActive)
+            .ThenByDescending(l => l.CreatedAt)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (existing != null)
+        {
+            var isTrial = string.Equals(existing.LicenseType, "Trial", StringComparison.OrdinalIgnoreCase);
+            if (isTrial || existing.ExpiresAt.HasValue)
+            {
+                existing.IsActive = true;
+                existing.LicenseType = "Registered";
+                existing.LicenseMode = "Individual";
+                existing.ExpiresAt = null;
+                existing.CustomerName = account.FullName;
+                existing.Company = account.Company;
+                if (existing.MaxActivations < 2) existing.MaxActivations = 2;
+            }
+
+            return existing.LicenseKey;
+        }
+
+        var license = new License
+        {
+            Id = Guid.NewGuid(),
+            LicenseKey = GenerateAvoidMepClashKey(),
+            Product = AvoidMepClashProduct,
+            CustomerName = account.FullName,
+            CustomerEmail = email,
+            Company = account.Company,
+            LicenseType = "Registered",
+            LicenseMode = "Individual",
+            MaxActivations = 2,
+            IsActive = true,
+            ExpiresAt = null,
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+        _db.Licenses.Add(license);
+        await _db.SaveChangesAsync(cancellationToken);
+        return license.LicenseKey;
+    }
+
+    private static string GenerateAvoidMepClashKey()
+    {
+        Span<byte> randomBytes = stackalloc byte[6];
+        RandomNumberGenerator.Fill(randomBytes);
+        var hex = Convert.ToHexString(randomBytes);
+        return $"CLASH-{hex[..4]}-{hex[4..8]}-{hex[8..12]}";
     }
 
     public static readonly DateTimeOffset ViewReferenceRobotFreeUntil = new(2027, 1, 31, 23, 59, 59, TimeSpan.Zero);

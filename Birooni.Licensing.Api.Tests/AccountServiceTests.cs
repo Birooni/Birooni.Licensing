@@ -164,6 +164,73 @@ public class AccountServiceTests
     }
 
     [Fact]
+    public async Task Signup_GrantsPerpetualAvoidMepClashLicense()
+    {
+        var (db, service, mail) = Create();
+        var signup = await service.SignupAsync(new SignupRequest
+        {
+            FullName = "Ada Khan",
+            Email = "ada-clash@studio.com",
+            Password = "secret123",
+            ConfirmPassword = "secret123"
+        });
+        Assert.True(signup.Success);
+        Assert.Empty(db.Licenses.Where(l => l.Product == "AvoidMepClash"));
+
+        var verified = await service.VerifyEmailAsync(mail.LastToken!);
+        var license = Assert.Single(db.Licenses.Where(l => l.Product == "AvoidMepClash"));
+        Assert.Equal("Registered", license.LicenseType);
+        Assert.Null(license.ExpiresAt);
+        Assert.True(license.IsActive);
+        Assert.Equal(2, license.MaxActivations);
+        Assert.StartsWith("CLASH-", license.LicenseKey);
+        Assert.Equal(verified.AvoidMepClashKey, license.LicenseKey);
+
+        var again = await service.SigninAsync(new SigninRequest
+        {
+            Email = "ada-clash@studio.com",
+            Password = "secret123"
+        });
+        Assert.Equal(verified.AvoidMepClashKey, again.AvoidMepClashKey);
+        Assert.Equal(1, db.Licenses.Count(l => l.Product == "AvoidMepClash"));
+    }
+
+    [Fact]
+    public async Task Signin_UpgradesExistingAvoidMepClashTrial()
+    {
+        var (db, service, mail) = Create();
+        db.Licenses.Add(new License
+        {
+            LicenseKey = "CLASH-TRIAL-OLD",
+            Product = "AvoidMepClash",
+            CustomerName = "Sara",
+            CustomerEmail = "sara-clash@studio.com",
+            LicenseType = "Trial",
+            LicenseMode = "Individual",
+            MaxActivations = 1,
+            IsActive = true,
+            ExpiresAt = DateTimeOffset.UtcNow.AddDays(3)
+        });
+        await db.SaveChangesAsync();
+
+        await service.SignupAsync(new SignupRequest
+        {
+            FullName = "Sara",
+            Email = "sara-clash@studio.com",
+            Password = "secret123",
+            ConfirmPassword = "secret123"
+        });
+        await service.VerifyEmailAsync(mail.LastToken!);
+
+        var license = Assert.Single(db.Licenses.Where(l => l.Product == "AvoidMepClash"));
+        Assert.Equal("CLASH-TRIAL-OLD", license.LicenseKey);
+        Assert.Equal("Registered", license.LicenseType);
+        Assert.Null(license.ExpiresAt);
+        Assert.True(license.IsActive);
+        Assert.Equal(2, license.MaxActivations);
+    }
+
+    [Fact]
     public async Task VerifyAndSignin_DoNotGrantViewReferenceRobotLicense()
     {
         var (db, service, mail) = Create();

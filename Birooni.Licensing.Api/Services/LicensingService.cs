@@ -404,6 +404,7 @@ public class LicensingService : ILicensingService
             p.Contains("FAMILY", StringComparison.Ordinal) ? "FAMILY" :
             p.Contains("ROBOT", StringComparison.Ordinal) || p.Contains("VIEWREFERENCE", StringComparison.Ordinal) ? "ROBOT" :
             p.Contains("SCAN", StringComparison.Ordinal) ? "SCAN" :
+            p.Contains("CLASH", StringComparison.Ordinal) || p.Contains("AVOIDMEP", StringComparison.Ordinal) ? "CLASH" :
             p.Contains("VERTICAL", StringComparison.Ordinal) || p.Contains("HOST", StringComparison.Ordinal) ? "VHP" :
             p.Contains("BOX", StringComparison.Ordinal) ? "BIRU" :
             "IBROONI";
@@ -697,6 +698,11 @@ public class LicensingService : ILicensingService
         if (p is "robot" or "viewreferencerobot")
         {
             return ["robot", "viewreferencerobot"];
+        }
+
+        if (p is "avoidmepclash" or "clash" or "avoidclash")
+        {
+            return ["avoidmepclash", "clash", "avoidclash"];
         }
 
         return [p];
