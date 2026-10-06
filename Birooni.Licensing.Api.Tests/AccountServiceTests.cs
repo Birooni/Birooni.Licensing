@@ -528,6 +528,31 @@ public class AccountServiceTests
         Assert.Contains(purchases, p => p.Product == "FamilyLoader" && p.LicenseType == "Registered");
         Assert.DoesNotContain(purchases, p => p.LicenseKey == "OTHER-1");
         Assert.DoesNotContain(purchases, p => p.LicenseKey == "COMPANY-LEAK");
+        Assert.Contains(purchases, p => p.Product == "AvoidMepClash" && p.LicenseType == "Registered");
+    }
+
+    [Fact]
+    public async Task Purchases_BackfillsFamilyLoaderAndAvoidMepClashForVerifiedAccount()
+    {
+        var (db, service, _) = Create();
+        var account = new CustomerAccount
+        {
+            Email = "old-user@studio.com",
+            PasswordHash = "x",
+            FullName = "Old User",
+            EmailVerified = true
+        };
+        db.CustomerAccounts.Add(account);
+        await db.SaveChangesAsync();
+
+        Assert.Empty(db.Licenses);
+
+        var purchases = await service.GetPurchasesAsync(account.Id);
+        Assert.Contains(purchases, p => p.Product == "FamilyLoader" && p.LicenseKey.StartsWith("FAMILY-"));
+        Assert.Contains(purchases, p => p.Product == "AvoidMepClash" && p.LicenseKey.StartsWith("CLASH-"));
+        Assert.DoesNotContain(purchases, p => p.Product == "ProjectSetupTools");
+        Assert.DoesNotContain(purchases, p => p.Product == "Biruscan");
+        Assert.DoesNotContain(purchases, p => p.Product == "ViewReferenceRobot");
     }
 
     [Fact]

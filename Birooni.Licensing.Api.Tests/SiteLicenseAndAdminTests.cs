@@ -288,4 +288,56 @@ public class SiteLicenseAndAdminTests
         var stats = await service.GetAdminStatsAsync();
         Assert.Equal(2, stats.ActiveDevices);
     }
+
+    [Theory]
+    [InlineData("FamilyLoader", "FAMILY-")]
+    [InlineData("AvoidMepClash", "CLASH-")]
+    [InlineData("ProjectSetupTools", "SETUP-")]
+    [InlineData("Biruscan", "SCAN-")]
+    [InlineData("ViewReferenceRobot", "ROBOT-")]
+    [InlineData("Robot", "ROBOT-")]
+    [InlineData("BiruBox", "BIRU-")]
+    [InlineData("VerticalHostPlacer", "VHP-")]
+    public async Task Admin_CreateAndActivate_UsesProductPrefix(string product, string prefix)
+    {
+        var (db, service) = CreateTestContext();
+
+        var created = await service.CreateCustomLicenseAsync(new CreateCustomLicenseRequest
+        {
+            Product = product,
+            CustomerName = "Assign Probe",
+            CustomerEmail = "assign-probe@ibrooni.com",
+            LicenseMode = "Individual",
+            LicenseType = "Commercial",
+            MaxActivations = 2
+        });
+
+        Assert.True(created.Success, created.Message);
+        Assert.StartsWith(prefix, created.LicenseKey);
+        Assert.Equal(product, created.Product);
+
+        var activated = await service.ActivateAsync(new ActivateLicenseRequest
+        {
+            LicenseKey = created.LicenseKey!,
+            DeviceId = "HW-" + product,
+            DeviceName = "Probe-PC",
+            PluginVersion = "1.0.0",
+            UserEmail = "assign-probe@ibrooni.com"
+        }, "127.0.0.1");
+
+        Assert.True(activated.Success, activated.Message);
+        Assert.Equal(product, activated.Product);
+        Assert.Equal(1, activated.ActivationsUsed);
+        Assert.NotNull(activated.Token);
+
+        var lower = await service.ActivateAsync(new ActivateLicenseRequest
+        {
+            LicenseKey = created.LicenseKey!.ToLowerInvariant(),
+            DeviceId = "HW-" + product,
+            DeviceName = "Probe-PC"
+        }, "127.0.0.1");
+
+        Assert.True(lower.Success, lower.Message);
+        Assert.Equal(product, lower.Product);
+    }
 }

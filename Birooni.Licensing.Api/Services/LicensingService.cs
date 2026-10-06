@@ -25,11 +25,11 @@ public class LicensingService : ILicensingService
 
     public async Task<LicenseResult> ActivateAsync(ActivateLicenseRequest request, string? ipAddress, CancellationToken cancellationToken = default)
     {
-        var licenseKey = request.LicenseKey.Trim();
+        var licenseKey = request.LicenseKey.Trim().ToUpperInvariant();
         var deviceId = request.DeviceId.Trim();
 
         var license = await _context.Licenses
-            .FirstOrDefaultAsync(l => l.LicenseKey == licenseKey, cancellationToken);
+            .FirstOrDefaultAsync(l => l.LicenseKey.ToUpper() == licenseKey, cancellationToken);
 
         if (license == null)
         {
@@ -169,11 +169,11 @@ public class LicensingService : ILicensingService
 
     public async Task<LicenseResult> ValidateAsync(ValidateLicenseRequest request, string? ipAddress, CancellationToken cancellationToken = default)
     {
-        var licenseKey = request.LicenseKey.Trim();
+        var licenseKey = request.LicenseKey.Trim().ToUpperInvariant();
         var deviceId = request.DeviceId.Trim();
 
         var license = await _context.Licenses
-            .FirstOrDefaultAsync(l => l.LicenseKey == licenseKey, cancellationToken);
+            .FirstOrDefaultAsync(l => l.LicenseKey.ToUpper() == licenseKey, cancellationToken);
 
         if (license == null)
         {
@@ -228,11 +228,11 @@ public class LicensingService : ILicensingService
 
     public async Task<DeactivateResult> DeactivateAsync(DeactivateLicenseRequest request, string? ipAddress, CancellationToken cancellationToken = default)
     {
-        var licenseKey = request.LicenseKey.Trim();
+        var licenseKey = request.LicenseKey.Trim().ToUpperInvariant();
         var deviceId = request.DeviceId.Trim();
 
         var license = await _context.Licenses
-            .FirstOrDefaultAsync(l => l.LicenseKey == licenseKey, cancellationToken);
+            .FirstOrDefaultAsync(l => l.LicenseKey.ToUpper() == licenseKey, cancellationToken);
 
         if (license == null)
         {

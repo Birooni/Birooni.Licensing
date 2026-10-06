@@ -286,6 +286,13 @@ public class AccountService : IAccountService
             return new List<PurchaseDto>();
         }
 
+        if (account.EmailVerified)
+        {
+            await EnsureFamilyLoaderLicenseAsync(account, cancellationToken);
+            await EnsureAvoidMepClashLicenseAsync(account, cancellationToken);
+            await _db.SaveChangesAsync(cancellationToken);
+        }
+
         var email = account.Email;
         var domain = GetEmailDomain(email);
 
