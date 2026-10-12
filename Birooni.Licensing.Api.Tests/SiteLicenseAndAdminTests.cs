@@ -62,7 +62,7 @@ public class SiteLicenseAndAdminTests
     }
 
     [Fact]
-    public async Task SiteLicense_RejectsActivation_WhenUserEmailDoesNotMatchDomain()
+    public async Task SiteLicense_AllowsActivation_WhenUserEmailDoesNotMatchDomain()
     {
         var (db, service) = CreateTestContext();
 
@@ -82,7 +82,6 @@ public class SiteLicenseAndAdminTests
         db.Licenses.Add(license);
         await db.SaveChangesAsync();
 
-        // User with external email tries to activate
         var result = await service.ActivateAsync(new ActivateLicenseRequest
         {
             LicenseKey = "SITE-GENSLER-2026",
@@ -90,12 +89,12 @@ public class SiteLicenseAndAdminTests
             UserEmail = "freelancer@gmail.com"
         }, null);
 
-        Assert.False(result.Success);
-        Assert.Contains("corporate domain", result.Message);
+        Assert.True(result.Success);
+        Assert.NotNull(result.Token);
     }
 
     [Fact]
-    public async Task SiteLicense_RejectsActivation_WhenUserEmailMissing()
+    public async Task SiteLicense_AllowsActivation_WhenUserEmailMissing()
     {
         var (db, service) = CreateTestContext();
 
@@ -120,8 +119,8 @@ public class SiteLicenseAndAdminTests
             DeviceId = "DEV-NO-MAIL"
         }, null);
 
-        Assert.False(result.Success);
-        Assert.Contains("corporate domain", result.Message);
+        Assert.True(result.Success);
+        Assert.NotNull(result.Token);
     }
 
     [Fact]

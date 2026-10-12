@@ -49,21 +49,6 @@ public class LicensingService : ILicensingService
             return LicenseResult.Fail($"License expired on {license.ExpiresAt.Value:yyyy-MM-dd HH:mm:ss} UTC.", licenseKey);
         }
 
-        // Domain validation for corporate Site Licenses
-        if (string.Equals(license.LicenseMode, "SiteLicense", StringComparison.OrdinalIgnoreCase) &&
-            !string.IsNullOrWhiteSpace(license.AllowedDomain))
-        {
-            var expectedDomain = license.AllowedDomain.Trim().ToLowerInvariant();
-            if (!expectedDomain.StartsWith('@')) expectedDomain = "@" + expectedDomain;
-
-            var userEmail = request.UserEmail?.Trim().ToLowerInvariant();
-            if (string.IsNullOrWhiteSpace(userEmail) || !userEmail.EndsWith(expectedDomain))
-            {
-                await LogValidationAsync(license.Id, deviceId, "DomainMismatch", ipAddress, cancellationToken);
-                return LicenseResult.Fail($"Site license requires user email matching corporate domain '{license.AllowedDomain}'.", licenseKey);
-            }
-        }
-
         var existingActivation = await _context.Activations
             .FirstOrDefaultAsync(a => a.LicenseId == license.Id && a.DeviceId == deviceId, cancellationToken);
 

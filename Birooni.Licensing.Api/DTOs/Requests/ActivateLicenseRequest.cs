@@ -14,6 +14,6 @@ public class ActivateLicenseRequest
 
     public string PluginVersion { get; set; } = string.Empty;
 
-    [EmailAddress]
+    /// <summary>Optional. Activation uses the license key only.</summary>
     public string? UserEmail { get; set; }
 }

@@ -84,8 +84,7 @@ public class BirooniLicenseClient
     }
 
     /// <summary>
-    /// Activates a purchased license key on this machine.
-    /// Site licenses require <paramref name="userEmail"/> (Mail ID) so the server can match @domain.
+    /// Activates a purchased license key on this machine. Only the key is required.
     /// </summary>
     public async Task<LicenseValidationResult> ActivateLicenseAsync(
         string licenseKey,
@@ -95,19 +94,12 @@ public class BirooniLicenseClient
     {
         try
         {
-            var email = NormalizeMailId(userEmail) ?? LicenseCacheManager.LoadMailId();
-            if (!string.IsNullOrWhiteSpace(email))
-            {
-                LicenseCacheManager.SaveMailId(email);
-            }
-
             var request = new
             {
                 LicenseKey = licenseKey.Trim(),
                 DeviceId = DeviceFingerprint,
                 DeviceName = deviceName ?? Environment.MachineName,
-                PluginVersion = _pluginVersion,
-                UserEmail = email
+                PluginVersion = _pluginVersion
             };
 
             var response = await _httpClient.PostAsJsonAsync($"{ApiBaseUrl}/api/license/activate", request, cancellationToken);
@@ -281,17 +273,6 @@ public class BirooniLicenseClient
             BackgroundValidationCompleted?.Invoke(this, errResult);
             return errResult;
         }
-    }
-
-    private static string? NormalizeMailId(string? email)
-    {
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            return null;
-        }
-
-        var value = email.Trim();
-        return value.IndexOf('@') > 0 ? value : null;
     }
 
     private class ServerLicenseResponse
